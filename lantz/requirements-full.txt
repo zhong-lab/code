@@ -1,0 +1,5 @@
+colorama
+pyserial
+pyusb
+numpy
+-r requirements-doc.txt

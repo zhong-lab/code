@@ -1,0 +1,5 @@
+libgpib_la-ibVers.lo: ibVers.c /usr/include/stdc-predef.h ibVers.h
+
+/usr/include/stdc-predef.h:
+
+ibVers.h:

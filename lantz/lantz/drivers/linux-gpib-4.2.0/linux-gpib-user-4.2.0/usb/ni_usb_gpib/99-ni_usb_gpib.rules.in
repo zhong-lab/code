@@ -1,0 +1,4 @@
+SUBSYSTEM=="usb", ACTION=="add", ENV{DEVTYPE}=="usb_device", ATTR{idVendor}=="3923", ATTR{idProduct}=="702[ab]", ENV{DEVICE}="$devnode", ENV{SERIAL}="$attr{serial}", RUN+="@hotplug_usb_conf_dir@/ni_usb_gpib"
+SUBSYSTEM=="usb", ACTION=="add", ENV{DEVTYPE}=="usb_device", ATTR{idVendor}=="3923", ATTR{idProduct}=="713b", ENV{DEVICE}="$devnode", ENV{SERIAL}="$attr{serial}", RUN+="@hotplug_usb_conf_dir@/ni_usb_gpib"
+SUBSYSTEM=="usb", ACTION=="add", ENV{DEVTYPE}=="usb_device", ATTR{idVendor}=="3923", ATTR{idProduct}=="709b", ENV{DEVICE}="$devnode", ENV{SERIAL}="$attr{serial}", RUN+="@hotplug_usb_conf_dir@/ni_usb_gpib"
+SUBSYSTEM=="usb", ACTION=="add", ENV{DEVTYPE}=="usb_device", ATTR{idVendor}=="3923", ATTR{idProduct}=="7618", ENV{DEVICE}="$devnode", ENV{SERIAL}="$attr{serial}", RUN+="@hotplug_usb_conf_dir@/ni_usb_gpib"

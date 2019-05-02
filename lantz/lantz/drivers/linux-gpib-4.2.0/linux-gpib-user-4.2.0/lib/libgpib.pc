@@ -1,0 +1,13 @@
+#########  pc.in               ########  
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libgpib
+Description:  Linux-GPIB the IEEE-488 card support package and measurement suite for LINUX
+Version: 3:0:3
+Requires: 
+Libs: -lgpib
+Cflags: -I${includedir}
+
