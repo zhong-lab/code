@@ -104,8 +104,6 @@ class Lifetime(Spyrelet):
             self.fungen.voltage[2] = self.fungen.voltage[2].magnitude + dcparams['DC step size'].magnitude
             time.sleep(expparams['Measurement Time'].magnitude)
 
-
-
     @Element(name='Pulse parameters')
     def pulse_parameters(self):
         params = [
