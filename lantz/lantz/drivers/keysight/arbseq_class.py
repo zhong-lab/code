@@ -5,7 +5,7 @@ class Arbseq_Class(object):
         self.timestep = timestep
         self.ydata = None
         self.totaltime = None
-        self.timeexp = 1e-6
+        self.timeexp = None
         self.widths = None
         self.heights = None
         self.delays = None
