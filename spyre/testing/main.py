@@ -12,7 +12,7 @@ from spyre.widgets.spyre_widget import SpyreApp, SpyreWidget
 from spyre.widgets.spyrelet_widget import SpyreletWidget
 from spyre.instrument import Instrument
 
-from main_config import spyrelets, devices
+#from main_config import spyrelets, devices
 
 
 verbose = True
@@ -118,4 +118,12 @@ def main():
     return app, spyrew
 
 if __name__ == '__main__':
+    import argparse
+    import importlib
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-c', '--config', default='main_config')
+    args = parser.parse_args()
+    config = importlib.import_module(args.config)
+    spyrelets = config.spyrelets
+    devices = config.devices
     app, spyrew = main()
