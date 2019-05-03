@@ -233,7 +233,8 @@ class Keysight_33622A(MessageBasedDriver):
         This stores the arbitrary waveform as a .arb file in internal memory
         """
         arb = str(arbseq.ydata).strip('[]')
-        sRate = 1/(arbseq.timestep*arbseq.timeexp)
+        print(arbseq.ydata)
+        sRate = 1/(arbseq.timestep)
         name = arbseq.name
 
         self.write('SOURCE{}:DATA:ARB {}, {}'.format(chn, name, arb))
@@ -261,7 +262,6 @@ class Keysight_33622A(MessageBasedDriver):
 
         for i in range(len(seqlist)):
             currentseq = seqlist[i]
-            self.send_arb(currentseq, chn)
             seqstring = seqstring + ',' + currentseq.get_seqstring()
             print(seqstring)
 

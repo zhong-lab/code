@@ -121,7 +121,7 @@ if __name__ == '__main__':
     import argparse
     import importlib
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--config', default='main_config')
+    parser.add_argument("config", help="name of config file of experiment")
     args = parser.parse_args()
     config = importlib.import_module(args.config)
     spyrelets = config.spyrelets
