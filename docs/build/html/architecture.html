@@ -1,0 +1,261 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Architecture &mdash; Zhong-Lab Code 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Inside Lantz" href="insidelantz.html" />
+    <link rel="prev" title="About" href="about.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Zhong-Lab Code
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Introduction</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#scaffolding-code">Scaffolding: /code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cmder">cmder</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#docs">docs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lantz">lantz</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pyqtgraph">pyqtgraph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#spyre">spyre</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Lantz</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="insidelantz.html">Inside Lantz</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drivers.html">Lantz Drivers</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Zhong-Lab Code</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Architecture</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/architecture.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="architecture">
+<h1>Architecture<a class="headerlink" href="#architecture" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="scaffolding-code">
+<h2>Scaffolding: /code<a class="headerlink" href="#scaffolding-code" title="Permalink to this headline">¶</a></h2>
+<p>The root directory of the entire code base, located in /code, contains 5 main
+files: cmder, docs, lantz, pyqtgraph, and spyre. We introduce them here.</p>
+</div>
+<div class="section" id="cmder">
+<h2>cmder<a class="headerlink" href="#cmder" title="Permalink to this headline">¶</a></h2>
+<p>The cmder folder contains “Cmder.exe”, which is the command line console used
+to execute spyre. The usual cmd or mingw can be used as well, but Cmder has some
+nice colors has the path configured to the spyre conda environment. In general,
+apart from running Cmder.exe, this folder should not have to be edited.</p>
+</div>
+<div class="section" id="docs">
+<h2>docs<a class="headerlink" href="#docs" title="Permalink to this headline">¶</a></h2>
+<p>Contains the files that build this documentation. More on this in the section
+on creating documentation.</p>
+</div>
+<div class="section" id="lantz">
+<h2>lantz<a class="headerlink" href="#lantz" title="Permalink to this headline">¶</a></h2>
+<p>Lantz is a Python toolkit that allows communication with scientific instruments
+through lantz drivers, and various API. Drivers are instrument-specific, and are
+grouped by the company that manufactured each device. Lantz is basically the
+glue that holds together Python, Spyre, and device DLLs and drivers.</p>
+<p>Extensive documentation on lantz can be found here:</p>
+<p><a class="reference external" href="https://lantz.readthedocs.io/en/latest/index.html">https://lantz.readthedocs.io/en/latest/index.html</a></p>
+</div>
+<div class="section" id="pyqtgraph">
+<h2>pyqtgraph<a class="headerlink" href="#pyqtgraph" title="Permalink to this headline">¶</a></h2>
+<p>Pyqtgraph is just a Python graphing library, and is kept in this particular
+location for unknown purposes. One could go through the code and change all
+references to pyqtgraph to another, more suitable location (such as a lib folder),
+but it’s not necessary. Since this is a prewritten library, there should be
+no need to edit this folder.</p>
+</div>
+<div class="section" id="spyre">
+<h2>spyre<a class="headerlink" href="#spyre" title="Permalink to this headline">¶</a></h2>
+<p>Spyre is a toolkit that goes hand in hand with lantz. While lantz establishes
+connections with the instrument, spyrelets (which are basically spyre widgets)
+are scripts that bring together all the lantz devices to run an experiment.</p>
+<p>Spyre also has a build-in GUI that graphs outputs and allows for tuning of
+various experimental parameters. Eventually, there will be no need to change
+any source code for spyrelets to change experimental parameters.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="insidelantz.html" class="btn btn-neutral float-right" title="Inside Lantz" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="about.html" class="btn btn-neutral float-left" title="About" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Riku Fukumori
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -728,3 +728,18 @@ cd
 pip3 install PyQt4-4.11.4-cp35-none-win_amd64.whl
 pip3 install PyQt4
 python configure.py --sip-module PyQt4.sip --no-dist-info --no-tools
+python configure.py --sip-module PyQt4.sip --no-dist-info --no-tools
+cd docs
+cd source
+cd ..
+cd build
+dir
+start html
+cd html
+start index.html 
+pip3 install PyQt4
+python configure.py --sip-module PyQt4.sip --no-dist-info --no-tools
+cd docs
+cd build
+cd ..
+make html

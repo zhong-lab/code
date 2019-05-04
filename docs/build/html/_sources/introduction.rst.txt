@@ -1,0 +1,7 @@
+Introduction
+============
+
+The following documentation shows how to use, alter, and build Zhong lab code.
+The GitHub repository for the code is located at:
+
+https://github.com/zhong-lab/code
