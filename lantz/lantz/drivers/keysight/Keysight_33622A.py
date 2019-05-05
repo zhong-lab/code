@@ -233,16 +233,15 @@ class Keysight_33622A(MessageBasedDriver):
         This stores the arbitrary waveform as a .arb file in internal memory
         """
         arb = str(arbseq.ydata).strip('[]')
-        print(arbseq.ydata)
         sRate = 1/(arbseq.timestep)
         name = arbseq.name
 
         self.write('SOURCE{}:DATA:ARB {}, {}'.format(chn, name, arb))
-        self.wait
+        self.wait()
         self.waveform[chn] = 'ARB'
         self.write('SOURCE{}:FUNC:ARB {}'.format(chn, name))
         self.write('SOURCE{}:FUNC:ARB:SRATE {}'.format(chn, sRate))
-        self.write('MMEM:STORE:DATA{} "INT:\\{}.arb"'.format(chn, name))
+        #self.write('MMEM:STORE:DATA{} "INT:\\{}.arb"'.format(chn, name))
         print('Arb waveform "{}" downloaded to channel {}'.format(name, chn))
 
         #error checking
@@ -263,8 +262,7 @@ class Keysight_33622A(MessageBasedDriver):
         for i in range(len(seqlist)):
             currentseq = seqlist[i]
             seqstring = seqstring + ',' + currentseq.get_seqstring()
-            print(seqstring)
-
+        print(seqstring)
         strlen = len(seqstring.encode('utf-8'))
         numbytes = len(str(strlen))
 
@@ -273,7 +271,7 @@ class Keysight_33622A(MessageBasedDriver):
         self.write('SOURCE{}:DATA:SEQ #{}{}{}'.format(chn, numbytes, strlen, seqstring))
         self.waveform[chn] = 'ARB'
         self.write('SOURCE{}:FUNC:ARB {}'.format(chn, seqname))
-        self.write('MMEM:STORE:DATA{} "INT:\\{}.seq"'.format(chn, seqname))
+        #self.write('MMEM:STORE:DATA{} "INT:\\{}.seq"'.format(chn, seqname))
         print('Arb sequence "{}" downloaded to channel {}'.format(seqname, chn))
 
         #error checking

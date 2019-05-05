@@ -11,6 +11,11 @@ devices = {
         'lantz.drivers.bristol.bristol771.Bristol_771',
         [6535],
         {}
+    ],
+    'qutag':[
+        'lantz.drivers.qutools.qutag2.QuTAG2',
+        [],
+        {}
     ]
 }
 
@@ -19,7 +24,7 @@ spyrelets = {
     'lifetime':[
         'spyre.spyrelets.lifetime_spyrelet.Lifetime',
         {'fungen': 'fungen',
-        'wm':'wm'}, 
+        'wm':'wm','qutag':'qutag'}, 
         {}
     ],
 }

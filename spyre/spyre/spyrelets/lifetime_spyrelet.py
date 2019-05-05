@@ -27,11 +27,13 @@ from lantz.drivers.keysight.seqbuild import SeqBuild
 
 from lantz.drivers.keysight import Keysight_33622A
 from lantz.drivers.bristol import Bristol_771
+from lantz.drivers.qutools import QuTAG2 as qutag
 
 class Lifetime(Spyrelet):
     requires = {
     	'fungen': Keysight_33622A,
-    	'wm': Bristol_771
+    	'wm': Bristol_771,
+        'qutag': QuTAG2
     }
 
     @Task()
@@ -61,7 +63,7 @@ class Lifetime(Spyrelet):
         dc.markerloc = 0
         period = params['period'].magnitude
         width = params['pulse width'].magnitude
-        repeats = period/width - 2
+        repeats = period/width - 1
         dc.nrepeats = repeats
         dc.create_sequence()
 
@@ -83,7 +85,7 @@ class Lifetime(Spyrelet):
         self.fungen.send_arb(dc, 1)
         self.fungen.send_arb(dc2, 2)
 
-        seq1 = [pulse, dc]
+        seq1 = [pulse,dc]
 
         self.fungen.create_arbseq('pulsetest', seq1, 1)
         self.fungen.wait()
@@ -97,12 +99,19 @@ class Lifetime(Spyrelet):
         self.fungen.voltage[2] = dcparams['DC height']
         self.fungen.output[2] = 'ON'
 
-        self.wm.start_data()
         expparams = self.exp_parameters.widget.get()
-        time.sleep(expparams['Measurement Time'].magnitude)
         for i in range(expparams['# of points']):
-            self.fungen.voltage[2] = self.fungen.voltage[2].magnitude + dcparams['DC step size'].magnitude
-            time.sleep(expparams['Measurement Time'].magnitude)
+            ##Wavemeter measurements
+            startTime = time.time()
+            while time.time()-startTime < expparams['Measurement Time'].magnitude:
+                print(str(self.wm.measure_wavelength()))
+                time.sleep(2)
+            self.fungen.voltage[2] = self.fungen.voltage[2].magnitude + 2*dcparams['DC step size'].magnitude
+
+    @Task()
+    def qutagInit(self):
+        print('qutag successfully initialized')
+        
 
     @Element(name='Pulse parameters')
     def pulse_parameters(self):
@@ -137,12 +146,32 @@ class Lifetime(Spyrelet):
 
     @startpulse.initializer
     def initialize(self):
+        self.wm.start_data()
         self.fungen.clear_mem(1)
         self.fungen.clear_mem(2)
         self.fungen.wait()
-        return
 
     @startpulse.finalizer
     def finalize(self):
-        #self.fungen.output[1] = 'OFF'
+        self.fungen.output[1] = 'OFF'
+        self.fungen.output[2] = 'OFF'
+        self.fungen.clear_mem(1)
+        self.fungen.clear_mem(2)
+        print('Lifetime measurements complete.')
+        return
+
+    @qutagInit.initializer
+    def initialize(self):
+        qutag = qutag.QuTAG()
+        print('am i here')
+        devType = qutag.getDeviceType()
+        if (devType == qutag.DEVTYPE_QUTAG):
+            print("found quTAG!")
+        else:
+            print("no suitable device found - demo mode activated")
+        print("Device timebase:" + str(qutag.getTimebase()))
+        return
+
+    @qutagInit.finalizer
+    def finalize(self):
         return
