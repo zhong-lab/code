@@ -1081,6 +1081,7 @@ if __name__ == '__main__':
     lost = qutag.getLastTimestamps(True) # clear Timestamp buffer
     stoptimestamp = 0
     synctimestamp = 0
+    stoparray = []
 
     for i in range(10):
         time.sleep(0.1)
@@ -1096,8 +1097,19 @@ if __name__ == '__main__':
                 synctimestamp = tstamp[k]
             else:
                 stoptimestamp = tstamp[k]
-                print(str(tchannel[k])+";"+str(stoptimestamp)+";"+str(synctimestamp)) 
-    
+                stoparray.append(stoptimestamp)
+                #print(str(tchannel[k])+";"+str(stoptimestamp)+";"+str(synctimestamp)) 
+    bincount = 10
+    hist = [0]*bincount
+    frequency = 1000
+    period = 1./frequency
+    timebase = qutag.getTimebase()
+    for stoptime in stoparray:
+        normalizedTime = int(stoptime*timebase*bincount/(period))
+        hist[normalizedTime]+=1
+    import matplotlib.pyplot as plt
+    plt.plot(range(bincount),hist,'.')
+    plt.show()
 
     
 # deinitialize device

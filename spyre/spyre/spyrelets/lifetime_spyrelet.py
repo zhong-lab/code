@@ -27,14 +27,13 @@ from lantz.drivers.keysight.seqbuild import SeqBuild
 
 from lantz.drivers.keysight import Keysight_33622A
 from lantz.drivers.bristol import Bristol_771
-from lantz.drivers.qutools import QuTAG2 as qutag
 
 class Lifetime(Spyrelet):
     requires = {
     	'fungen': Keysight_33622A,
-    	'wm': Bristol_771,
-        'qutag': QuTAG2
+    	'wm': Bristol_771
     }
+    qutag = None
 
     @Task()
     def startpulse(self, timestep=1e-9):
@@ -99,6 +98,8 @@ class Lifetime(Spyrelet):
         self.fungen.voltage[2] = dcparams['DC height']
         self.fungen.output[2] = 'ON'
 
+        configureQutag()
+
         expparams = self.exp_parameters.widget.get()
         for i in range(expparams['# of points']):
             ##Wavemeter measurements
@@ -162,16 +163,26 @@ class Lifetime(Spyrelet):
 
     @qutagInit.initializer
     def initialize(self):
-        qutag = qutag.QuTAG()
-        print('am i here')
-        devType = qutag.getDeviceType()
-        if (devType == qutag.DEVTYPE_QUTAG):
+        from lantz.drivers.qutools import QuTAG
+        self.qutag = QuTAG()
+        devType = self.qutag.getDeviceType()
+        if (devType == self.qutag.DEVTYPE_QUTAG):
             print("found quTAG!")
         else:
             print("no suitable device found - demo mode activated")
-        print("Device timebase:" + str(qutag.getTimebase()))
+        print("Device timebase:" + str(self.qutag.getTimebase()))
         return
 
     @qutagInit.finalizer
     def finalize(self):
         return
+
+    def configureQutag():
+        start = 0
+        stop = 1
+
+        self.qutag.setSignalConditioning(start,self.qutag.SIGNALCOND_MISC,True,1) # threshold 1 V, rising edge
+        self.qutag.setSignalConditioning(stop,self.qutag.SIGNALCOND_MISC,True,1)
+        qutag.enableChannels((start,stop))
+
+        
