@@ -743,3 +743,111 @@ cd docs
 cd build
 cd ..
 make html
+cd Desktop\
+cd A
+cd Anritsu\
+cd
+cd code\
+pwd
+cd spyre\
+device
+QEventLoop: Cannot be used without QApplicationQEventLoop: Cannot be used without QApplicationQEventLoop: Cannot be used without QApplication
+python C:\Users\zhong\code\lantz\lantz\drivers\anritsu\MS2721b.py 
+python main_config
+python "C:\Users\zhong\code\spyre\spyre\spyrelets\spectrumanalyzer.py" 
+cd C:\Users\zhong\code\spyre\spyre\spyrelets 
+python spectrumanalyzer.py 
+ls ..\
+cd ..
+cd test\
+python main_config.py 
+ipython 
+ipython main_config.py 
+activate spyre
+phyton "..\spyre\spyrelets\spectrumanalyzer.py" 
+spyre load
+spyre load "..\spyre\spyrelets\spectrumanalyzer.py" 
+python spyre/test/main.py
+ls
+python main.py 300
+CLEAR
+ python main.py
+ python main.py
+ python main.py
+ python main.py
+ python main.py
+ python main.py
+ python main.py
+python "..\spyre\spyrelets\spectrumanalyzer.py" 
+ python main.py
+ python main.py
+ python main.py
+ python main.py
+ python main.py
+ python main.py
+celar
+clear
+python main.py 
+python main.py 
+activate spyre
+LS
+cd code\
+cd test\
+ls
+pip
+pip install paramiko
+ssh plbevington@midway.rcc.uchicago.edu
+pip
+pip install paramiko
+ssh plbevington@midway.rcc.uchicago.edu
+cd code\lantz\lantz\drivers\stanford\
+ls
+pip install lantz
+python3 srs900.py 
+python srs900.py 
+conda
+conda python sr9
+anaconda
+activate spyre
+cd code\lantz\lantz\drivers\stanford\
+dir
+C:\Python3\python.exe C:\Users\zhong\code\lantz\lantz\drivers\stanford\srs900.py
+C:\Python34\python.exe C:\Users\zhong\code\lantz\lantz\drivers\stanford\srs900.py
+C:\path\where\wheel\is\> pip install PyQt4-4.11.4-cp35-none-win_amd64.whl
+cd
+pip3 install PyQt4-4.11.4-cp35-none-win_amd64.whl
+pip3 install PyQt4
+python configure.py --sip-module PyQt4.sip --no-dist-info --no-tools
+python configure.py --sip-module PyQt4.sip --no-dist-info --no-tools
+cd docs
+cd source
+cd ..
+cd build
+dir
+start html
+cd html
+start index.html 
+pip3 install PyQt4
+python configure.py --sip-module PyQt4.sip --no-dist-info --no-tools
+cd docs
+cd build
+make html
+activate spyre
+conda info --envs
+activate C:\Miniconda3\envs\spyre
+cd bristol\
+python bristol771.py 
+cd .
+cd spyre
+cd .. 
+python qutools\
+python qutag.py 
+cd spyre\
+cd testing\
+python main.py lifetime
+cd ..
+cd lantz\
+cd lantz
+cd drivers\
+cd qutools\
+python qutag.py

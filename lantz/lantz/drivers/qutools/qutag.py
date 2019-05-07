@@ -604,11 +604,10 @@ class QuTAG:
         return ans
         
     def getDeviceParams(self):
-        chn = ctypes.c_int32()
         coinc = ctypes.c_int32()
-        exptime = ctype.c_int32()
+        exptime = ctypes.c_int32()
         
-        ans = self.qutools_dll.TDC_getDeviceParams(ctypes.byref(chn), ctypes.byref(coinc), ctypes.byref(exptime))
+        ans = self.qutools_dll.TDC_getDeviceParams(ctypes.byref(coinc), ctypes.byref(exptime))
         if ans != 0:
             print("Error in TDC_getDeviceParams:"+self.err_dict[ans])
         return (chn.value, coinc.value, exptime.value)
@@ -1082,9 +1081,15 @@ if __name__ == '__main__':
     stoptimestamp = 0
     synctimestamp = 0
     stoparray = []
+    bincount = 10
+    hist = [0]*bincount
+    frequency = 10
+    period = 1./frequency
+    timebase = qutag.getTimebase()
+    print(qutag.getDeviceParams())
 
     for i in range(10):
-        time.sleep(0.1)
+        time.sleep(period)
         timestamps = qutag.getLastTimestamps(True)
 
         tstamp = timestamps[0] # array of timestamps
@@ -1099,11 +1104,6 @@ if __name__ == '__main__':
                 stoptimestamp = tstamp[k]
                 stoparray.append(stoptimestamp)
                 #print(str(tchannel[k])+";"+str(stoptimestamp)+";"+str(synctimestamp)) 
-    bincount = 10
-    hist = [0]*bincount
-    frequency = 1000
-    period = 1./frequency
-    timebase = qutag.getTimebase()
     for stoptime in stoparray:
         normalizedTime = int(stoptime*timebase*bincount/(period))
         hist[normalizedTime]+=1

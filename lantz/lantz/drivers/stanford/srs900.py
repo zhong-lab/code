@@ -141,7 +141,8 @@ if __name__ == '__main__':
         print('The identification of this instrument is : ' + inst.idn)
         inst.self_test
         inst.SIM928_on[6]
-        inst.SIM928_voltage[6] = float(0.75)
-        inst.module_clear_status[6]
-        inst.SIM928_voltage[6]
+        #inst.SIM928_voltage[6] = round((0.8),2)
+        inst.write('SNDT {},"VOLT {}"'.format(6, round(0.8,2)))  
+        #inst.SIM928_voltage[6] = float(0.9)
+        #inst.SIM928_voltage[6]
         inst.SIM928_off[6]

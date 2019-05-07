@@ -10,6 +10,7 @@ import time
 import csv
 
 from PyQt5.Qsci import QsciScintilla, QsciLexerPython
+import matplotlib.pyplot as plt
 
 from spyre import Spyrelet, Task, Element
 from spyre.widgets.task import TaskWidget
@@ -34,6 +35,26 @@ class Lifetime(Spyrelet):
     	'wm': Bristol_771
     }
     qutag = None
+
+    def configureQutag(self):
+        qutagparams = self.qutag_params.widget.get()
+        start = qutagparams['Start Channel']
+        stop = qutagparams['Stop Channel']
+        ##True = rising edge, False = falling edge. Final value is threshold voltage
+        self.qutag.setSignalConditioning(start,self.qutag.SIGNALCOND_MISC,True,1)
+        self.qutag.setSignalConditioning(stop,self.qutag.SIGNALCOND_MISC,True,1)
+        self.qutag.enableChannels((start,stop))
+
+    def createHistogram(self,stoparray, timebase, bincount, period, index, startWl, lastWl):
+        hist = [0]*bincount
+        for stoptime in stoparray:
+            normalizedTime = int(stoptime*timebase*bincount/(period))
+            hist[normalizedTime]+=1
+        hist.append(startWl)
+        hist.append(lastWl)
+        np.savetxt(self.exp_parameters.widget.get()['File Name'] + str(index), hist)
+        print('Data stored under File Name: ' + self.exp_parameters.widget.get()['File Name'] + str(index))
+
 
     @Task()
     def startpulse(self, timestep=1e-9):
@@ -75,8 +96,9 @@ class Lifetime(Spyrelet):
         dc2.markerstring = 'lowAtStart'
         dc2.markerloc = 0
         period = params['period'].magnitude
+        print(period)
         width = params['pulse width'].magnitude
-        repeats = period/width - 2
+        repeats = period/width 
         dc2.nrepeats = repeats
         dc2.create_sequence()
 
@@ -98,15 +120,39 @@ class Lifetime(Spyrelet):
         self.fungen.voltage[2] = dcparams['DC height']
         self.fungen.output[2] = 'ON'
 
-        configureQutag()
+        self.configureQutag()
+
+        qutagparams = self.qutag_params.widget.get()
+        lost = self.qutag.getLastTimestamps(True) # clear Timestamp buffer
+        stoptimestamp = 0
+        synctimestamp = 0
+        bincount = qutagparams['Bin Count']
+        timebase = self.qutag.getTimebase()
+        start = qutagparams['Start Channel']
+        stop = qutagparams['Stop Channel']
 
         expparams = self.exp_parameters.widget.get()
         for i in range(expparams['# of points']):
             ##Wavemeter measurements
             startTime = time.time()
+            startWl = self.wm.measure_wavelength()
+            stoparray = []
             while time.time()-startTime < expparams['Measurement Time'].magnitude:
-                print(str(self.wm.measure_wavelength()))
-                time.sleep(2)
+                time.sleep(period)
+                timestamps = self.qutag.getLastTimestamps(True)
+
+                tstamp = timestamps[0] # array of timestamps
+                tchannel = timestamps[1] # array of channels
+                values = timestamps[2] # number of recorded timestamps
+                for k in range(values):
+                    # output all stop events together with the latest start event
+                    if tchannel[k] == start:
+                        synctimestamp = tstamp[k]
+                    else:
+                        stoptimestamp = tstamp[k]
+                        stoparray.append(stoptimestamp)
+            lastWl = self.wm.measure_wavelength()
+            self.createHistogram(stoparray, timebase, bincount, period,i, startWl, lastWl)
             self.fungen.voltage[2] = self.fungen.voltage[2].magnitude + 2*dcparams['DC step size'].magnitude
 
     @Task()
@@ -141,6 +187,18 @@ class Lifetime(Spyrelet):
     #    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
         ('# of points', {'type': int, 'default': 10}),
         ('Measurement Time', {'type': int, 'default': 10, 'units':'s'}),
+        ('File Name', {'type': str})
+        ]
+        w = ParamWidget(params)
+        return w
+
+    @Element(name='QuTAG Parameters')
+    def qutag_params(self):
+        params = [
+    #    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
+        ('Start Channel', {'type': int, 'default': 0}),
+        ('Stop Channel', {'type': int, 'default': 1}),
+        ('Bin Count', {'type': int, 'default': 10})
         ]
         w = ParamWidget(params)
         return w
@@ -156,8 +214,6 @@ class Lifetime(Spyrelet):
     def finalize(self):
         self.fungen.output[1] = 'OFF'
         self.fungen.output[2] = 'OFF'
-        self.fungen.clear_mem(1)
-        self.fungen.clear_mem(2)
         print('Lifetime measurements complete.')
         return
 
@@ -177,12 +233,4 @@ class Lifetime(Spyrelet):
     def finalize(self):
         return
 
-    def configureQutag():
-        start = 0
-        stop = 1
 
-        self.qutag.setSignalConditioning(start,self.qutag.SIGNALCOND_MISC,True,1) # threshold 1 V, rising edge
-        self.qutag.setSignalConditioning(stop,self.qutag.SIGNALCOND_MISC,True,1)
-        qutag.enableChannels((start,stop))
-
-        

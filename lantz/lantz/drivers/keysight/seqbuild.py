@@ -12,23 +12,29 @@ class SeqBuild(object):
         arbseq = Arbseq_Class(name, timestep)
         seqtype = self.seqtype
         
-        if seqtype == 'dc':
-            totaltime = self.params['totaltime']
-            arbseq.totaltime = totaltime
-            arbseq.heights = [1]
+        if seqtype == 'dc' or seqtype=='dcoff':
+            arbseq.totaltime = self.params['totaltime']
+            arbseq.widths = self.params['width']
+            arbseq.nrepeats = self.params['nrepeats']
+            arbseq.repeatstring = 'repeat'
+            arbseq.markerstring = 'lowAtStart'
+            arbseq.period = self.params['period']
+            arbseq.markerloc = 0
+            if seqtype=='dcoff':
+                arbseq.height=[0]
+            else:
+                arbseq.heights = [1]
             arbseq.delays = [0]
-            arbseq.widths = [totaltime]
             arbseq.create_sequence()
         elif seqtype == 'pulse':
             totaltime = self.params['totaltime']
             period = self.params['period']
             width = self.params['width']
-            delay = period - width
-            pulses = int(totaltime / period)
+            delay = self.params['delay']
             arbseq.totaltime = totaltime
-            arbseq.heights = [1] * pulses
-            arbseq.delays = [delay] * pulses
-            arbseq.widths = [width] * pulses
+            arbseq.heights = [1] 
+            arbseq.delays = [delay]
+            arbseq.widths = [width]
             arbseq.create_sequence()
         elif seqtype == 'ramp':
             slope = self.params['slope']
