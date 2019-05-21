@@ -25,9 +25,9 @@ class DLC(MessageBasedDriver):
         def initialize(self):
             super().initialize()
             # clear welcome message
-            for _ in range(5):
-                self.resource.read_raw()
-            return
+            # for _ in range(5):
+            #     self.resource.read_raw()
+            # return
 
         def set_param(self, param_name, value):
             cmd = "(param-set! '{} {})".format(param_name, value)
@@ -243,6 +243,30 @@ class DLC(MessageBasedDriver):
             return self.set_param('laser1:scan:signal-type', val)
 
 
+        ###Set Wavelength
+        # @Feat()
+        # def set_wavelength(self):
+        #     return self.get_param('laser1:ctl:wavelength-set')
+
+        # @set_wavelength.setter
+        # def set_wavelength(self, val):
+        #     return self.set_param('laser1:ctl:wavelength-set', val)
+
+        def set_wavelength(self, val):
+            return self.set_param('laser1:ctl:wavelength-set', val)
+
+        def set_output(self, val):
+            return self.set_param('laser1:dl:cc:enabled', val)
 
 class DLCException(Exception):
     pass
+
+if __name__ == '__main__':
+    import time
+    with DLC('ASRL15::INSTR') as inst:
+        for i in range(5):
+            inst.set_wavelength(1530.000 + i*0.01)
+            time.sleep(2)
+        #inst.set_output('#t')
+        #print(inst.write("(param-set! 'laser1:ctl:wavelength-set 1500)"))
+        print(inst.read)

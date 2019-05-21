@@ -7,19 +7,23 @@ devices = {
         ['USB0::0x0957::0x5707::MY53801461::INSTR'],
         {}
     ],
+    'wm':[
+        'lantz.drivers.bristol.bristol771.Bristol_771',
+        [6535],
+        {}
+        ],
     'srs':[
         'lantz.drivers.stanford.srs900.SRS900',
         ['GPIB0::2::INSTR'],
         {}
-        ]
+    ]
 }
 
 # Experiment List
 spyrelets = {
-    'twopulsephotonecho':[
-        'spyre.spyrelets.twopulsephotonecho_spyrelet.TwoPulsePhotonEcho',
-        {'fungen': 'fungen','srs':'srs'}, 
+    'lifetimewithshutter':[
+        'spyre.spyrelets.lifetimewithshutter_spyrelet.Lifetimewithshutter',
+        {'fungen': 'fungen', 'wm':'wm', 'srs':'srs'}, 
         {}
     ],
-
 }

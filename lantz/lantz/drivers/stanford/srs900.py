@@ -105,12 +105,14 @@ class SRS900(MessageBasedDriver):
 
     @DictFeat(units='V',limits=(-20,20,0.001),keys=list(range(1,8)))
     def SIM928_voltage(self,key):
-      self.write('SNDT {},"VOLT?"'.format(key))
-      return self.query('GETN? {},80'.format(key))
+      inst.wait_time(10)
+      return self.query('SNDT {},"VOLT?"'.format(key))
+     #return self.query('GETN? {},80'.format(key))
+      
 
     @SIM928_voltage.setter
     def SIM928_voltage(self,key,value):
-   	  self.write('SNDT {},"VOLT {}"'.format(key, value))	
+   	  self.write('SNDT {},"VOLT {}"'.format(key, float(round(value,3))))	
 """
     @DictFeat(units='V',keys=list(range(1,8)),channels=list(range(0,4)))
     def SIM970_voltage(self,key,channel):
@@ -139,10 +141,8 @@ if __name__ == '__main__':
     # this is the GPIB Address:
     with SRS900('GPIB0::2::INSTR') as inst:
         print('The identification of this instrument is : ' + inst.idn)
-        inst.self_test
+        inst.clear_status
         inst.SIM928_on[6]
-        #inst.SIM928_voltage[6] = round((0.8),2)
-        inst.write('SNDT {},"VOLT {}"'.format(6, round(0.8,2)))  
-        #inst.SIM928_voltage[6] = float(0.9)
-        #inst.SIM928_voltage[6]
+        inst.SIM928_voltage[6] = 0.698
+        inst.SIM928_voltage[6]
         inst.SIM928_off[6]

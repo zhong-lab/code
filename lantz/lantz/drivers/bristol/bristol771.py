@@ -66,6 +66,8 @@ class Bristol_771(LibraryDriver):
         self.lib.GetMeasTemp.argtypes = [c_void_p, POINTER(c_float)]
         self.lib.GetMeas.argtypes = [c_void_p, POINTER(tsDataMeas)]
 
+        self.lib.GetRawData.argtypes = [c_void_p, POINTER(c_int),c_int]
+
         self.lib.StartRawData.argtypes = [c_void_p, c_int]
         self.lib.StopRawData.argtypes = [c_void_p]
         self.lib.StartSpectrumData.argtypes = [c_void_p, c_int, c_int, c_int]
@@ -163,7 +165,10 @@ class Bristol_771(LibraryDriver):
         status = data.stat
         return status
 
-
+    def get_rawData(self, buf, size):
+        ret_val=c_int()
+        self.lib.GetRawData(self.device, pointer(ret_val),c_int(size) )
+        return ret_val.value
 
 if __name__ == '__main__':
     from time import sleep
@@ -173,11 +178,9 @@ if __name__ == '__main__':
     log_to_screen(DEBUG)
 
     inst = Bristol_771(6535)
-    inst.start_data()
-    time.sleep(5)
-    print('wavelength: ' + str(inst.measure_wavelength()) + ' nm')
-    time.sleep(2)
-    print('wavelength: ' + str(inst.measure_wavelength()) + ' nm')
+    print(inst.start_data())
+    time.sleep(3)
+    print(inst.get_rawData(10,10))
     #inst.measure_temperature()
     #inst.measure_pressure()
     #inst.measure_power()

@@ -22,31 +22,9 @@ class DarkCount(Spyrelet):
 	requires = {
     	'srs': SRS900
     }
-	qutag = None
 
 	@Task()
-	def qutagInit(self):
-		print('qutag successfully initialized')
-
-	@qutagInit.initializer
-	def initialize(self):
-		from lantz.drivers.qutools import QuTAG
-		self.qutag = QuTAG()
-		devType = self.qutag.getDeviceType()
-		if (devType == self.qutag.DEVTYPE_QUTAG):
-			print("found quTAG!")
-		else:
-			print("no suitable device found - demo mode activated")
-		print("Device timebase:" + str(self.qutag.getTimebase()))
-		return
-
-	@qutagInit.finalizer
-	def finalize(self):
-		return
-	
-
-	@Task()
-	def getDarkCounts(self):
+	def getIVcurce(self):
 		self.srs.module_reset[6]
 		self.srs.wait_time(10000)
 		biasCurrentParams = self.bias_current.widget.get()
@@ -61,24 +39,20 @@ class DarkCount(Spyrelet):
 		currentCurrent = startCurrent
 		self.srs.SIM928_voltage[6] = currentCurrent*resistance
 		self.srs.SIM928_on[6]
-		self.srs.wait_time(100000)
-		points = ((stopCurrent-startCurrent)/stepSize)+(1+stepSize)
-		print(points)
+		points = (stopCurrent-startCurrent)/stepSize
 		BC =[]
-		DCR =[]
+		DC =[]
 		for i in range(int(points)):
 			lost = self.qutag.getLastTimestamps(True)
 			time.sleep(expParams['Exposure Time'].magnitude)
 			timestamps = self.qutag.getLastTimestamps(True)
+			bc = points
 			darkcounts = timestamps[2]
 			BC.append(currentCurrent)
-			DCR.append(darkcounts/expParams['Exposure Time'].magnitude)
+			DC.append(darkcounts)
 			currentCurrent +=stepSize
 			self.srs.SIM928_voltage[6] = currentCurrent*resistance
-		self.srs.SIM928_voltage[6]=0
-		self.srs.module_reset[6]
-		datadir = 'D:\Data\\'
-		np.savetxt(datadir+expParams['File Name'], (BC,DCR), delimiter=',')
+		np.savetxt(expParams['File Name'], (BC,DC))
 		print('Data stored under File Name: ' + expParams['File Name'])	
 		return
 
@@ -99,8 +73,6 @@ class DarkCount(Spyrelet):
 	def exp_params(self):
 		params = [
     #    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
-        ('Exposure Time', {'type': int, 'default': 10, 'units': 's'}),
-        ('Points per Bias Current',{'type':int, 'default': 1.0}),
         ('File Name', {'type': str})
         ]
 		w = ParamWidget(params)
