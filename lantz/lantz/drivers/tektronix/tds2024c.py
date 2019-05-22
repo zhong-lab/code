@@ -10,7 +10,7 @@
 """
 
 import struct
-
+import matplotlib.pyplot as plt
 import numpy as np
 
 from lantz.feat import Feat
@@ -56,6 +56,28 @@ class TDS2024C(MessageBasedDriver):
         """
         self.write('TRIG:MAIN:MODE {}'.format(mode))
 
+    @Feat()
+    def mode(self):
+        """Trigger state.
+        """
+        return self.query('ACQ?')
+
+    @mode.setter
+    def mode(self, mode):
+        """Set trigger state.
+        """
+        temp = ''
+        if mode == 'sample':
+            temp = 'SAMP'
+        elif mode == 'average':
+            temp = 'AVE'
+        elif mode == 'peak detect':
+            temp = 'PEAK'
+        if temp=='':
+            print('cant set mode. keywords are: sample, average, peak detect')
+        else:
+            self.write('ACQ:MODE {}'.format(temp))
+
     @Action()
     def triggerlevel(self):
         """Set trigger level to 50% of the minimum adn maximum
@@ -92,7 +114,7 @@ class TDS2024C(MessageBasedDriver):
         self.write(':DAT:ENC ascii;WID 2;')
         return "Set data encoding"
 
-    @Action()
+    # @Action()
     def curv(self):
         """Get data.
 
@@ -110,7 +132,7 @@ class TDS2024C(MessageBasedDriver):
         xze = params['XZE?']
         ydata = (data - yoff) * ymu + yze
         xdata = np.arange(len(data)) * xin + xze
-        return list(xdata), list(data)
+        return list(xdata), list(ydata)
 
     def _measure(self, type, source):
         self.write('MEASUrement:IMMed:TYPe {}'.format(type))
@@ -141,6 +163,33 @@ class TDS2024C(MessageBasedDriver):
         """
         return self._measure('MEAN', channel)
 
+    @Action()
+    def set_time(self, time):
+        self.write('HORizontal:MAIn:POSition {}'.format(time))
+        return
+
+    @Action()
+    def average(self, number):
+        if number in (4,16,64,128): 
+            self.write('ACQ:NUMAV {}'.format(number))
+        else:
+            print('can only average over 4, 16, 64, or 128 samples!')
+        return
+
+    @Action()
+    def position(self, channel, position):
+        self.write('CH{}:POS {}'.format(channel,position))
+        return
+
+    @Action()
+    def scale(self, channel, scale):
+        self.write('CH{}:SCA {}'.format(channel,scale))
+        return
+
+    @Action()
+    def time_scale(self, scale):
+        self.write('HORizontal:MAIn:SCAle {}'.format(scale))
+        return
 
 if __name__ == '__main__':
     import argparse
@@ -161,35 +210,46 @@ if __name__ == '__main__':
     log_to_screen(DEBUG)
     with TDS2024C(args.port) as osc:
         osc.init()
-        print(osc.idn)
-        print(osc.trigger)
-        osc.forcetrigger()
-        osc.triggerlevel()
-        osc.trigger = "AUTO"
-        print(osc.trigger)
-        #osc.autoconf()
-        #params = osc.acqparams()
+        # print(osc.idn)
+        osc.set_time(0)
+        # print(osc.trigger)
+        # osc.average(16)
+        osc.position(1,1)
+        osc.scale(1,0.05)
+        osc.mode = 'sample'
+        x,y = osc.curv()
+        x = np.array(x)
+        x = x-x.min()
+        y = np.array(y)
+        plt.plot(x,y)
+        plt.show()
+        # osc.forcetrigger()
+        # osc.triggerlevel()
+        # osc.trigger = "AUTO"
+        # print(osc.trigger)
+        # #osc.autoconf()
+        # #params = osc.acqparams()
 
-        if args.view:
-            import matplotlib.pyplot as plt
-            import numpy as np
+        # if args.view:
+        #     import matplotlib.pyplot as plt
+        #     import numpy as np
 
-        with args.output as fp:
-            writer = csv.writer(fp, dialect='excel')
-            writer.writerow(['Channel', 'Freq', 'Max', 'Min', 'Mean'])
-            for channel in args.Channels:
-                osc.datasource(channel)
-                writer.writerow(([channel, osc.measure_frequency(channel),
-                                    osc.measure_max(channel),
-                                    osc.measure_min(channel),
-                                    osc.measure_mean(channel)]))
+        # with args.output as fp:
+        #     writer = csv.writer(fp, dialect='excel')
+        #     writer.writerow(['Channel', 'Freq', 'Max', 'Min', 'Mean'])
+        #     for channel in args.Channels:
+        #         osc.datasource(channel)
+        #         writer.writerow(([channel, osc.measure_frequency(channel),
+        #                             osc.measure_max(channel),
+        #                             osc.measure_min(channel),
+        #                             osc.measure_mean(channel)]))
 
-                if args.view:
-                    x, y = osc.curv()
-                    x = np.array(x)
-                    x = x - x.min()
-                    y = np.array(y)
-                    plt.plot(x, y)
+        #         if args.view:
+        #             x, y = osc.curv()
+        #             x = np.array(x)
+        #             x = x - x.min()
+        #             y = np.array(y)
+        #             plt.plot(x, y)
 
-        if args.view:
-            plt.show()
+        # if args.view:
+        #     plt.show()

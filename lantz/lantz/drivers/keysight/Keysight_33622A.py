@@ -234,6 +234,9 @@ class Keysight_33622A(MessageBasedDriver):
 		"""
 		self.write('OUTPUT{} {}'.format(key, value))
 
+	def sync_source(self, chn):
+		self.write('OUTP:SYNC:SOUR CH{}'.format(chn))
+
 	def sync_arbs(self, chn):
 		self.write('SOURCE{}:FUNC:ARB:SYNC'.format(chn))
 
@@ -274,11 +277,9 @@ class Keysight_33622A(MessageBasedDriver):
 		for i in range(len(seqlist)):
 			currentseq = seqlist[i]
 			seqstring = seqstring + ',' + currentseq.get_seqstring()
-		print(seqstring)
 		strlen = len(seqstring.encode('utf-8'))
 		numbytes = len(str(strlen))
-
-		print('SOURCE{}:DATA:SEQ #{}{}{}'.format(chn, numbytes, strlen, seqstring))
+		# print('SOURCE{}:DATA:SEQ #{}{}{}'.format(chn, numbytes, strlen, seqstring))
 
 		self.write('SOURCE{}:DATA:SEQ #{}{}{}'.format(chn, numbytes, strlen, seqstring))
 		self.waveform[chn] = 'ARB'
