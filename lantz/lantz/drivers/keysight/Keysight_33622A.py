@@ -12,8 +12,8 @@ class Keysight_33622A(MessageBasedDriver):
 	protocol implementation also has a native mechanism to specify the
 	end of the of a message.
 	"""
-
-	DEFAULTS = {'COMMON': {'write_termination': '\n', 'read_termination': '\n'}}
+ 
+	DEFAULTS = {'COMMON':{'write_termination': '\n', 'read_termination': '\n'}}
 
 	@Feat()
 	def idn(self):
