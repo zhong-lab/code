@@ -851,3 +851,42 @@ cd lantz
 cd drivers\
 cd qutools\
 python qutag.py
+python bristol771.py 
+cd .
+cd spyre
+cd .. 
+python qutools\
+python qutag.py 
+python main.py lifetime
+cd lantz\
+cd lantz
+cd drivers\
+cd qutools\
+python qutag.py
+activate spyre
+cd ..
+cd code
+dir
+cd spyre\
+cd testing\
+python main.py heterodyneecho\
+python main.py heterodyneecho
+python main.py heterodyneecho\
+cd ..
+activate spyre
+cd test
+cd spyre\
+cd testing\
+dir
+python main.py heterodyneecho
+cd ..
+cd zhong
+activate spyre
+conda activate spyre
+conda
+conda
+cd ..
+cd zhong
+cd code\
+python
+activate spyre

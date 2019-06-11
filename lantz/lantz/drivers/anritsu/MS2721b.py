@@ -138,7 +138,7 @@ class MS2721B(MessageBasedDriver):
 
     @Action()
     def savefile(self,value):
-        return self.write('MMEM:STOR:TRAC 0,"filetest{}"'.format(value))
+        return self.write('MMEM:STOR:TRAC 0,"QvsB_2000_0_mT{}"'.format(value))
 
     # @Feat(units='W')
     # def ref_level(self):
@@ -148,8 +148,15 @@ class MS2721B(MessageBasedDriver):
     # def ref_level(self, value):
     #     return self.write('DISP:WIND:TRAC:Y:RLEV {}'.format(value))
 
+    @Action()
+    def acquireData(self):
+        return self.query(':TRACe[:DATA]? 1')
 
-'''
+    @Action()
+    def format(self):
+        self.write(':FORMat:DATA REAL,32')
+
+
 if __name__ == '__main__':
     from time import sleep
     from lantz import Q_
@@ -161,10 +168,8 @@ if __name__ == '__main__':
 
     log_to_screen(DEBUG)
     # this is the USB VISA Address:
-    with MS2721B('USB0::0x0B5B::0xFFF9::1001042_146_11::INSTR') as inst:
+    with MS2721B('USB0::0x0B5B::0xFFF9::1118010_150_11::INSTR') as inst:
         print('The identification of this instrument is :' + inst.idn)
-        inst.freq_span = 3000
-        print(inst.freq_span)
-        inst.freq_span = 300000
-        print(inst.freq_span)
-'''
+        # inst.format()
+        # print(inst.acquireData())
+
