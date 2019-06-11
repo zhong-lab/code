@@ -23,10 +23,10 @@ from lantz.drivers.keysight.seqbuild import SeqBuild
 from lantz.drivers.keysight import Keysight_33622A
 from lantz.drivers.stanford.srs900 import SRS900
 
-class TwoPulsePhotonEcho(Spyrelet):
+class ThreePulsePhotonEcho(Spyrelet):
 	requires = {
-		'fungen': Keysight_33622A
-		# 'srs': SRS900
+		'fungen': Keysight_33622A,
+		'srs': SRS900
 	}
 	qutag = None
 	xs = np.array([])
@@ -50,12 +50,12 @@ class TwoPulsePhotonEcho(Spyrelet):
 				continue
 			else:
 				hist[binNumber]+=1
-		out_name = "D:\\Data\\6.9.2019\\Echo\\wavelength dependance_600mT\\195231"
+		out_name = "D:\\Data\\5.29.2019\\Echo\\600mT\\data"
 		x=[]
 		for i in range(bincount):
 			x.append(i*totalWidth/bincount)
-		np.savez(os.path.join(out_name,str(int(round(tau*1e6,0)))),hist,x)
-		print('Data stored under File Name: ' + str(tau))
+		np.savez(os.path.join(out_name,self.exp_parameters.widget.get()['File Name']+str(int(round(tau*1e6,0)))),hist,x)
+		print('Data stored under File Name: ' + self.exp_parameters.widget.get()['File Name'] + str(tau))
 
 	def createPlottingHist(self, stoparray, timebase, bincount, totalWidth):
 		for stoptime in stoparray:
@@ -78,6 +78,7 @@ class TwoPulsePhotonEcho(Spyrelet):
 		buffer_time = params['buffer time'].magnitude
 		shutter_offset = params['shutter offset'].magnitude
 		wholeRange=params['measuring range'].magnitude
+		waitTime = params['wait time'].magnitude
 
 		self.configureQutag()
 		for i in range(int((params['stop tau']-params['start tau'])/params['step tau'])+1):
@@ -90,9 +91,9 @@ class TwoPulsePhotonEcho(Spyrelet):
 			self.fungen.clear_mem(1)
 			self.fungen.clear_mem(2)
 			self.fungen.wait()
-			# self.srs.module_reset[5]
-			# self.srs.SIM928_voltage[5]=params['srs bias'].magnitude+0.000000001*i
-			# self.srs.SIM928_on[5]
+			self.srs.module_reset[5]
+			self.srs.SIM928_voltage[5]=params['srs bias'].magnitude+0.000000001*i
+			self.srs.SIM928_on[5]
 
 			## build pulse sequence for AWG channel 1
 			chn1buffer = Arbseq_Class('chn1buffer', timestep)
@@ -127,7 +128,7 @@ class TwoPulsePhotonEcho(Spyrelet):
 			chn1dc.repeatstring = 'repeat'
 			chn1dc.markerstring = 'lowAtStart'
 			chn1dc.markerloc = 0
-			chn1dcrepeats = int((tau.magnitude-1.5*pulse_width)/repeat_unit)
+			chn1dcrepeats = int((tau.magnitude-pulse_width)/repeat_unit)
 			chn1dc.nrepeats = chn1dcrepeats
 			chn1dcwidth = repeat_unit*chn1dcrepeats
 			print(tau.magnitude, pulse_width, chn1dcrepeats)
@@ -136,40 +137,64 @@ class TwoPulsePhotonEcho(Spyrelet):
 			chn1pulse2 = Arbseq_Class('chn1pulse2', timestep)
 			chn1pulse2.delays = [0]
 			chn1pulse2.heights = [1]
-			chn1pulse2.widths = [pulse_width*2]
-			chn1pulse2.totaltime = pulse_width*2 
-			chn1pulse2width = pulse_width*2
+			chn1pulse2.widths = [pulse_width]
+			chn1pulse2.totaltime = pulse_width
+			chn1pulse2width = pulse_width
 			chn1pulse2.nrepeats = 0
 			chn1pulse2.repeatstring = 'once'
 			chn1pulse2.markerstring = 'lowAtStart'
 			chn1pulse2.markerloc = 0
 			chn1pulse2.create_sequence()
-		
-			chn1pulse3 = Arbseq_Class('chn1pulse3', timestep)
-			chn1pulse3.delays = [0]
-			chn1pulse3.heights = [0]
-			chn1pulse3.widths = [repeat_unit]
-			chn1pulse3.totaltime = repeat_unit 
-			chn1pulse3width = shutter_offset
-			chn1pulse3.nrepeats = shutter_offset/repeat_unit
-			chn1pulse3.repeatstring = 'repeat'
-			chn1pulse3.markerstring = 'lowAtStart'
-			chn1pulse3.markerloc = 0
-			chn1pulse3.create_sequence()
-		
+
 			chn1dc2 = Arbseq_Class('chn1dc2', timestep)
 			chn1dc2.delays = [0]
 			chn1dc2.heights = [0]
 			chn1dc2.widths = [repeat_unit]
 			chn1dc2.totaltime = repeat_unit
+			chn1dc2width = repeat_unit
+			chn1dc2repeats=int((waitTime-pulse_width)/repeat_unit)
+			chn1dc2.nrepeats = chn1dc2repeats
+			chn1dc2width = repeat_unit*chn1dc2repeats
 			chn1dc2.repeatstring = 'repeat'
 			chn1dc2.markerstring = 'lowAtStart'
-			chn1dc2repeats = int((period-chn1bufferwidth-chn1pulsewidth-chn1dcwidth-chn1pulse2width-chn1pulse3width)/repeat_unit)
-			chn1dc2.nrepeats = chn1dc2repeats
 			chn1dc2.markerloc = 0
-			#print((chn1dc2repeats*params['repeat unit'].magnitude) + tau.magnitude + params['pulse width'].magnitude)
-			print(params['repeat unit'].magnitude*chn1dc2.nrepeats)
 			chn1dc2.create_sequence()
+
+			chn1pulse3 = Arbseq_Class('chn1pulse3', timestep)
+			chn1pulse3.delays = [0]
+			chn1pulse3.heights = [1]
+			chn1pulse3.widths = [pulse_width]
+			chn1pulse3.totaltime = pulse_width 
+			chn1pulse3width = pulse_width
+			chn1pulse3.nrepeats = 0
+			chn1pulse3.repeatstring = 'once'
+			chn1pulse3.markerstring = 'lowAtStart'
+			chn1pulse3.markerloc = 0
+			chn1pulse3.create_sequence()
+		
+			chn1pulse4 = Arbseq_Class('chn1pulse4', timestep)
+			chn1pulse4.delays = [0]
+			chn1pulse4.heights = [0]
+			chn1pulse4.widths = [repeat_unit]
+			chn1pulse4.totaltime = repeat_unit 
+			chn1pulse4width = shutter_offset
+			chn1pulse4.nrepeats = shutter_offset/repeat_unit
+			chn1pulse4.repeatstring = 'repeat'
+			chn1pulse4.markerstring = 'lowAtStart'
+			chn1pulse4.markerloc = 0
+			chn1pulse4.create_sequence()
+		
+			chn1dc3 = Arbseq_Class('chn1dc3', timestep)
+			chn1dc3.delays = [0]
+			chn1dc3.heights = [0]
+			chn1dc3.widths = [repeat_unit]
+			chn1dc3.totaltime = repeat_unit
+			chn1dc3.repeatstring = 'repeat'
+			chn1dc3.markerstring = 'lowAtStart'
+			chn1dc3repeats = int((period-chn1bufferwidth-3*chn1pulsewidth-chn1dcwidth-chn1dc2width-chn1pulse4width)/repeat_unit)
+			chn1dc3.nrepeats = chn1dc3repeats
+			chn1dc3.markerloc = 0
+			chn1dc3.create_sequence()
 
 			## build pulse sequence for AWG channel 2
 			chn2buffer = Arbseq_Class('chn2buffer', timestep)
@@ -184,83 +209,112 @@ class TwoPulsePhotonEcho(Spyrelet):
 			chn2bufferwidth = repeat_unit*chn2buffer.nrepeats
 			chn2buffer.create_sequence()
 
-			chn2pulse1 = Arbseq_Class('chn2pulse1', timestep)
-			chn2pulse1.delays = [0]
-			chn2pulse1.heights = [1]
-			chn2pulse1.widths = [pulse_width]
-			chn2pulse1.totaltime = pulse_width
-			chn2pulse1width = pulse_width
-			chn2pulse1.nrepeats = 0
-			chn2pulse1.repeatstring = 'once'
-			chn2pulse1.markerstring = 'highAtStartGoLow'
-			chn2pulse1.markerloc = 0
-			chn2pulse1.create_sequence()
+			chn2pulse = Arbseq_Class('chn2pulse', timestep)
+			chn2pulse.delays = [0]
+			chn2pulse.heights = [1]
+			chn2pulse.widths = [pulse_width]
+			chn2pulse.totaltime = pulse_width
+			chn2pulse.nrepeats = 0
+			chn2pulse.repeatstring = 'once'
+			chn2pulse.markerstring = 'highAtStartGoLow'
+			chn2pulse.markerloc = 0
+			chn2pulsewidth = pulse_width
+			chn2pulse.create_sequence()
 
-			chn2dc1 = Arbseq_Class('chn2dc1', timestep)
-			chn2dc1.delays = [0]
-			chn2dc1.heights = [1]
-			chn2dc1.widths = [repeat_unit]
-			chn2dc1.totaltime = repeat_unit
-			chn2dc1.repeatstring = 'repeat'
-			chn2dc1.markerstring = 'lowAtStart'
-			chn2dc1.markerloc = 0
-			chn2dc1repeats = int((tau.magnitude-1.5*pulse_width)/repeat_unit)
-			chn2dc1.nrepeats = chn2dc1repeats
-			chn2dc1width = repeat_unit*chn2dc1repeats
-			chn2dc1.create_sequence()
-	
+			chn2dc = Arbseq_Class('chn2dc', timestep)
+			chn2dc.delays = [0]
+			chn2dc.heights = [1]
+			chn2dc.widths = [repeat_unit]
+			chn2dc.totaltime = repeat_unit
+			chn2dc.repeatstring = 'repeat'
+			chn2dc.markerstring = 'lowAtStart'
+			chn2dc.markerloc = 0
+			chn2dcrepeats = int((tau.magnitude-pulse_width)/repeat_unit)
+			chn2dc.nrepeats = chn2dcrepeats
+			chn2dcwidth = repeat_unit*chn2dcrepeats
+			chn2dc.create_sequence()
+		
 			chn2pulse2 = Arbseq_Class('chn2pulse2', timestep)
 			chn2pulse2.delays = [0]
 			chn2pulse2.heights = [1]
-			chn2pulse2.widths = [pulse_width*2]
-			chn2pulse2.totaltime = pulse_width*2
-			chn2pulse2width = pulse_width*2
+			chn2pulse2.widths = [pulse_width]
+			chn2pulse2.totaltime = pulse_width
+			chn2pulse2width = pulse_width
 			chn2pulse2.nrepeats = 0
 			chn2pulse2.repeatstring = 'once'
 			chn2pulse2.markerstring = 'lowAtStart'
 			chn2pulse2.markerloc = 0
 			chn2pulse2.create_sequence()
 
+			chn2dc2 = Arbseq_Class('chn2dc2', timestep)
+			chn2dc2.delays = [0]
+			chn2dc2.heights = [1]
+			chn2dc2.widths = [repeat_unit]
+			chn2dc2.totaltime = repeat_unit
+			chn2dc2width = repeat_unit
+			chn2dc2repeats=int((waitTime-pulse_width)/repeat_unit)
+			chn2dc2.nrepeats = chn2dc2repeats
+			chn2dc2width = repeat_unit*chn2dc2repeats
+			chn2dc2.repeatstring = 'repeat'
+			chn2dc2.markerstring = 'lowAtStart'
+			chn2dc2.markerloc = 0
+			chn2dc2.create_sequence()
+
 			chn2pulse3 = Arbseq_Class('chn2pulse3', timestep)
 			chn2pulse3.delays = [0]
 			chn2pulse3.heights = [1]
-			chn2pulse3.widths = [repeat_unit]
-			chn2pulse3.totaltime = repeat_unit
-			chn2pulse3width = shutter_offset
-			chn2pulse3.nrepeats = shutter_offset/repeat_unit
-			chn2pulse3.repeatstring = 'repeat'
+			chn2pulse3.widths = [pulse_width]
+			chn2pulse3.totaltime = pulse_width 
+			chn2pulse3width = pulse_width
+			chn2pulse3.nrepeats = 0
+			chn2pulse3.repeatstring = 'once'
 			chn2pulse3.markerstring = 'lowAtStart'
 			chn2pulse3.markerloc = 0
 			chn2pulse3.create_sequence()
-
-			chn2dc2 = Arbseq_Class('chn2dc2', timestep)
-			chn2dc2.delays = [0]
-			chn2dc2.heights = [-1]
-			chn2dc2.widths = [repeat_unit]
-			chn2dc2.totaltime = repeat_unit
-			chn2dc2.repeatstring = 'repeat'
-			chn2dc2.markerstring = 'lowAtStart'
-			chn2dc2repeats = int((period-chn2bufferwidth-chn2pulse1width-chn2dc1width-chn2pulse2width-chn2pulse3width)/repeat_unit)
-			chn2dc2.nrepeats = chn2dc2repeats
-			chn2dc2.markerloc = 0
-			print(repeat_unit*chn2dc2.nrepeats)
-			chn2dc2.create_sequence()
+		
+			chn2pulse4 = Arbseq_Class('chn2pulse4', timestep)
+			chn2pulse4.delays = [0]
+			chn2pulse4.heights = [1]
+			chn2pulse4.widths = [repeat_unit]
+			chn2pulse4.totaltime = repeat_unit 
+			chn2pulse4width = shutter_offset
+			chn2pulse4.nrepeats = shutter_offset/repeat_unit
+			chn2pulse4.repeatstring = 'repeat'
+			chn2pulse4.markerstring = 'lowAtStart'
+			chn2pulse4.markerloc = 0
+			chn2pulse4.create_sequence()
+		
+			chn2dc3 = Arbseq_Class('chn2dc3', timestep)
+			chn2dc3.delays = [0]
+			chn2dc3.heights = [-1]
+			chn2dc3.widths = [repeat_unit]
+			chn2dc3.totaltime = repeat_unit
+			chn2dc3.repeatstring = 'repeat'
+			chn2dc3.markerstring = 'lowAtStart'
+			chn2dc3repeats = int((period-chn2bufferwidth-3*chn2pulsewidth-chn2dcwidth-chn2dc2width-chn2pulse4width)/repeat_unit)
+			chn2dc3.nrepeats = chn1dc3repeats
+			chn2dc3.markerloc = 0
+			chn2dc3.create_sequence()
 
 			self.fungen.send_arb(chn1buffer, 1)
 			self.fungen.send_arb(chn1pulse, 1)
 			self.fungen.send_arb(chn1dc, 1)
 			self.fungen.send_arb(chn1pulse2, 1)
 			self.fungen.send_arb(chn1pulse3, 1)
+			self.fungen.send_arb(chn1pulse4, 1)
 			self.fungen.send_arb(chn1dc2, 1)
+			self.fungen.send_arb(chn1dc3, 1)
 			self.fungen.send_arb(chn2buffer, 2)
-			self.fungen.send_arb(chn2pulse1, 2)
-			self.fungen.send_arb(chn2dc1, 2)
+			self.fungen.send_arb(chn2pulse, 2)
+			self.fungen.send_arb(chn2dc, 2)
 			self.fungen.send_arb(chn2pulse2, 2)
 			self.fungen.send_arb(chn2pulse3, 2)
+			self.fungen.send_arb(chn2pulse4, 2)
 			self.fungen.send_arb(chn2dc2, 2)
+			self.fungen.send_arb(chn2dc3, 2)
 
-			seq = [chn1buffer, chn1pulse, chn1dc, chn1pulse2, chn1pulse3, chn1dc2]
-			seq2 = [chn2buffer, chn2pulse1, chn2dc1, chn2pulse2, chn2pulse3, chn2dc2]
+			seq = [chn1buffer, chn1pulse, chn1dc, chn1pulse2,chn1dc2, chn1pulse3,chn1pulse4, chn1dc3]
+			seq2 = [chn2buffer, chn2pulse, chn2dc, chn2pulse2,chn2dc2, chn2pulse3,chn2pulse4, chn2dc3]
 			
 			self.fungen.create_arbseq('twoPulse', seq, 1)
 			self.fungen.create_arbseq('shutter', seq2, 2)
@@ -275,7 +329,6 @@ class TwoPulsePhotonEcho(Spyrelet):
 			time.sleep(1)
 			self.fungen.output[1] = 'ON'
 			#self.fungen.output[2] = 'OFF'
-			
 
 			##Qutag Part
 			self.configureQutag()
@@ -360,7 +413,7 @@ class TwoPulsePhotonEcho(Spyrelet):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
 		('# of Passes', {'type': int, 'default': 100}),
-		# ('File Name', {'type': str})
+		('File Name', {'type': str})
 		]
 		w = ParamWidget(params)
 		return w
@@ -390,9 +443,10 @@ class TwoPulsePhotonEcho(Spyrelet):
 		('start tau', {'type': float, 'default': 3e-6, 'units':'s'}),
 		('stop tau', {'type': float, 'default': 10e-6, 'units':'s'}),
 		('step tau', {'type': float, 'default': 1e-6, 'units':'s'}),
-		# ('srs bias', {'type': float, 'default': 1.2, 'units':'V'}),
+		('srs bias', {'type': float, 'default': 1.2, 'units':'V'}),
 		('shutter offset', {'type': float, 'default': 500e-9, 'units':'s'}),
 		('measuring range', {'type': float, 'default': 70e-6, 'units':'s'}),
+		('wait time', {'type': float, 'default': 1e-3, 'units':'s'}),
 		('buffer time', {'type': float, 'default': 100e-6, 'units':'s'}),
 		]
 		w = ParamWidget(params)

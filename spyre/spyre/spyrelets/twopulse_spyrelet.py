@@ -43,7 +43,7 @@ class TwoPulse(Spyrelet):
 
 			chn1pulse = Arbseq_Class('chn1pulse', timestep)
 			chn1pulse.delays = [0]
-			chn1pulse.heights = [1]
+			chn1pulse.heights = [0]
 			chn1pulse.widths = [params['pulse width'].magnitude]
 			chn1pulse.totaltime = params['pulse width'].magnitude
 			chn1pulse.nrepeats = 0
@@ -106,7 +106,7 @@ class TwoPulse(Spyrelet):
 
 			chn2pulse1 = Arbseq_Class('chn2pulse1', timestep)
 			chn2pulse1.delays = [0]
-			chn2pulse1.heights = [1]
+			chn2pulse1.heights = [0]
 			# chn2pulse1width = pulsewidth+pulse2width+dcwidth
 			chn2pulse1.widths=[params['pulse width'].magnitude]
 			chn2pulse1.totaltime=params['pulse width'].magnitude
@@ -143,7 +143,7 @@ class TwoPulse(Spyrelet):
 
 			chn2pulse3 = Arbseq_Class('chn2pulse3', timestep)
 			chn2pulse3.delays = [0]
-			chn2pulse3.heights = [1]
+			chn2pulse3.heights = [0]
 			chn2pulse3.widths = [params['repeat unit'].magnitude]
 			chn2pulse3.totaltime = params['repeat unit'].magnitude 
 			chn2pulse3width = 400e-9 
@@ -155,7 +155,7 @@ class TwoPulse(Spyrelet):
 
 			chn2dc2 = Arbseq_Class('chn2dc2', timestep)
 			chn2dc2.delays = [0]
-			chn2dc2.heights = [-1]
+			chn2dc2.heights = [0]
 			chn2dc2.widths = [params['repeat unit'].magnitude]
 			chn2dc2.totaltime = params['repeat unit'].magnitude
 			chn2dc2.repeatstring = 'repeat'
@@ -183,21 +183,15 @@ class TwoPulse(Spyrelet):
 			self.fungen.create_arbseq('twoPulse', seq, 1)
 			self.fungen.create_arbseq('shutter', seq2, 2)
 			self.fungen.wait()
-			self.fungen.voltage[1] = params['pulse height'].magnitude+0.000000000001*i
-			self.fungen.voltage[2] = 7.1+0.0000000000001*i
+			self.fungen.voltage[1] = 3.3+0.000000000001*i
+			self.fungen.voltage[2]=0.6
+			self.fungen.offset[2] = 3.0
 			
 			print(self.fungen.voltage[1], self.fungen.voltage[2])
 			self.fungen.output[1] = 'ON'
 			self.fungen.output[2] = 'ON'
 			self.fungen.trigger_delay(1,400e-9)
 			self.fungen.sync()
-			
-
-			self.srs.module_reset[5]
-			self.srs.SIM928_voltage[5]=params['srs bias'].magnitude
-			self.srs.SIM928_on[5]
-
-
 
 			time.sleep(10000)
 
