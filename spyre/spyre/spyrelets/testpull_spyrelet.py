@@ -4,6 +4,7 @@ import time
 import csv
 import sys
 import thorlabs_apt as apt
+import msvcrt
 
 from PyQt5.Qsci import QsciScintilla, QsciLexerPython
 
@@ -63,40 +64,30 @@ class FiberPulling(Spyrelet):
 
         input("Press any key to start pulling")
         print("pulling")
-        motor1.move_velocity(0.2)
+        motor1.move_velocity(0.002)
         motor1.move_to(20)
-        motor2.move_velocity(0.2)
+        motor2.move_velocity(0.002)
         motor2.move_to(20)
 
-        t0 = time.time()
         while True:
             t1 = time.time()
             t = t1 - t0
             self.xs.append(t)
             self.ys.append(self.pmd.power.magnitude * 1000)
-
             values = {
                   'x': self.xs,
                   'y': self.ys,
                   }
+
             self.HardPull.acquire(values)
-            sleep(0.5)
-
-            if len(xs) < 10:
-                continue
-
-            else:
-                tail = ys[-10:]
-                maxi = max(tail)
-                mini = min(tail)
-                variance = maxi - mini
-
-            if variance < 0.001 and t > 20:
-                self.gpd.set_voltage(12)
-                self.gpd.set_output(1)
-                sleep(2)
-                self.gpd.set_output(0)
-                break
+            time.sleep(1)
+            
+            if msvcrt.kbhit():
+                if msvcrt.getwche() == '\r':
+                    self.gpd.set_voltage(12)
+                    self.gpd.set_output(1)
+                    self.gpd.set_output(0)
+                    break
 
         return
 

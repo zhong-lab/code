@@ -851,6 +851,7 @@ cd lantz
 cd drivers\
 cd qutools\
 python qutag.py
+<<<<<<< HEAD
 activate C:\\Miniconda3\envs/spyre
 cd code
 cd lantz\
@@ -906,6 +907,8 @@ activate spyre
 conda info --envs
 activate C:\Miniconda3\envs\spyre
 cd bristol\
+=======
+>>>>>>> 39f5e9b79ae884bba12f8d3ae161628e31246c36
 python bristol771.py 
 cd .
 cd spyre
@@ -913,6 +916,7 @@ cd ..
 python qutools\
 python qutag.py 
 python main.py lifetime
+<<<<<<< HEAD
 cd ..
 cd lantz\
 cd lantz
@@ -1086,3 +1090,145 @@ python main.py fiberpulling\
 python main.py itc4020
 python main.py fiberpulling
 I can see you
+=======
+cd lantz\
+cd lantz
+cd drivers\
+cd qutools\
+python qutag.py
+activate spyre
+cd ..
+cd code
+dir
+cd spyre\
+cd testing\
+python main.py heterodyneecho\
+python main.py heterodyneecho
+python main.py heterodyneecho\
+cd ..
+activate spyre
+cd test
+cd spyre\
+cd testing\
+dir
+python main.py heterodyneecho
+cd ..
+cd zhong
+activate spyre
+conda activate spyre
+conda
+conda
+cd ..
+cd zhong
+cd code\
+python
+activate spyre
+>>>>>>> 39f5e9b79ae884bba12f8d3ae161628e31246c36
+cd drivers\
+cd qutools\
+python qutag.py
+cd windfreak\
+python synthnvpro.py 
+activate C:\\Miniconda3\envs/spyre
+cd code
+LS
+python main.py spectrum
+deactivate spyre
+conda deactivate spyre
+activate spyre
+activate C:\\Miniconda3\envs\spyre
+cd lantz\
+cd lantz
+cd drivers\
+cd thorlabs\
+python pm100d.py 
+cd ..
+cd spyre\
+cd testing\
+python main.py fiberpulling
+conda deactivate
+cd ../..
+ls
+python pm100d.py 
+cd spyre\
+cd testing\
+python main.py fiberpulling
+conda deactivate
+cd ../..
+cd code\
+cd lantz\
+cd lantz\drivers\
+mkdir gwinstek
+cd ..\attocube\
+vi __init__.py 
+vi anc350
+vi anc350.py 
+cd ..
+cd gwinstek\
+vi powersupply.py
+vi __init__.py
+ls
+cd qutools\
+python qutag.py
+cd windfreak\
+python synthnvpro.py 
+activate C:\\Miniconda3\envs/spyre
+cd code
+LS
+python main.py spectrum
+deactivate spyre
+conda deactivate spyre
+activate spyre
+activate C:\\Miniconda3\envs\spyre
+cd lantz\
+cd lantz
+cd drivers\
+cd thorlabs\
+python pm100d.py 
+cd ..
+cd spyre\
+cd testing\
+python main.py fiberpulling
+conda deactivate
+cd ../..
+ls
+conda deactivate
+cd ../..
+mkdir gwinstek
+cd ..\attocube\
+vi __init__.py 
+vi anc350
+vi anc350.py 
+vi powersupply.py
+vi __init__.py
+cd code\
+cd lantz\
+python main.py fiberpulling.py 
+cd ..\..\lantz\docs\
+cd lantz\drivers\
+cd ..
+cd ../../
+cd spyre\
+cd testing\
+python main.py fiberpulling\
+python main.py itc4020
+I can see you
+cd code\lantz\lantz\drivers\gwinstek\
+cd ..\thorlabs\
+python pm100d.py 
+cd ..\gwinstek\
+python powersupply.py 
+mv powersupply.py g3303s.py
+python main.py fiberpulling
+cd ..\..\lantz\lantz\drivers\
+cd gwinstek\
+rm powersupply.py 
+python g3303s.py 
+python g3303s.py \
+python g3303s.py \\
+python g3303s.py
+cd ..\..\..\..\spyre\testing\
+ls
+python main.py powertest.py 
+python main.py powertest\
+python main.py powertest

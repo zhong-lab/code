@@ -3,7 +3,7 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 import numpy as np
 import time
 
-from PyQt5.Qsci import QsciScintilla, QsciLexerPython
+# from PyQt5.Qsci import QsciScintilla, QsciLexerPython
 
 from spyre import Spyrelet, Task, Element
 from spyre.plotting import LinePlotWidget, HeatmapPlotWidget
