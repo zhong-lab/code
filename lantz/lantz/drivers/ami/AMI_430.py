@@ -46,7 +46,7 @@ class AMI_430(MessageBasedDriver):
 		#sets ramp rate units, 1 for minutes, 0 for seconds
 		if value==0 or value==1:
 			self.write('CONFigure:RAMP:RATE:UNITS {}'.format(value))
-		else
+		else:
 			self.write('CONFigure:RAMP:RATE:UNITS 1')
 
 	@Feat()
@@ -55,7 +55,7 @@ class AMI_430(MessageBasedDriver):
 		return self.query('FIELD:UNITS?')
 
 	@fieldUnits.setter
-	def fieldUnits(self, value)
+	def fieldUnits(self, value):
 		#sets field units
 		self.write('CONFigure:FIELD:UNITS {}'.format(value))
 
@@ -155,5 +155,8 @@ if __name__ == '__main__':
 	from lantz.log import log_to_screen, DEBUG
 	log_to_screen(DEBUG)
 	# this is the USB VISA Address:
-	with AMI_430('') as inst:
+	with AMI_430('ASRL19::INSTR') as inst:
 		print('The identification of this instrument is :' + inst.idn)
+		inst.fieldUnits = 1
+		inst.fieldTarget = 0.899
+		print(inst.field)

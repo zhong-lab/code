@@ -102,5 +102,3 @@ if __name__=='__main__':
 		inst.frequency=200
 		inst.power=1
 		inst.output=1
-		print(inst.reference)
-		print(inst.temperature_comp)

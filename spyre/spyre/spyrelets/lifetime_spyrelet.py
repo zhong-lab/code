@@ -54,8 +54,8 @@ class Lifetime(Spyrelet):
 				continue
 			else:
 				hist[binNumber]+=1
-		out_name = "D:\\Data\\6.10.2019\\Lifetime\\Y3-Z1"
-		np.savez(os.path.join(out_name,self.exp_parameters.widget.get()['File Name']+str(index)),hist,wls)
+		out_name = "D:\\Data\\6.11.2019\\Lifetime\\Y5-Z1"
+		np.savez(os.path.join(out_name,str(index)),hist,wls)
 		print('Data stored under File Name: ' + self.exp_parameters.widget.get()['File Name'] + str(index))
 
 

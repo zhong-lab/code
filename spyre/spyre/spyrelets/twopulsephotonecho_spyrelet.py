@@ -50,7 +50,7 @@ class TwoPulsePhotonEcho(Spyrelet):
 				continue
 			else:
 				hist[binNumber]+=1
-		out_name = "D:\\Data\\6.9.2019\\Echo\\wavelength dependance_600mT\\195231"
+		out_name = "D:\\Data\\6.13.2019\\Echo\\800mT10mA48"
 		x=[]
 		for i in range(bincount):
 			x.append(i*totalWidth/bincount)

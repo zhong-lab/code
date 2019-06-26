@@ -851,3 +851,238 @@ cd lantz
 cd drivers\
 cd qutools\
 python qutag.py
+activate C:\\Miniconda3\envs/spyre
+cd code
+cd lantz\
+cd lantz
+cd drivers\
+cd windfreak\
+python synthnvpro.py 
+python main.py 
+activate spyre
+LS
+cd code\
+cd test\
+ls
+pip
+pip install paramiko
+ssh plbevington@midway.rcc.uchicago.edu
+pip
+pip install paramiko
+ssh plbevington@midway.rcc.uchicago.edu
+cd code\lantz\lantz\drivers\stanford\
+ls
+pip install lantz
+python3 srs900.py 
+python srs900.py 
+conda
+conda python sr9
+anaconda
+activate spyre
+cd code\lantz\lantz\drivers\stanford\
+dir
+C:\Python3\python.exe C:\Users\zhong\code\lantz\lantz\drivers\stanford\srs900.py
+C:\Python34\python.exe C:\Users\zhong\code\lantz\lantz\drivers\stanford\srs900.py
+C:\path\where\wheel\is\> pip install PyQt4-4.11.4-cp35-none-win_amd64.whl
+cd
+pip3 install PyQt4-4.11.4-cp35-none-win_amd64.whl
+pip3 install PyQt4
+python configure.py --sip-module PyQt4.sip --no-dist-info --no-tools
+python configure.py --sip-module PyQt4.sip --no-dist-info --no-tools
+cd docs
+cd source
+cd ..
+cd build
+dir
+start html
+cd html
+start index.html 
+pip3 install PyQt4
+python configure.py --sip-module PyQt4.sip --no-dist-info --no-tools
+cd docs
+cd build
+make html
+activate spyre
+conda info --envs
+activate C:\Miniconda3\envs\spyre
+cd bristol\
+python bristol771.py 
+cd .
+cd spyre
+cd .. 
+python qutools\
+python qutag.py 
+python main.py lifetime
+cd ..
+cd lantz\
+cd lantz
+cd drivers\
+cd qutools\
+python qutag.py
+cd lantz\
+cd lantz
+cd drivers\
+cd windfreak\
+python synthnvpro.py 
+activate C:\\Miniconda3\envs/spyre
+cd code
+cd spyre\
+cd testing\
+python main.py twopulsephotonecho
+python main.py photoncounts.py 
+python main.py photoncounts]
+python main.py photoncounts
+python main.py darkcount
+python main.py spectrum
+           time.sleep(360)
+cd lantz
+cd drivers\
+cd qutools\
+python qutag.py
+cd lantz\
+cd lantz
+cd drivers\
+cd windfreak\
+python synthnvpro.py 
+activate C:\\Miniconda3\envs/spyre
+cd code
+cd spyre\
+cd testing\
+python main.py twopulsephotonecho
+python main.py photoncounts.py 
+python main.py photoncounts]
+python main.py photoncounts
+python main.py darkcount
+python main.py spectrum
+           time.sleep(360)
+cd Downloads\
+cd Python_Pull\
+conda activate C:\\Miniconda3\envs\spyre\
+which python
+cd thorlabs_apt
+vi core.py 
+conda deactivate
+py3.7
+python3.7
+py-3.7
+find python
+python 3.7
+py-3
+python3
+python
+python process.py
+python -v process.py 
+vi thorlabs_apt\core.py 
+nano thorlabs_apt\core.py 
+python process.py 
+cd ~
+cd C:\\
+find lantz
+cd ..
+where zhong
+ls
+conda info --envs
+activate C:\Miniconda3\envs\spyre
+cd bristol\
+python bristol771.py 
+cd .
+cd spyre
+cd .. 
+python qutools\
+python qutag.py 
+python main.py lifetime
+cd lantz\
+cd lantz
+cd drivers\
+cd qutools\
+python qutag.py
+cd windfreak\
+python synthnvpro.py 
+activate C:\\Miniconda3\envs/spyre
+cd code
+LS
+python main.py spectrum
+deactivate spyre
+conda deactivate spyre
+activate spyre
+activate C:\\Miniconda3\envs\spyre
+cd lantz\
+cd lantz
+cd drivers\
+cd thorlabs\
+python pm100d.py 
+cd ..
+cd spyre\
+cd testing\
+python main.py fiberpulling
+conda deactivate
+cd ../..
+ls
+python pm100d.py 
+cd spyre\
+cd testing\
+python main.py fiberpulling
+conda deactivate
+cd ../..
+cd code\
+cd lantz\
+cd lantz\drivers\
+mkdir gwinstek
+cd ..\attocube\
+vi __init__.py 
+vi anc350
+vi anc350.py 
+cd ..
+cd gwinstek\
+vi powersupply.py
+vi __init__.py
+ls
+cd qutools\
+python qutag.py
+cd windfreak\
+python synthnvpro.py 
+activate C:\\Miniconda3\envs/spyre
+cd code
+LS
+python main.py spectrum
+deactivate spyre
+conda deactivate spyre
+activate spyre
+activate C:\\Miniconda3\envs\spyre
+cd lantz\
+cd lantz
+cd drivers\
+cd thorlabs\
+python pm100d.py 
+cd ..
+cd spyre\
+cd testing\
+python main.py fiberpulling
+conda deactivate
+cd ../..
+ls
+python pm100d.py 
+conda deactivate
+cd ../..
+mkdir gwinstek
+cd ..\attocube\
+vi __init__.py 
+vi anc350
+vi anc350.py 
+cd gwinstek\
+vi powersupply.py
+vi __init__.py
+cd code\
+cd lantz\
+python main.py fiberpulling.py 
+cd ..\..\lantz\docs\
+cd lantz\drivers\
+cd ..
+cd ../../
+cd spyre\
+cd testing\
+ls
+python main.py fiberpulling\
+python main.py itc4020
+python main.py fiberpulling
+I can see you

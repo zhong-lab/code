@@ -21,12 +21,11 @@ from lantz.drivers.keysight import Arbseq_Class
 from lantz.drivers.keysight.seqbuild import SeqBuild
 
 from lantz.drivers.keysight import Keysight_33622A
-from lantz.drivers.stanford.srs900 import SRS900
 
 class ThreePulsePhotonEcho(Spyrelet):
 	requires = {
-		'fungen': Keysight_33622A,
-		'srs': SRS900
+		'fungen': Keysight_33622A
+		# 'srs': SRS900
 	}
 	qutag = None
 	xs = np.array([])
@@ -50,7 +49,7 @@ class ThreePulsePhotonEcho(Spyrelet):
 				continue
 			else:
 				hist[binNumber]+=1
-		out_name = "D:\\Data\\5.29.2019\\Echo\\600mT\\data"
+		out_name = "D:\\Data\\6.11.2019\\Echo\\600mT1600us"
 		x=[]
 		for i in range(bincount):
 			x.append(i*totalWidth/bincount)
@@ -91,9 +90,9 @@ class ThreePulsePhotonEcho(Spyrelet):
 			self.fungen.clear_mem(1)
 			self.fungen.clear_mem(2)
 			self.fungen.wait()
-			self.srs.module_reset[5]
-			self.srs.SIM928_voltage[5]=params['srs bias'].magnitude+0.000000001*i
-			self.srs.SIM928_on[5]
+			# self.srs.module_reset[5]
+			# self.srs.SIM928_voltage[5]=params['srs bias'].magnitude+0.000000001*i
+			# self.srs.SIM928_on[5]
 
 			## build pulse sequence for AWG channel 1
 			chn1buffer = Arbseq_Class('chn1buffer', timestep)
@@ -291,7 +290,7 @@ class ThreePulsePhotonEcho(Spyrelet):
 			chn2dc3.totaltime = repeat_unit
 			chn2dc3.repeatstring = 'repeat'
 			chn2dc3.markerstring = 'lowAtStart'
-			chn2dc3repeats = int((period-chn2bufferwidth-3*chn2pulsewidth-chn2dcwidth-chn2dc2width-chn2pulse4width)/repeat_unit)
+			chn2dc3repeats = int((period-chn1bufferwidth-3*chn1pulsewidth-chn1dcwidth-chn1dc2width-chn1pulse4width)/repeat_unit)
 			chn2dc3.nrepeats = chn1dc3repeats
 			chn2dc3.markerloc = 0
 			chn2dc3.create_sequence()
@@ -316,12 +315,11 @@ class ThreePulsePhotonEcho(Spyrelet):
 			seq = [chn1buffer, chn1pulse, chn1dc, chn1pulse2,chn1dc2, chn1pulse3,chn1pulse4, chn1dc3]
 			seq2 = [chn2buffer, chn2pulse, chn2dc, chn2pulse2,chn2dc2, chn2pulse3,chn2pulse4, chn2dc3]
 			
-			self.fungen.create_arbseq('twoPulse', seq, 1)
+			self.fungen.create_arbseq('threepulse', seq, 1)
 			self.fungen.create_arbseq('shutter', seq2, 2)
 			self.fungen.wait()
 			self.fungen.voltage[1] = params['pulse height'].magnitude+0.000000000001*i
 			self.fungen.voltage[2] = 7.1+0.0000000000001*i
-			
 			print(self.fungen.voltage[1], self.fungen.voltage[2])
 			self.fungen.output[2] = 'ON'
 			self.fungen.trigger_delay(1,shutter_offset)
@@ -329,6 +327,7 @@ class ThreePulsePhotonEcho(Spyrelet):
 			time.sleep(1)
 			self.fungen.output[1] = 'ON'
 			#self.fungen.output[2] = 'OFF'
+			# time.sleep(10000)
 
 			##Qutag Part
 			self.configureQutag()
@@ -446,7 +445,7 @@ class ThreePulsePhotonEcho(Spyrelet):
 		('srs bias', {'type': float, 'default': 1.2, 'units':'V'}),
 		('shutter offset', {'type': float, 'default': 500e-9, 'units':'s'}),
 		('measuring range', {'type': float, 'default': 70e-6, 'units':'s'}),
-		('wait time', {'type': float, 'default': 1e-3, 'units':'s'}),
+		('wait time', {'type': float, 'default': 1e-6, 'units':'s'}),
 		('buffer time', {'type': float, 'default': 100e-6, 'units':'s'}),
 		]
 		w = ParamWidget(params)
@@ -480,5 +479,5 @@ class ThreePulsePhotonEcho(Spyrelet):
 	def finalize(self):
 		self.fungen.output[1] = 'OFF'
 		self.fungen.output[2] = 'OFF'
-		print('Two Pulse measurements complete.')
+		print('Three Pulse measurements complete.')
 		return

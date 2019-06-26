@@ -33,3 +33,17 @@ class PM100D(MessageBasedDriver):
         cmd = 'SENSE:CORRECTION:WAVELENGTH? {}'
         cmd_vals = ['MIN', 'MAX']
         return tuple(float(self.query(cmd.format(cmd_val))) for cmd_val in cmd_vals)
+
+
+if __name__ == '__main__':
+    from time import sleep
+    from lantz import Q_
+    from lantz.log import log_to_screen, DEBUG
+
+    log_to_screen(DEBUG)
+    # this is the USB VISA Address:
+    with PM100D('USB0::0x1313::0x8078::P0019269::INSTR') as inst:
+        print('The identification of this instrument is :' + inst.idn)
+        print(inst.power)
+        # inst.format()
+        # print(inst.acquireData())

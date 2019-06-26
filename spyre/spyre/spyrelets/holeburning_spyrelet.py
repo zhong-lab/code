@@ -400,7 +400,7 @@ class HoleBurning(Spyrelet):
 
 			chn1pulse2 = Arbseq_Class('chn1pulse2', timestep)
 			chn1pulse2.delays = [0]*len(heights)
-			chn1pulse2.heights = [0.35]*10+ [0.35]*(len(heights)-10)
+			chn1pulse2.heights = [0.4]*10+ [0.4]*(len(heights)-10)
 			chn1pulse2.widths = [timestep] * len(heights)
 			chn1pulse2.totaltime = tri_time
 			chn1pulse2.nrepeats = 3
@@ -433,7 +433,7 @@ class HoleBurning(Spyrelet):
 
 			chn2pulse = Arbseq_Class('chn2pulse', timestep)
 			chn2pulse.delays = [0]
-			chn2pulse.heights = [0.6]
+			chn2pulse.heights = [0.65]
 			chn2pulse.widths = [params['pump width'].magnitude]
 			chn2pulse.totaltime = params['pump width'].magnitude
 			chn2pulse.nrepeats = 10
@@ -513,7 +513,7 @@ class HoleBurning(Spyrelet):
 			x = np.array(x)
 			x = x-x.min()
 			y = np.array(y)
-			np.savez(os.path.join("D:\\Data\\6.7.2019\\HoleBurning600mT",str(i)),x,y)
+			np.savez(os.path.join("D:\\Data\\6.12.2019\\HoleBurning0T",str(i)),x,y)
 
 			self.fungen.clear_mem(1)
 			self.fungen.clear_mem(2)
