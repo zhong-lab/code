@@ -14,8 +14,8 @@ devices = {
 
 # Experiment List
 spyrelets = {
-    'fiberpulling':[
-        'spyre.spyrelets.fiberpulling_spyrelet.FiberPulling',
+    'testpull':[
+        'spyre.spyrelets.testpull_spyrelet.FiberPulling',
         {'gpd': 'gpd', 'pmd': 'pmd'},
         {}
     ],

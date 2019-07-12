@@ -138,11 +138,8 @@ class MS2721B(MessageBasedDriver):
 
     @Action()
     def savefile(self,value):
-<<<<<<< HEAD
-        return self.write('MMEM:STOR:TRAC 0,"QvsB_0_60_0.25mT_n{}"'.format(value))
-=======
-        return self.write('MMEM:STOR:TRAC 0,"QvsB_2000_0_mT{}"'.format(value))
->>>>>>> 39f5e9b79ae884bba12f8d3ae161628e31246c36
+        return self.write('MMEM:STOR:TRAC 0,"Filename_{}"'.format(value))
+        # return self.write('MMEM:STOR:TRAC 0,"QvsBz_Rampdown_{}"'.format(value))
 
     # @Feat(units='W')
     # def ref_level(self):

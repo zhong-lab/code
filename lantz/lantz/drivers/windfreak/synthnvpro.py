@@ -100,5 +100,5 @@ if __name__=='__main__':
 	with SynthNVPro('ASRL16::INSTR') as inst:
 		print(inst.output)
 		inst.frequency=200
-		inst.power=1
-		inst.output=1
+		inst.power=0
+		inst.output=0

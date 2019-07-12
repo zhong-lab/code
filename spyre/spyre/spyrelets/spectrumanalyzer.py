@@ -67,16 +67,12 @@ class SpectrumAnalyzer(Spyrelet):
         # print('set center frequency to {}'.format(center))
         print('done!')
 
-<<<<<<< HEAD
-        for x in range(121,240):
-            self.spa.savefile(x)
-            time.sleep(30)        
-=======
-        for x in range(1,201):
-            time.sleep(30)
+     
+        for x in range(1,501):
+            time.sleep(60)            
             self.spa.savefile(x)
         
->>>>>>> 39f5e9b79ae884bba12f8d3ae161628e31246c36
+
 
 
 

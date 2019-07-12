@@ -54,8 +54,6 @@ class Test(Spyrelet):
         xs = np.array(self.xs)
         ys = np.array(self.ys)
         w.set('Transmission Power', xs=xs, ys=ys)
-        # print(xs)
-        # print(ys)
         return
 
     def initialize(self):

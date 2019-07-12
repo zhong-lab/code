@@ -44,7 +44,7 @@ class FiberPulling(Spyrelet):
         self.gpd.set_output(value)
         return
 
-    @Element()
+    @Task()
     def HardPull(self):
         elements = apt.list_available_devices()
         serials = [x[1] for x in elements]
@@ -107,7 +107,7 @@ class FiberPulling(Spyrelet):
         p.plot('Transmission Power')
         return p
 
-    @averaged.on(startpulse.acquired)
+    @averaged.on(HardPull.acquired)
     def averaged_update(self, ev):
         w = ev.widget
         xs = np.array(self.xs)

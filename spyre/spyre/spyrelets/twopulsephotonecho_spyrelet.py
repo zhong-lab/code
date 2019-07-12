@@ -43,9 +43,11 @@ class TwoPulsePhotonEcho(Spyrelet):
 		self.qutag.enableChannels((start,stop))
 
 	def createHistogram(self,stoparray, timebase, bincount, totalWidth, tau):
+		lowBound=1.9*tau
+		highBound=2.1*tau
 		hist = [0]*bincount
 		for stoptime in stoparray:
-			binNumber = int(stoptime*timebase*bincount/(totalWidth))
+			binNumber = int(stoptime*timebase*bincount/(0.2*tau))
 			if binNumber >= bincount:
 				continue
 			else:
