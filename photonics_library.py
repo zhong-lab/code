@@ -486,6 +486,152 @@ class Bragg(pya.PCellDeclarationHelper):
         
       # create the shape for this circle
       self.cell.shapes(self.l_layer).insert(pya.Polygon(pts))
+      
+#create an alligator Bragg grating      
+class alligatorBG(pya.PCellDeclarationHelper):
+  """
+  The PCell declaration for the alligator Bragg mirror
+  Be aware of that this class doesn't set any taper part for the alligator Bragg mirror
+  """
+
+  def __init__(self):
+
+    # Important: initialize the super class
+    super(alligatorBG, self).__init__()
+
+    # declare the parameters
+    self.param("l", self.TypeLayer, "Layer", default = pya.LayerInfo(1, 0))  
+    self.param("n", self.TypeInt, "Number of points", default = 64)     
+    self.param("rd", self.TypeDouble, "Double radius", readonly = True)
+    
+    # this hidden parameter is used to determine whether the radius has changed
+    # or the "s" handle has been moved
+    self.param("ru", self.TypeDouble, "Radius", default = 0.0, hidden = True)
+    self.param("s", self.TypeShape, "", default = pya.DPoint(0, 0))
+    self.param("r", self.TypeDouble, "Radius", default = 0.1)
+    
+
+    # length for the input/output waveguide
+    self.param("wglength", self.TypeDouble,"waveguide length",default=5)
+    
+    # spacing
+    self.param("spacing", self.TypeDouble,"spacing",default=0.381)
+    
+    # the width of the center waveguide of the alligator structure
+    self.param("cwidth", self.TypeDouble,"center waveguide width",default=0.270)
+        
+    # define the number of points used
+    self.param("n", self.TypeInt, "Number of points per curve", default = 300)
+    
+    # define the amplitude of the sine wave, e.i., the modulation amplitude
+    self.param("amplitude",self.TypeDouble,"amplitude",default=0.09)
+    
+    # define the alligator period
+    self.param("period", self.TypeInt, "period", default=60)
+    
+    #define the input/output waveguide length
+    self.param("wglength", self.TypeInt,"wglength",default=2e-6)
+    
+    
+  def display_text_impl(self):
+    # Provide a descriptive text for the cell
+    return "Circle(L=" + str(self.l) + ",R=" + ('%.3f' % self.r) + ")"
+  
+  def coerce_parameters_impl(self):
+  
+    # We employ coerce_parameters_impl to decide whether the handle or the 
+    # numeric parameter has changed (by comparing against the effective 
+    # radius ru) and set ru to the effective radius. We also update the 
+    # numerical value or the shape, depending on which on has not changed.
+    rs = None
+    if isinstance(self.s, pya.DPoint): 
+      # compute distance in micron
+      rs = self.s.distance(pya.DPoint(0, 0))
+    if rs != None and abs(self.r-self.ru) < 1e-6:
+      self.ru = rs
+      self.r = rs 
+    else:
+      self.ru = self.r
+      self.s = pya.DPoint(-self.r, 0)
+    
+    self.rd = 2*self.r
+    
+    # n must be larger or equal than 4
+    if self.n <= 4:
+      self.n = 4
+  
+  def can_create_from_shape_impl(self):
+    # Implement the "Create PCell from shape" protocol: we can use any shape which 
+    # has a finite bounding box
+    return self.shape.is_box() or self.shape.is_polygon() or self.shape.is_path()
+  
+  def parameters_from_shape_impl(self):
+    # Implement the "Create PCell from shape" protocol: we set r and l from the shape's 
+    # bounding box width and layer
+    self.r = self.shape.bbox().width() * self.layout.dbu / 2
+    self.l = self.layout.get_info(self.layer)
+  
+  def transformation_from_shape_impl(self):
+    # Implement the "Create PCell from shape" protocol: we use the center of the shape's
+    # bounding box to determine the transformation
+    return pya.Trans(self.shape.bbox().center())
+  
+  def produce_impl(self):
+  
+    # This is the main part of the implementation: create the layout
+
+    # fetch the parameters
+    dbu = self.layout.dbu;
+    ly = self.layout
+    shapes = self.cell.shapes
+    spacing = self.spacing
+    cwidth = self.cwidth
+    amplitude = self.amplitude
+    maxamplitude = cwidth/2+amplitude
+    
+    dist=0
+    # spacing between each point
+    dx=spacing/self.n
+    dy=maxamplitude/self.n
+    
+    da = math.pi*2/self.n
+
+    for i in range(0,self.period):
+      pts=[]
+         
+      # add the total distance along mirror
+      dist+=spacing
+      
+      #creat the left edge bottom part
+      for j in range(0,self.n):
+        pts.append(pya.Point.from_dpoint(pya.DPoint((0+dist)/dbu,-maxamplitude+j*dy/dbu)))   
+      
+      #creat the left edge upper part
+      for j in range(0,self.n):
+        pts.append(pya.Point.from_dpoint(pya.DPoint((0+dist)/dbu,j*dy/dbu)))
+        
+      # creat the top curve
+      # iterate through all the points on each circle
+      for j in range(0,self.n+1):
+        pts.append(pya.Point.from_dpoint(pya.DPoint(((j*dx+dist)/dbu),(cwidth/2+amplitude/2+(amplitude/2)*math.cos(2*math.pi*j*dx/spacing))/dbu)))
+        #pts.append(pya.Point.from_dpoint(pya.DPoint(0*dx/dbu,j*dy/dbu)))
+           
+      #creat the right edge upper part
+      for j in range(0,self.n):
+        pts.append(pya.Point.from_dpoint(pya.DPoint((spacing+dist)/dbu,maxamplitude-j*dy/dbu)))
+      
+      #creat the right edge bottom part
+      for j in range(0,self.n):
+        pts.append(pya.Point.from_dpoint(pya.DPoint((spacing+dist)/dbu,-j*dy/dbu)))
+               
+      #creat the bottom curve
+      for j in range(0,self.n+1):
+        pts.append(pya.Point.from_dpoint(pya.DPoint(((dist+spacing-j*dx)/dbu),(-1)*(cwidth/2+amplitude/2+(amplitude/2)*math.cos(2*math.pi*(dist+spacing-j*dx)/spacing))/dbu)))
+
+     # pts.append(pya.Point.from_dpoint(pya.DPoint((0/dbu),dy*self.n/dbu)))
+     
+      # create the shape for this sine curve
+      self.cell.shapes(self.l_layer).insert(pya.Polygon(pts))
     
 class photonics(pya.Library):
   """
