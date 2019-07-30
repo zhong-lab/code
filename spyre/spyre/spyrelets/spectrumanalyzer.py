@@ -68,9 +68,9 @@ class SpectrumAnalyzer(Spyrelet):
         print('done!')
 
      
-        for x in range(1,501):
-            time.sleep(60)            
+        for x in range(1,1001):
             self.spa.savefile(x)
+            time.sleep(360)            
         
 
 

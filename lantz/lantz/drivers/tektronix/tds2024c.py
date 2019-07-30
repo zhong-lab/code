@@ -169,6 +169,10 @@ class TDS2024C(MessageBasedDriver):
         return
 
     @Action()
+    def query_time(self):
+        return self.query('HORizontal:MAIn:POSition?')
+
+    @Action()
     def average(self, number):
         if number in (4,16,64,128): 
             self.write('ACQ:NUMAV {}'.format(number))
@@ -180,6 +184,10 @@ class TDS2024C(MessageBasedDriver):
     def position(self, channel, position):
         self.write('CH{}:POS {}'.format(channel,position))
         return
+
+    @Action()
+    def scale_query(self, channel):
+        return self.query('CH{}:SCA?'.format(channel))
 
     @Action()
     def scale(self, channel, scale):

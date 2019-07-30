@@ -35,36 +35,16 @@ parser.add_argument("--recwnd", action='store_true', help="Use reconstruction wi
 parser.add_argument("--multithreading", action='store_true', help="Use multithreading")
 parser.add_argument("--downmix-after", action='store_true', help="Downmix signal after spectrogram generation")
 parser.add_argument("--plot", action='store_true', help="Plot transform (needs installed matplotlib package)")
-
 args = parser.parse_args()
+
 if not os.path.exists(args.input):
     parser.error("Input file '%s' not found"%args.input)
-
-fs = args.sr
-scales = {'log':LogScale, 'lin':LinScale, 'mel':MelScale, 'oct':OctScale}
-try:
-    scale = scales[args.scale]
-except KeyError:
-    parser.error('Scale unknown (--scale option)')
-
-scl = scale(args.fmin, args.fmax, args.bins, beyond=int(args.reducedform == 2))
+    
 slicq = NSGT_sliced(scl, args.sllen, args.trlen, fs, 
                     real=args.real, recwnd=args.recwnd, 
-                    matrixform=args.matrixform, reducedform=args.reducedform, 
+                    matrixform=True, reducedform=args.reducedform, 
                     multithreading=args.multithreading,
                     multichannel=True
                     )
 
 signal = np.genfromtxt(args.input, delimiter=',')[:,1]
-
-print(np.shape(signal))
-dur = signal.size/float(fs)
-ncoefs = int(signal.size*slicq.coef_factor)
-c = slicq.forward(signal)
-coefs = assemble_coeffs(c, ncoefs)
-fs_coef = fs*slicq.coef_factor
-mls_dur = len(mls)/fs_coef
-times = np.linspace(0, mls_dur, endpoint=True, num=len(mls)+1)
-mls_max = np.percentile(mls, 99.9)
-pl.imshow(mls.T, aspect=mls_dur/mls.shape[1]*0.2, interpolation='nearest', origin='bottom', vmin=mls_max-60., vmax=mls_max, extent=(0,mls_dur,0,mls.shape[1]))
-pl.show()

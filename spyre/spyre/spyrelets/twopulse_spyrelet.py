@@ -25,8 +25,7 @@ from lantz.drivers.stanford.srs900 import SRS900
 
 class TwoPulse(Spyrelet):
 	requires = {
-		'fungen': Keysight_33622A,
-		'srs': SRS900
+		'fungen': Keysight_33622A
 	}
 
 	@Task()
@@ -43,7 +42,7 @@ class TwoPulse(Spyrelet):
 
 			chn1pulse = Arbseq_Class('chn1pulse', timestep)
 			chn1pulse.delays = [0]
-			chn1pulse.heights = [0]
+			chn1pulse.heights = [1]
 			chn1pulse.widths = [params['pulse width'].magnitude]
 			chn1pulse.totaltime = params['pulse width'].magnitude
 			chn1pulse.nrepeats = 0
@@ -70,9 +69,9 @@ class TwoPulse(Spyrelet):
 			chn1pulse2 = Arbseq_Class('chn1pulse2', timestep)
 			chn1pulse2.delays = [0]
 			chn1pulse2.heights = [1]
-			chn1pulse2.widths = [params['pulse width'].magnitude]
-			chn1pulse2.totaltime = params['pulse width'].magnitude 
-			chn1pulse2width = params['pulse width'].magnitude 
+			chn1pulse2.widths = [params['pulse width'].magnitude*2]
+			chn1pulse2.totaltime = params['pulse width'].magnitude*2 
+			chn1pulse2width = params['pulse width'].magnitude*2
 			chn1pulse2.nrepeats = 0
 			chn1pulse2.repeatstring = 'once'
 			chn1pulse2.markerstring = 'lowAtStart'

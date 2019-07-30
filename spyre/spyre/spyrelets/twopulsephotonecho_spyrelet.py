@@ -47,12 +47,13 @@ class TwoPulsePhotonEcho(Spyrelet):
 		highBound=2.1*tau
 		hist = [0]*bincount
 		for stoptime in stoparray:
-			binNumber = int(stoptime*timebase*bincount/(0.2*tau))
+			binNumber = int(stoptime*timebase*bincount/(totalWidth))
 			if binNumber >= bincount:
 				continue
+				print('error')
 			else:
 				hist[binNumber]+=1
-		out_name = "D:\\Data\\6.13.2019\\Echo\\800mT10mA48"
+		out_name = "D:\\Data\\7.23.2019\\0T"
 		x=[]
 		for i in range(bincount):
 			x.append(i*totalWidth/bincount)

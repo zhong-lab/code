@@ -54,8 +54,9 @@ class Lifetime(Spyrelet):
 				continue
 			else:
 				hist[binNumber]+=1
-		out_name = "D:\\Data\\6.11.2019\\Lifetime\\Y5-Z1"
+		out_name = "D:\\Data\\7.28.2019\\0"
 		np.savez(os.path.join(out_name,str(index)),hist,wls)
+		#np.savez(os.path.join(out_name,str(index+40)),hist,wls)
 		print('Data stored under File Name: ' + self.exp_parameters.widget.get()['File Name'] + str(index))
 
 
@@ -159,30 +160,10 @@ class Lifetime(Spyrelet):
 						stoparray.append(stoptimestamp)
 				wls.append(str(self.wm.measure_wavelength()))
 			self.createHistogram(stoparray, timebase, bincount, period,i, wls)
-			print('Approx. ' + str(int((expparams['# of points']-i)/expparams['Measurement Time'].magnitude)) + ' min left')
+			print(i)
 			self.fungen.voltage[2] = self.fungen.voltage[2].magnitude + 2*dcparams['DC step size'].magnitude
 
 		self.fungen.output[1] = 'OFF'
-		startTime = time.time()
-		startWl = self.wm.measure_wavelength()
-		stoparray = []
-		lastwls=[]
-		while time.time()-startTime < expparams['Measurement Time'].magnitude:
-			time.sleep(period)
-			timestamps = self.qutag.getLastTimestamps(True)
-
-			tstamp = timestamps[0] # array of timestamps
-			tchannel = timestamps[1] # array of channels
-			values = timestamps[2] # number of recorded timestamps
-			for k in range(values):
-				# output all stop events together with the latest start event
-				if tchannel[k] == start:
-					synctimestamp = tstamp[k]
-				else:
-					stoptimestamp = tstamp[k]
-					stoparray.append(stoptimestamp)
-			lastwls.append(str(self.wm.measure_wavelength()))
-		self.createHistogram(stoparray, timebase, bincount, period,'bg', lastwls)
 
 	@Task()
 	def qutagInit(self):

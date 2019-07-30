@@ -47,9 +47,21 @@ class DarkCount(Spyrelet):
 
 	@Task()
 	def getDarkCounts(self):
+		self.srs.SIM928_voltage[5]=0
+		self.srs.SIM928_voltage[6]=0
 		self.srs.module_reset[6]
-		self.srs.wait_time(10000)
+		self.srs.module_reset[5]
+		self.srs.wait_time(100000)
+		qutagparams = self.qutag_params.widget.get()
+		start = qutagparams['Start Channel']
+		stop_1 = qutagparams['Stop Channel 1']
+		stop_2 = qutagparams['Stop Channel 2']
+        ##True = rising edge, False = falling edge. Final value is threshold voltage
+		self.qutag.setSignalConditioning(start,self.qutag.SIGNALCOND_MISC,True,0.1)
+		self.qutag.setSignalConditioning(stop_1,self.qutag.SIGNALCOND_MISC,True,0.1)
+		self.qutag.enableChannels((start,stop_1))
 		biasCurrentParams = self.bias_current.widget.get()
+		qutagParams = self.qutag_params.widget.get()
 		resistance = 10000
 		startCurrent = biasCurrentParams['Start Current'].to('A').magnitude
 		stepSize = biasCurrentParams['Step Size'].to('A').magnitude
@@ -65,21 +77,55 @@ class DarkCount(Spyrelet):
 		points = ((stopCurrent-startCurrent)/stepSize)+(1+stepSize)
 		print(points)
 		BC =[]
-		DCR =[]
+		DCR_1 =[]
 		for i in range(int(points)):
 			lost = self.qutag.getLastTimestamps(True)
 			time.sleep(expParams['Exposure Time'].magnitude)
 			timestamps = self.qutag.getLastTimestamps(True)
-			darkcounts = timestamps[2]
+			tstamp = timestamps[0] # array of timestamps
+			tchannel = timestamps[1] # array of channels
+			values = timestamps[2] # number of recorded timestamps
+			print(tchannel)
+			darkcounts = values
 			BC.append(currentCurrent)
-			DCR.append(darkcounts/expParams['Exposure Time'].magnitude)
-			currentCurrent +=stepSize
+			DCR_1.append(darkcounts/expParams['Exposure Time'].magnitude)
+			currentCurrent += stepSize
 			self.srs.SIM928_voltage[6] = currentCurrent*resistance
 		self.srs.SIM928_voltage[6]=0
 		self.srs.module_reset[6]
+		currentCurrent = startCurrent	
+		self.srs.module_reset[5]
+		self.srs.wait_time(100000)
+		self.srs.SIM928_voltage[5] = currentCurrent*resistance
+		self.srs.SIM928_on[5]	
+		self.srs.wait_time(100000)
+		BC =[]
+		DCR_2 =[]
+		self.qutag.setSignalConditioning(stop_2,self.qutag.SIGNALCOND_MISC,True,0.1)
+		self.qutag.enableChannels((start,stop_2))
+		#print(self.qutag.getChannelsEnabled())	
+		for i in range(int(points)):
+			lost = self.qutag.getLastTimestamps(True)
+			time.sleep(expParams['Exposure Time'].magnitude)
+			timestamps = self.qutag.getLastTimestamps(True)
+			tstamp = timestamps[0] # array of timestamps
+			tchannel = timestamps[1] # array of channels
+			values = timestamps[2] # number of recorded timestamps
+			print(tchannel)
+			darkcounts = values
+			BC.append(currentCurrent)
+			DCR_2.append(darkcounts/expParams['Exposure Time'].magnitude)
+			currentCurrent += stepSize
+			self.srs.SIM928_voltage[5] = currentCurrent*resistance
+		self.srs.SIM928_voltage[5]=0
+		self.srs.module_reset[5]
 		datadir = 'D:\Data\\'
-		np.savetxt(datadir+expParams['File Name'], (BC,DCR), delimiter=',')
-		print('Data stored under File Name: ' + expParams['File Name'])	
+		print(BC)
+		print(DCR_1)
+		print(DCR_2)
+		np.savetxt(datadir+expParams['File Name']+'SNSPD1'+'.csv', (BC,DCR_1), delimiter=',')
+		np.savetxt(datadir+expParams['File Name']+'SNSPD2'+'.csv', (BC,DCR_2), delimiter=',')
+		print('Data stored under File Name: ' + expParams['File Name'] + 'SNSPD1 and ' + expParams['File Name'] + 'SNSPD2')	
 		return
 
 
@@ -106,6 +152,19 @@ class DarkCount(Spyrelet):
 		w = ParamWidget(params)
 		return w
 
+	@Element(name='QuTAG Parameters')
+	def qutag_params(self):
+		params = [
+	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
+		('Start Channel', {'type': int, 'default': 0}),
+		('Stop Channel 1', {'type': int, 'default': 1}),
+		('Stop Channel 2', {'type': int, 'default': 2}),
+		('Total Hist Width Multiplier', {'type': int, 'default': 5}),
+		('Bin Count', {'type': int, 'default': 1000})
+		]
+		w = ParamWidget(params)
+		return w	
+
 
 	@getDarkCounts.initializer
 	def initialize(self):
@@ -117,13 +176,5 @@ class DarkCount(Spyrelet):
 	def finalize(self):
 		return
 
-	def configureQutag(self):
-		qutagparams = self.qutag_params.widget.get()
-		start = qutagparams['Start Channel']
-		stop = qutagparams['Stop Channel']
-        ##True = rising edge, False = falling edge. Final value is threshold voltage
-		self.qutag.setSignalConditioning(start,self.qutag.SIGNALCOND_MISC,True,1)
-		self.qutag.setSignalConditioning(stop,self.qutag.SIGNALCOND_MISC,True,1)
-		self.qutag.enableChannels((start,stop))
 
 

@@ -49,7 +49,7 @@ class ThreePulsePhotonEcho(Spyrelet):
 				continue
 			else:
 				hist[binNumber]+=1
-		out_name = "D:\\Data\\6.11.2019\\Echo\\600mT1600us"
+		out_name = "D:\\Data\\7.29.2019\\no3rdpulse"
 		x=[]
 		for i in range(bincount):
 			x.append(i*totalWidth/bincount)

@@ -23,14 +23,14 @@ from lantz.drivers.keysight.seqbuild import SeqBuild
 from lantz.drivers.keysight import Keysight_33622A
 from lantz.drivers.tektronix import TDS2024C
 
-class HeterodyneEcho(Spyrelet):
+class HeterodyneThreePulse(Spyrelet):
 	requires = {
 		'fungen': Keysight_33622A,
 		'osc': TDS2024C
 	}
 
 	def saveData(self,x,y,index,ind):
-		out_name = "D:\\Data\\7.25.2019\\100mT14"
+		out_name = "D:\\Data\\7.30.2019\\0T\\0.05ms"
 		index=str(round(index,8))
 		ind='.'+str(ind)
 		np.savez(os.path.join(out_name,str(index+ind)),x,y)
@@ -52,8 +52,8 @@ class HeterodyneEcho(Spyrelet):
 		repeat_unit = params['repeat unit'].magnitude
 		pulse_width = params['pulse width'].magnitude
 		echo = params['echo'].magnitude
-		varwidth=pulse_width*2
 		step_tau=params['step tau'].magnitude
+		waitTime=0.05e-3
 		for i in range(100):
 			self.dataset.clear()
 			self.fungen.output[1] = 'OFF'
@@ -62,7 +62,6 @@ class HeterodyneEcho(Spyrelet):
 			self.fungen.clear_mem(2)
 			self.fungen.wait()
 
-			## build pulse sequence for AWG channel 1
 			chn1pulse = Arbseq_Class('chn1pulse', timestep)
 			chn1pulse.delays = [0]
 			chn1pulse.heights = [1]
@@ -83,54 +82,68 @@ class HeterodyneEcho(Spyrelet):
 			chn1dc.repeatstring = 'repeat'
 			chn1dc.markerstring = 'lowAtStart'
 			chn1dc.markerloc = 0
-			chn1dcrepeats = int((tau-0.5*pulse_width-0.5*varwidth)/repeat_unit)
+			chn1dcrepeats = int((tau-pulse_width)/repeat_unit)
 			chn1dc.nrepeats = chn1dcrepeats
 			chn1dcwidth = repeat_unit*chn1dcrepeats
-			print(tau, pulse_width, chn1dcrepeats)
 			chn1dc.create_sequence()
 		
 			chn1pulse2 = Arbseq_Class('chn1pulse2', timestep)
 			chn1pulse2.delays = [0]
 			chn1pulse2.heights = [1]
-			chn1pulse2.widths = [varwidth]
-			chn1pulse2.totaltime = varwidth
-			chn1pulse2width = varwidth
+			chn1pulse2.widths = [pulse_width]
+			chn1pulse2.totaltime = pulse_width
+			chn1pulse2width = pulse_width
 			chn1pulse2.nrepeats = 0
 			chn1pulse2.repeatstring = 'once'
 			chn1pulse2.markerstring = 'lowAtStart'
 			chn1pulse2.markerloc = 0
 			chn1pulse2.create_sequence()
-		
-			chn1pulse3 = Arbseq_Class('chn1pulse3', timestep)
-			chn1pulse3.delays = [0]
-			chn1pulse3.heights = [0]
-			chn1pulse3.widths = [repeat_unit]
-			chn1pulse3.totaltime = repeat_unit 
-			chn1pulse3width = echo
-			chn1pulse3.nrepeats = echo/repeat_unit
-			chn1pulse3.repeatstring = 'repeat'
-			chn1pulse3.markerstring = 'lowAtStart'
-			chn1pulse3.markerloc = 0
-			chn1pulse3.create_sequence()
-		
+
 			chn1dc2 = Arbseq_Class('chn1dc2', timestep)
 			chn1dc2.delays = [0]
 			chn1dc2.heights = [0]
 			chn1dc2.widths = [repeat_unit]
 			chn1dc2.totaltime = repeat_unit
+			chn1dc2width = repeat_unit
+			chn1dc2repeats=int((waitTime-pulse_width)/repeat_unit)
+			chn1dc2.nrepeats = chn1dc2repeats
+			chn1dc2width = repeat_unit*chn1dc2repeats
 			chn1dc2.repeatstring = 'repeat'
 			chn1dc2.markerstring = 'lowAtStart'
-			chn1dc2repeats = int((period-chn1pulsewidth-chn1dcwidth-chn1pulse2width-chn1pulse3width)/repeat_unit)
-			chn1dc2.nrepeats = chn1dc2repeats
 			chn1dc2.markerloc = 0
 			chn1dc2.create_sequence()
+
+			chn1pulse3 = Arbseq_Class('chn1pulse3', timestep)
+			chn1pulse3.delays = [0]
+			chn1pulse3.heights = [1]
+			chn1pulse3.widths = [pulse_width]
+			chn1pulse3.totaltime = pulse_width 
+			chn1pulse3width = pulse_width
+			chn1pulse3.nrepeats = 0
+			chn1pulse3.repeatstring = 'once'
+			chn1pulse3.markerstring = 'lowAtStart'
+			chn1pulse3.markerloc = 0
+			chn1pulse3.create_sequence()
+		
+			chn1dc3 = Arbseq_Class('chn1dc3', timestep)
+			chn1dc3.delays = [0]
+			chn1dc3.heights = [0]
+			chn1dc3.widths = [repeat_unit]
+			chn1dc3.totaltime = repeat_unit
+			chn1dc3.repeatstring = 'repeat'
+			chn1dc3.markerstring = 'lowAtStart'
+			chn1dc3repeats = int((period-3*chn1pulsewidth-chn1dcwidth-chn1dc2width)/repeat_unit)
+			chn1dc3.nrepeats = chn1dc3repeats
+			chn1dc3.markerloc = 0
+			chn1dc3.create_sequence()
 
 			self.fungen.send_arb(chn1pulse, 1)
 			self.fungen.send_arb(chn1dc, 1)
 			self.fungen.send_arb(chn1pulse2, 1)
 			self.fungen.send_arb(chn1pulse3, 1)
 			self.fungen.send_arb(chn1dc2, 1)
-			seq = [chn1pulse, chn1dc, chn1pulse2, chn1pulse3, chn1dc2]
+			self.fungen.send_arb(chn1dc3, 1)
+			seq = [chn1pulse, chn1dc, chn1pulse2,chn1dc2, chn1pulse3, chn1dc3]
 			
 			self.fungen.create_arbseq('twoPulse', seq, 1)
 
@@ -157,7 +170,7 @@ class HeterodyneEcho(Spyrelet):
 			y = np.array(y)
 			curTime=float(self.osc.query_time())
 			maxIndex=np.argmax(y)
-			if maxIndex<1000:
+			if maxIndex<800:
 				self.osc.set_time(curTime-500e-9)
 			if np.max(y)<1.1*float(self.osc.scale_query(1)):
 				self.osc.scale(1,self.stepDown(1,float(self.osc.scale_query(1))))
@@ -173,7 +186,7 @@ class HeterodyneEcho(Spyrelet):
 
 			tau=tau+step_tau
 			curTime=float(self.osc.query_time())
-			self.osc.set_time(curTime+2.0*step_tau)
+			self.osc.set_time(curTime+1.98*step_tau)
 
 	@Element(name='Pulse parameters')
 	def pulse_parameters(self):

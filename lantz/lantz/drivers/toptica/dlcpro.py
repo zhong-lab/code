@@ -263,7 +263,7 @@ class DLCException(Exception):
 
 if __name__ == '__main__':
     import time
-    with DLC('ASRL15::INSTR') as inst:
+    with DLC('TCPIP0::192.168.1.200::INSTR') as inst:
         for i in range(5):
             inst.set_wavelength(1530.000 + i*0.01)
             time.sleep(2)

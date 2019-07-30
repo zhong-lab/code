@@ -24,15 +24,6 @@ class PhotonCount(Spyrelet):
     }
 	qutag = None
 
-	def configureQutag(self):
-		qutagparams = self.qutag_params.widget.get()
-		start = qutagparams['Start Channel']
-		stop = qutagparams['Stop Channel']
-		##True = rising edge, False = falling edge. Final value is threshold voltage
-		self.qutag.setSignalConditioning(start,self.qutag.SIGNALCOND_MISC,True,1)
-		self.qutag.setSignalConditioning(stop,self.qutag.SIGNALCOND_MISC,True,0.1)
-		self.qutag.enableChannels((start,stop))
-
 	@Task()
 	def qutagInit(self):
 		print('qutag successfully initialized')
@@ -56,10 +47,21 @@ class PhotonCount(Spyrelet):
 
 	@Task()
 	def getPhotonCounts(self):
-		self.configureQutag()
+		self.srs.SIM928_voltage[5]=0
+		self.srs.SIM928_voltage[6]=0
 		self.srs.module_reset[6]
-		self.srs.wait_time(10000)
+		self.srs.module_reset[5]
+		self.srs.wait_time(100000)
+		qutagparams = self.qutag_params.widget.get()
+		start = qutagparams['Start Channel']
+		stop_1 = qutagparams['Stop Channel 1']
+		stop_2 = qutagparams['Stop Channel 2']
+        ##True = rising edge, False = falling edge. Final value is threshold voltage
+		self.qutag.setSignalConditioning(start,self.qutag.SIGNALCOND_MISC,True,0.1)
+		self.qutag.setSignalConditioning(stop_1,self.qutag.SIGNALCOND_MISC,True,0.1)
+		self.qutag.enableChannels((start,stop_1))
 		biasCurrentParams = self.bias_current.widget.get()
+		qutagParams = self.qutag_params.widget.get()
 		resistance = 10000
 		startCurrent = biasCurrentParams['Start Current'].to('A').magnitude
 		stepSize = biasCurrentParams['Step Size'].to('A').magnitude
@@ -71,25 +73,60 @@ class PhotonCount(Spyrelet):
 		currentCurrent = startCurrent
 		self.srs.SIM928_voltage[6] = currentCurrent*resistance
 		self.srs.SIM928_on[6]
-		self.srs.wait_time(10000)
+		self.srs.wait_time(100000)
 		points = ((stopCurrent-startCurrent)/stepSize)+(1+stepSize)
 		print(points)
 		BC =[]
-		PCR =[]
+		PCR_1 =[]
 		for i in range(int(points)):
 			lost = self.qutag.getLastTimestamps(True)
 			time.sleep(expParams['Exposure Time'].magnitude)
 			timestamps = self.qutag.getLastTimestamps(True)
-			darkcounts = timestamps[2]
+			tstamp = timestamps[0] # array of timestamps
+			tchannel = timestamps[1] # array of channels
+			values = timestamps[2] # number of recorded timestamps
+			print(tchannel)
+			print(values)
+			photoncounts = values
 			BC.append(currentCurrent)
-			PCR.append(darkcounts/expParams['Exposure Time'].magnitude)
-			currentCurrent +=stepSize
+			PCR_1.append(photoncounts/expParams['Exposure Time'].magnitude)
+			currentCurrent += stepSize
 			self.srs.SIM928_voltage[6] = currentCurrent*resistance
 		self.srs.SIM928_voltage[6]=0
 		self.srs.module_reset[6]
+		currentCurrent = startCurrent	
+		self.srs.module_reset[5]
+		self.srs.wait_time(100000)
+		self.srs.SIM928_voltage[5] = currentCurrent*resistance
+		self.srs.SIM928_on[5]	
+		self.srs.wait_time(100000)
+		BC =[]
+		PCR_2 =[]
+		self.qutag.setSignalConditioning(stop_2,self.qutag.SIGNALCOND_MISC,True,0.1)
+		self.qutag.enableChannels((start,stop_2))
+		#print(self.qutag.getChannelsEnabled())	
+		for i in range(int(points)):
+			lost = self.qutag.getLastTimestamps(True)
+			time.sleep(expParams['Exposure Time'].magnitude)
+			timestamps = self.qutag.getLastTimestamps(True)
+			tstamp = timestamps[0] # array of timestamps
+			tchannel = timestamps[1] # array of channels
+			values = timestamps[2] # number of recorded timestamps
+			print(tchannel)
+			photoncounts = values
+			BC.append(currentCurrent)
+			PCR_2.append(photoncounts/expParams['Exposure Time'].magnitude)
+			currentCurrent += stepSize
+			self.srs.SIM928_voltage[5] = currentCurrent*resistance
+		self.srs.SIM928_voltage[5]=0
+		self.srs.module_reset[5]
 		datadir = 'D:\Data\\'
-		np.savetxt(datadir+expParams['File Name'], (BC,PCR), delimiter=',')
-		print('Data stored under File Name: ' + expParams['File Name'])	
+		print(BC)
+		print(PCR_1)
+		print(PCR_2)
+		np.savetxt(datadir+expParams['File Name']+'SNSPD1'+'.csv', (BC,PCR_1), delimiter=',')
+		np.savetxt(datadir+expParams['File Name']+'SNSPD2'+'.csv', (BC,PCR_2), delimiter=',')
+		print('Data stored under File Name: ' + expParams['File Name'] + 'SNSPD1 and ' + expParams['File Name'] + 'SNSPD2')	
 		return
 
 
@@ -132,7 +169,8 @@ class PhotonCount(Spyrelet):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
 		('Start Channel', {'type': int, 'default': 0}),
-		('Stop Channel', {'type': int, 'default': 1})
+		('Stop Channel 1', {'type': int, 'default': 1}),
+		('Stop Channel 2', {'type': int, 'default': 2})
 		]
 		w = ParamWidget(params)
 		return w
