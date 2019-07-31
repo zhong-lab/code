@@ -30,7 +30,7 @@ class HeterodyneThreePulse(Spyrelet):
 	}
 
 	def saveData(self,x,y,index,ind):
-		out_name = "D:\\Data\\7.30.2019\\0T\\0.05ms"
+		out_name = "D:\\Data\\7.30.2019\\0.05T\\0.05ms"
 		index=str(round(index,8))
 		ind='.'+str(ind)
 		np.savez(os.path.join(out_name,str(index+ind)),x,y)
