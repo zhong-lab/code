@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Lantz Drivers &mdash; Zhong-Lab Code 0.0.1 documentation</title>
+  <title>Keysight_33622A.py &mdash; Zhong-Lab Code 0.0.1 documentation</title>
   
 
   
@@ -35,8 +35,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Inside Lantz" href="insidelantz.html" /> 
+    <link rel="search" title="Search" href="search.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -86,9 +85,9 @@
 <li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Lantz</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="insidelantz.html">Inside Lantz</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Lantz Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drivers.html">Lantz Drivers</a></li>
 </ul>
 
             
@@ -134,13 +133,13 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Lantz Drivers</li>
+      <li>Keysight_33622A.py</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/drivers.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/keysight.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -153,13 +152,28 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="lantz-drivers">
-<h1>Lantz Drivers<a class="headerlink" href="#lantz-drivers" title="Permalink to this headline">¶</a></h1>
-<p>Inside the drivers folder, there are a bunch of folders, each with the name of
-the manufacturer of the instrument’s driver. Contained in each folder are the
-drivers for each instrument, and the init file.</p>
-<p>The driver is used to connect to devices. There are different methods to connect,
-and are device dependent.</p>
+  <div class="section" id="keysight-33622a-py">
+<h1>Keysight_33622A.py<a class="headerlink" href="#keysight-33622a-py" title="Permalink to this headline">¶</a></h1>
+<p>The header of the main driver file looks like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">lantz</span> <span class="k">import</span> <span class="n">Feat</span><span class="p">,</span> <span class="n">DictFeat</span><span class="p">,</span> <span class="n">Action</span>
+<span class="kn">from</span> <span class="nn">lantz.messagebased</span> <span class="k">import</span> <span class="n">MessageBasedDriver</span>
+<span class="kn">from</span> <span class="nn">lantz.drivers.keysight.arbseq_class</span> <span class="k">import</span> <span class="n">Arbseq_Class</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">sleep</span>
+
+<span class="k">class</span> <span class="nc">Keysight_33622A</span><span class="p">(</span><span class="n">MessageBasedDriver</span><span class="p">):</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="init-py">
+<h1>__init__.py<a class="headerlink" href="#init-py" title="Permalink to this headline">¶</a></h1>
+<p>The init file should look something like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">.Keysight_33622A</span> <span class="k">import</span> <span class="n">Keysight_33622A</span>
+<span class="kn">from</span> <span class="nn">.seqbuild</span> <span class="k">import</span> <span class="n">SeqBuild</span>
+<span class="kn">from</span> <span class="nn">.arbseq_class</span> <span class="k">import</span> <span class="n">Arbseq_Class</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Keysight_33622A&#39;</span><span class="p">,</span> <span class="s1">&#39;SeqBuild&#39;</span><span class="p">,</span> <span class="s1">&#39;Arbseq_Class&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
 </div>
 
 
@@ -167,13 +181,6 @@ and are device dependent.</p>
            
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-      
-        <a href="insidelantz.html" class="btn btn-neutral float-left" title="Inside Lantz" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
   
 
   <hr/>

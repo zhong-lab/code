@@ -2,35 +2,7 @@ Lantz Drivers
 ============================
 Inside the drivers folder, there are a bunch of folders, each with the name of
 the manufacturer of the instrument's driver. Contained in each folder are the
-drivers for each instrument, and the init file. In this page, we go through the
-Keysight 33622A Arbitrary Waveform Generator.
+drivers for each instrument, and the init file.
 
-__init__.py
-^^^^^^^^^^^
-The init file should look something like this::
-
-    from .Keysight_33622A import Keysight_33622A
-    from .seqbuild import SeqBuild
-    from .arbseq_class import Arbseq_Class
-
-    __all__ = ['Keysight_33622A', 'SeqBuild', 'Arbseq_Class']
-
-There may be more files than are imported here. However, all files that you will
-use now or in the future should be included in the init file. The first driver,
-Keysight_33622A, is the main driver. SeqBuild and Arbseq_Class are merely classes
-that help the driver build arbitrary waveforms. For all intents and purposes, the
-contents of the latter two classes could have been included in the main driver.
-That's all that needs to be done for init. Most driver folders will only have
-main driver files, many even only having one file if we only have one machine
-from that particular company.
-
-Keysight_33622A.py
-^^^^^^^^^^^^^^^^^^^^^
-The header of the main driver file looks like this::
-
-    from lantz import Feat, DictFeat, Action
-    from lantz.messagebased import MessageBasedDriver
-    from lantz.drivers.keysight.arbseq_class import Arbseq_Class
-    from time import sleep
-
-    class Keysight_33622A(MessageBasedDriver):
+The driver is used to connect to devices. There are different methods to connect,
+and are device dependent. 
