@@ -21,15 +21,29 @@ Search
    architecture
 
 .. toctree::
-   :glob:
    :caption: Lantz
-   :maxdepth: 2
+   :maxdepth: 3
 
    insidelantz
    drivers
+   keysight
 
 .. toctree::
-   :glob:
+   :caption: Spyre
+   :maxdepth: 4
+
+   insidespyre
+   examplespyrelet
+   exampleconfig
+   creatingspyrelet
+
+.. toctree::
+   :caption: Running spyrelets
+   :maxdepth: 1
+
+   runspyre
+
+.. toctree::
    :caption: Installation
    :maxdepth: 1
 

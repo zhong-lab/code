@@ -30,7 +30,7 @@ class HeterodyneEcho(Spyrelet):
 	}
 
 	def saveData(self,x,y,index,ind):
-		out_name = "D:\\Data\\7.25.2019\\100mT14"
+		out_name = "D:\\Data\\7.31.2019\\250mTd3"
 		index=str(round(index,8))
 		ind='.'+str(ind)
 		np.savez(os.path.join(out_name,str(index+ind)),x,y)

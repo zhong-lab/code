@@ -53,7 +53,7 @@ class TwoPulsePhotonEcho(Spyrelet):
 				print('error')
 			else:
 				hist[binNumber]+=1
-		out_name = "D:\\Data\\7.23.2019\\0T"
+		out_name = "D:\\Data\\7.31.2019\\250mTSNSPD"
 		x=[]
 		for i in range(bincount):
 			x.append(i*totalWidth/bincount)

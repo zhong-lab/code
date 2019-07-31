@@ -1,0 +1,374 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Dark Count Spyrelet &mdash; Zhong-Lab Code 0.0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'./',
+              VERSION:'0.0.1',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Dark Count Config File" href="exampleconfig.html" />
+    <link rel="prev" title="Spyre" href="insidespyre.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Zhong-Lab Code
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Introduction</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Lantz</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="insidelantz.html">Inside Lantz</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drivers.html">Lantz Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="keysight.html">Keysight_33622A.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="keysight.html#init-py">__init__.py</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Spyre</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="insidespyre.html">Spyre</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Dark Count Spyrelet</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#imports">Imports</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#class-header">Class Header</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#task">Task</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#elements">Elements</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="exampleconfig.html">Dark Count Config File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="creatingspyrelet.html">Creating Spyrelet</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Running spyrelets</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="runspyre.html">Running Spyrelets</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installcode.html">Installation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Zhong-Lab Code</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Dark Count Spyrelet</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/examplespyrelet.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="dark-count-spyrelet">
+<h1>Dark Count Spyrelet<a class="headerlink" href="#dark-count-spyrelet" title="Permalink to this headline">¶</a></h1>
+<p>This section runs through a simple spyrelet, found in ~/code/spyre/spyre/spyrelets/darkcount_spyrelet
+The experiment counts dark counts detected by the SNSPD, by communicating with the QuTAG and SRS modules.
+It stores the data in csv files.</p>
+<div class="section" id="imports">
+<h2>Imports<a class="headerlink" href="#imports" title="Permalink to this headline">¶</a></h2>
+<p>The top of every spyrelet file will have the following</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pyqtgraph</span> <span class="kn">as</span> <span class="nn">pg</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">lantz</span> <span class="kn">import</span> <span class="n">Q_</span>
+
+<span class="kn">from</span> <span class="nn">PyQt5.Qsci</span> <span class="kn">import</span> <span class="n">QsciScintilla</span><span class="p">,</span> <span class="n">QsciLexerPython</span>
+
+<span class="kn">from</span> <span class="nn">spyre</span> <span class="kn">import</span> <span class="n">Spyrelet</span><span class="p">,</span> <span class="n">Task</span><span class="p">,</span> <span class="n">Element</span>
+<span class="kn">from</span> <span class="nn">spyre.widgets.task</span> <span class="kn">import</span> <span class="n">TaskWidget</span>
+<span class="kn">from</span> <span class="nn">spyre.plotting</span> <span class="kn">import</span> <span class="n">LinePlotWidget</span>
+<span class="kn">from</span> <span class="nn">spyre.widgets.rangespace</span> <span class="kn">import</span> <span class="n">Rangespace</span>
+<span class="kn">from</span> <span class="nn">spyre.widgets.param_widget</span> <span class="kn">import</span> <span class="n">ParamWidget</span>
+<span class="kn">from</span> <span class="nn">spyre.widgets.repository_widget</span> <span class="kn">import</span> <span class="n">RepositoryWidget</span>
+</pre></div>
+</div>
+<p>Other modules can be imported as needed.</p>
+<p>The lantz drivers for each instruments used must also be imported. Dark counts uses the SRS modules and the QuTAG, so the following are imported:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">lantz.drivers.stanford.srs900</span> <span class="kn">import</span> <span class="n">SRS900</span>
+<span class="kn">from</span> <span class="nn">lantz.drivers.qutools</span> <span class="kn">import</span> <span class="n">QuTAG</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="class-header">
+<h2>Class Header<a class="headerlink" href="#class-header" title="Permalink to this headline">¶</a></h2>
+<p>The class is declared as a spyrelet:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">DarkCount</span><span class="p">(</span><span class="n">Spyrelet</span><span class="p">):</span>
+</pre></div>
+</div>
+<p>Following this, give aliases to the instruments to connect it to the config file (see <a class="reference internal" href="exampleconfig.html#config"><span class="std std-ref">Dark Count Config File</span></a>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>    <span class="n">requires</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;srs&#39;</span><span class="p">:</span> <span class="n">SRS900</span>
+<span class="p">}</span>
+    <span class="n">qutag</span> <span class="o">=</span> <span class="bp">None</span>
+</pre></div>
+</div>
+<p>Note usually, with NI Max devices (such as SRS, AWG, scopes, etc.) the declaration will be similar to the srs.
+The exception is for devices that don’t use NI VISA to connect, but instead use .dll files to communicate (Attocube, QuTAG, etc.).
+For these, we separately intiate communication with them, so initially setting them to None is my temporary solution.
+Now we have to establish a connection with the QuTAG (SRS is already connected at this point).</p>
+</div>
+<div class="section" id="task">
+<h2>Task<a class="headerlink" href="#task" title="Permalink to this headline">¶</a></h2>
+<p>The bulk of the code is contained in the task functions, indicated by:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@Task</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>above the function declaration. In the particular case of having a .dll instrument such as the QuTAG, we can have a Task that establishes connection with the device, as with the case of the dark counts spyrelet.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@Task</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">qutagInit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;qutag successfully initialized&#39;</span><span class="p">)</span>
+
+<span class="nd">@qutagInit.initializer</span>
+<span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">lantz.drivers.qutools</span> <span class="kn">import</span> <span class="n">QuTAG</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qutag</span> <span class="o">=</span> <span class="n">QuTAG</span><span class="p">()</span>
+        <span class="n">devType</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qutag</span><span class="o">.</span><span class="n">getDeviceType</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">devType</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">qutag</span><span class="o">.</span><span class="n">DEVTYPE_QUTAG</span><span class="p">):</span>
+                <span class="k">print</span><span class="p">(</span><span class="s2">&quot;found quTAG!&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s2">&quot;no suitable device found - demo mode activated&quot;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Device timebase:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">qutag</span><span class="o">.</span><span class="n">getTimebase</span><span class="p">()))</span>
+        <span class="k">return</span>
+
+<span class="nd">@qutagInit.finalizer</span>
+<span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span>
+</pre></div>
+</div>
+<p>A Task is the main function that you will run in the spyrelet, once the GUI pops up. You can have multiple Tasks in a spyrelet.</p>
+<p>The main body of a Task is contained under the &#64;Task() header, followed by a defined function with a name of your choice. The argument of the task is always just self. Inside the body of this function, put what you want to happen during the experiment. For this particular simple Task, we just print something.</p>
+<p>In addition to the main Task function, each Task must have an initializer and finalizer. They can both be as simple as just return. Specify the initializer and finalizer with the &#64;__functionName__initializer/finalizer, as shown above, with the corresponding function names, with argument self. The initializer and finalizer are no different than running them at the beginning/end of the main task. For instance, the following code is exactly the same as the above:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@Task</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">qutagInit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">lantz.drivers.qutools</span> <span class="kn">import</span> <span class="n">QuTAG</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qutag</span> <span class="o">=</span> <span class="n">QuTAG</span><span class="p">()</span>
+        <span class="n">devType</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qutag</span><span class="o">.</span><span class="n">getDeviceType</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">devType</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">qutag</span><span class="o">.</span><span class="n">DEVTYPE_QUTAG</span><span class="p">):</span>
+                <span class="k">print</span><span class="p">(</span><span class="s2">&quot;found quTAG!&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+                <span class="k">print</span><span class="p">(</span><span class="s2">&quot;no suitable device found - demo mode activated&quot;</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Device timebase:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">qutag</span><span class="o">.</span><span class="n">getTimebase</span><span class="p">()))</span>
+
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;qutag successfully initialized&#39;</span><span class="p">)</span>
+
+<span class="nd">@qutagInit.initializer</span>
+<span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span>
+
+<span class="nd">@qutagInit.finalizer</span>
+<span class="k">def</span> <span class="nf">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span>
+</pre></div>
+</div>
+<p>The initialize and finalize simply help the organization of the code. For instance, if you are using the AWG, you may always want to turn it off at the end of the Task, so it’s a good idea to include that in finalize.</p>
+<p>A Task on the GUI looks like this:</p>
+<img alt="_images/task.png" src="_images/task.png" />
+<p>Once the “play” button is pressed, the initializer will run, followed by the main task function, and then the finalizer. Simply running the code without pressing this button will not run any tasks. In this way, you can set up several tasks and run them in any order.</p>
+</div>
+<div class="section" id="elements">
+<h2>Elements<a class="headerlink" href="#elements" title="Permalink to this headline">¶</a></h2>
+<p>An Element is a GUI component that will display something, whether it be a plot or adjustable parameters.
+Dark count spyrelet has several parameter Elements, one of them is:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@Element</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;QuTAG Parameters&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">qutag_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s1">&#39;Start Channel&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}),</span>
+        <span class="p">(</span><span class="s1">&#39;Stop Channel 1&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}),</span>
+        <span class="p">(</span><span class="s1">&#39;Stop Channel 2&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}),</span>
+        <span class="p">(</span><span class="s1">&#39;Total Hist Width Multiplier&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">}),</span>
+        <span class="p">(</span><span class="s1">&#39;Bin Count&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">})</span>
+        <span class="p">]</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">ParamWidget</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">w</span>
+</pre></div>
+</div>
+<p>Each parameter has a type, such as int, float, string, etc.
+This is displayed on the GUI as:</p>
+<img alt="_images/element.png" src="_images/element.png" />
+<p>You can call the elements in Tasks with</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">qutagparams</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qutag_params</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+<span class="n">start</span> <span class="o">=</span> <span class="n">qutagparams</span><span class="p">[</span><span class="s1">&#39;Start Channel&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The .get() function creates a dictionary, and you can reference each parameter using it’s dictionary key to get the value. The “start” variable above will be set to 0, if no changes were made in the GUI.</p>
+<p>The use of Elements is so that you can dynamically change parameters of the experiment without digging into the code everytime. You can change the parameters in the GUI before running Tasks, and the change will be reflected when you run the Tasks.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="exampleconfig.html" class="btn btn-neutral float-right" title="Dark Count Config File" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="insidespyre.html" class="btn btn-neutral float-left" title="Spyre" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

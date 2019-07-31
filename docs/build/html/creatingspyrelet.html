@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Introduction &mdash; Zhong-Lab Code 0.0.1 documentation</title>
+  <title>Creating Spyrelet &mdash; Zhong-Lab Code 0.0.1 documentation</title>
   
 
   
@@ -20,11 +20,20 @@
   <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
   
     
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'./',
+              VERSION:'0.0.1',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
         <script type="text/javascript" src="_static/jquery.js"></script>
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -33,10 +42,11 @@
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Architecture" href="architecture.html" />
-    <link rel="prev" title="Zhong Lab Code Documentation" href="index.html" /> 
+    <link rel="next" title="Running Spyrelets" href="runspyre.html" />
+    <link rel="prev" title="Dark Count Config File" href="exampleconfig.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -80,9 +90,32 @@
               
             
             
-              <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a></li>
+              <p class="caption"><span class="caption-text">Introduction</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Lantz</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="insidelantz.html">Inside Lantz</a></li>
+<li class="toctree-l1"><a class="reference internal" href="drivers.html">Lantz Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="keysight.html">Keysight_33622A.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="keysight.html#init-py">__init__.py</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Spyre</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="insidespyre.html">Spyre</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examplespyrelet.html">Dark Count Spyrelet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exampleconfig.html">Dark Count Config File</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Creating Spyrelet</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Running spyrelets</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="runspyre.html">Running Spyrelets</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installcode.html">Installation</a></li>
 </ul>
 
             
@@ -128,13 +161,13 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Introduction</li>
+      <li>Creating Spyrelet</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/introduction.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/creatingspyrelet.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -147,11 +180,12 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="introduction">
-<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
-<p>The following documentation shows how to use, alter, and build Zhong lab code.
-The GitHub repository for the code is located at:</p>
-<p><a class="reference external" href="https://github.com/zhong-lab/code">https://github.com/zhong-lab/code</a></p>
+  <div class="section" id="creating-spyrelet">
+<h1>Creating Spyrelet<a class="headerlink" href="#creating-spyrelet" title="Permalink to this headline">¶</a></h1>
+<p>To create your own spyrelet, first make a config file.
+Pick any config file in ~/code/spyre/testing, and copy the contents into a new file.
+Then change the device list so it reflects what devices you will connect to, and change the experiment list to reflect the spyrelet you will use. Finally, name this config file expname.py, where “expname” should be replaced by the name of your experiment.</p>
+<p>Then, make the spyrelet itself. Copy template_spyrelet into a new file, and name is expname_spyrelet.py, where “expname” should be replaced by the name of your experiment. _spyrelet is added at the end to distinguish the spyrelet from the config file.</p>
 </div>
 
 
@@ -162,10 +196,10 @@ The GitHub repository for the code is located at:</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="architecture.html" class="btn btn-neutral float-right" title="Architecture" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="runspyre.html" class="btn btn-neutral float-right" title="Running Spyrelets" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral float-left" title="Zhong Lab Code Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="exampleconfig.html" class="btn btn-neutral float-left" title="Dark Count Config File" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -174,7 +208,7 @@ The GitHub repository for the code is located at:</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Riku Fukumori
+        &copy; Copyright 2019
 
     </p>
   </div>

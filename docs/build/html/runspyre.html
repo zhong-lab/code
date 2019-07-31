@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>testing &mdash; Zhong-Lab Code 0.0.1 documentation</title>
+  <title>Running Spyrelets &mdash; Zhong-Lab Code 0.0.1 documentation</title>
   
 
   
@@ -20,11 +20,20 @@
   <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
   
     
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'./',
+              VERSION:'0.0.1',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
         <script type="text/javascript" src="_static/jquery.js"></script>
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -36,7 +45,8 @@
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Lantz Drivers" href="drivers.html" /> 
+    <link rel="next" title="Installation" href="installcode.html" />
+    <link rel="prev" title="Creating Spyrelet" href="creatingspyrelet.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -89,10 +99,23 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="insidelantz.html">Inside Lantz</a></li>
 <li class="toctree-l1"><a class="reference internal" href="drivers.html">Lantz Drivers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="keysight.html">Keysight_33622A.py</a></li>
+<li class="toctree-l1"><a class="reference internal" href="keysight.html#init-py">__init__.py</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Lantz</span></p>
+<p class="caption"><span class="caption-text">Spyre</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="insidespyre.html">Spyre</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examplespyrelet.html">Dark Count Spyrelet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exampleconfig.html">Dark Count Config File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="creatingspyrelet.html">Creating Spyrelet</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Running spyrelets</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">testing</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Running Spyrelets</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installcode.html">Installation</a></li>
 </ul>
 
             
@@ -138,13 +161,13 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>testing</li>
+      <li>Running Spyrelets</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/testing.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/runspyre.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -157,8 +180,28 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="testing">
-<h1>testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="running-spyrelets">
+<span id="runspyre"></span><h1>Running Spyrelets<a class="headerlink" href="#running-spyrelets" title="Permalink to this headline">¶</a></h1>
+<p>To run a written spyrelet, first make sure spyre is activated by looking for (spyre) on the left side of cmd.
+If not, activate spyre:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">activate</span> <span class="n">spyre</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Sometimes, your path will not be set to envs and the above command will not work. In this case, look for the environment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="nb">list</span> <span class="n">envs</span>
+</pre></div>
+</div>
+<p class="last">After finding the path the spyre environment, activate it with “activate” followed by the full path to the spyre env.</p>
+</div>
+<p>If spyre is not installed, refer to <a class="reference internal" href="installcode.html#installcode"><span class="std std-ref">Installation</span></a>.</p>
+<p>Navigate to your code path, and go to ~/code/spyre/testing.
+To run the spyrelet, (let the spyrelet name be “example”):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">main</span><span class="o">.</span><span class="n">py</span> <span class="n">example</span>
+</pre></div>
+</div>
+<p>The spyrelet name must be passed into the argument of main.py.</p>
 </div>
 
 
@@ -169,8 +212,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
+        <a href="installcode.html" class="btn btn-neutral float-right" title="Installation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-        <a href="drivers.html" class="btn btn-neutral float-left" title="Lantz Drivers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+        <a href="creatingspyrelet.html" class="btn btn-neutral float-left" title="Creating Spyrelet" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -179,7 +224,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Riku Fukumori
+        &copy; Copyright 2019
 
     </p>
   </div>

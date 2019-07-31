@@ -18,7 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'Zhong-Lab Code'
-copyright = '2019, Riku Fukumori'
+copyright = '2019'
 author = 'Riku Fukumori'
 
 # The full version, including alpha/beta/rc tags
