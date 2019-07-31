@@ -22,10 +22,9 @@ Search
 
 .. toctree::
    :caption: Lantz
-   :maxdepth: 3
+   :maxdepth: 2
 
    insidelantz
-   drivers
    keysight
 
 .. toctree::

@@ -1,5 +1,5 @@
 Keysight_33622A.py
-^^^^^^^^^^^^^^^^^^^^^
+===================
 The header of the main driver file looks like this::
 
     from lantz import Feat, DictFeat, Action

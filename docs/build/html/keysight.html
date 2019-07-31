@@ -46,7 +46,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Spyre" href="insidespyre.html" />
-    <link rel="prev" title="Lantz Drivers" href="drivers.html" /> 
+    <link rel="prev" title="Inside Lantz" href="insidelantz.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -98,9 +98,10 @@
 <p class="caption"><span class="caption-text">Lantz</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="insidelantz.html">Inside Lantz</a></li>
-<li class="toctree-l1"><a class="reference internal" href="drivers.html">Lantz Drivers</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Keysight_33622A.py</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#init-py">__init__.py</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Keysight_33622A.py</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#init-py">__init__.py</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption"><span class="caption-text">Spyre</span></p>
 <ul>
@@ -191,9 +192,8 @@
 <span class="k">class</span> <span class="nc">Keysight_33622A</span><span class="p">(</span><span class="n">MessageBasedDriver</span><span class="p">):</span>
 </pre></div>
 </div>
-</div>
 <div class="section" id="init-py">
-<h1>__init__.py<a class="headerlink" href="#init-py" title="Permalink to this headline">¶</a></h1>
+<h2>__init__.py<a class="headerlink" href="#init-py" title="Permalink to this headline">¶</a></h2>
 <p>The init file should look something like this:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">.Keysight_33622A</span> <span class="k">import</span> <span class="n">Keysight_33622A</span>
 <span class="kn">from</span> <span class="nn">.seqbuild</span> <span class="k">import</span> <span class="n">SeqBuild</span>
@@ -201,6 +201,7 @@
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Keysight_33622A&#39;</span><span class="p">,</span> <span class="s1">&#39;SeqBuild&#39;</span><span class="p">,</span> <span class="s1">&#39;Arbseq_Class&#39;</span><span class="p">]</span>
 </pre></div>
+</div>
 </div>
 </div>
 
@@ -215,7 +216,7 @@
         <a href="insidespyre.html" class="btn btn-neutral float-right" title="Spyre" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="drivers.html" class="btn btn-neutral float-left" title="Lantz Drivers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="insidelantz.html" class="btn btn-neutral float-left" title="Inside Lantz" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
