@@ -29,7 +29,8 @@ Search
    drivers
 
 .. toctree::
+   :glob:
    :caption: Installation
    :maxdepth: 1
 
-   install-code
+   installcode
