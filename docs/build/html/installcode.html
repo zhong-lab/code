@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Zhong Lab Code Documentation &mdash; Zhong-Lab Code 0.0.1 documentation</title>
+  <title>Installation &mdash; Zhong-Lab Code 0.0.1 documentation</title>
   
 
   
@@ -36,7 +36,7 @@
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="About" href="about.html" /> 
+    <link rel="prev" title="Lantz Drivers" href="drivers.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -50,7 +50,7 @@
           
 
           
-            <a href="#" class="icon icon-home"> Zhong-Lab Code
+            <a href="index.html" class="icon icon-home"> Zhong-Lab Code
           
 
           
@@ -91,8 +91,8 @@
 <li class="toctree-l1"><a class="reference internal" href="drivers.html">Lantz Drivers</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Installation</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="installcode.html">Installation</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a></li>
 </ul>
 
             
@@ -107,7 +107,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="#">Zhong-Lab Code</a>
+          <a href="index.html">Zhong-Lab Code</a>
         
       </nav>
 
@@ -136,15 +136,15 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="#">Docs</a> &raquo;</li>
+      <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Zhong Lab Code Documentation</li>
+      <li>Installation</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/installcode.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -157,48 +157,39 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="zhong-lab-code-documentation">
-<h1>Zhong Lab Code Documentation<a class="headerlink" href="#zhong-lab-code-documentation" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="getting-started">
-<h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
-<p>If you are new to the code base, start at <a class="reference internal" href="about.html#about"><span class="std std-ref">About</span></a> and run through all the
-modules.</p>
-<p>If you just need to run a spyrelet, then go to</p>
+  <div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>This page will go through installing the code in a new pc. Currently, code only works on a Windows PC.
+Before starting, check the following:
+1. Check if you have conda installed by opening command line (cmd) and typing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="o">--</span><span class="n">v</span>
+</pre></div>
 </div>
-<div class="section" id="search">
-<h2>Search<a class="headerlink" href="#search" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
-</ul>
-<div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Introduction</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="architecture.html#scaffolding-code">Scaffolding: /code</a></li>
-<li class="toctree-l2"><a class="reference internal" href="architecture.html#cmder">cmder</a></li>
-<li class="toctree-l2"><a class="reference internal" href="architecture.html#docs">docs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="architecture.html#lantz">lantz</a></li>
-<li class="toctree-l2"><a class="reference internal" href="architecture.html#pyqtgraph">pyqtgraph</a></li>
-<li class="toctree-l2"><a class="reference internal" href="architecture.html#spyre">spyre</a></li>
-</ul>
+<p>If conda can’t be found, then install from  &lt;<a class="reference external" href="https://conda.io/miniconda.html">https://conda.io/miniconda.html</a>&gt;`_. and run the .exe, and follow the instructions.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Add miniconda to PATH during the installation (Should be a check box).
+If you don’t, you may have to add conda to your PATH later.</p>
+</div>
+<ol class="arabic" start="2">
+<li><p>Check if you have pip installed by opening command line (cmd) and typing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="o">--</span><span class="n">version</span>
+</pre></div>
+</div>
 </li>
-</ul>
+</ol>
+<p>If pip can’t be found, make sure any verison of python is installed. Then go to &lt;<a class="reference external" href="https://pip.pypa.io/en/stable/installing/">https://pip.pypa.io/en/stable/installing/</a>&gt;`_.
+and follow “install with get-pip.py”.</p>
+<ol class="arabic" start="3">
+<li><p>Get familiar with command line. For the installation, you need:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span>
+<span class="nb">dir</span> <span class="p">(</span><span class="n">ls</span> <span class="k">for</span> <span class="n">unix</span> <span class="n">systems</span><span class="p">)</span>
+</pre></div>
 </div>
-<div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Lantz</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="insidelantz.html">Inside Lantz</a></li>
-<li class="toctree-l1"><a class="reference internal" href="drivers.html">Lantz Drivers</a></li>
-</ul>
-</div>
-<div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Installation</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="installcode.html">Installation</a></li>
-</ul>
-</div>
-</div>
+</li>
+</ol>
+<p>cd will change your current working directory to the specified directory, and cd .. will move you one directory back.
+dir will show you all directories and files in your current directory.</p>
 </div>
 
 
@@ -209,8 +200,8 @@ modules.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="about.html" class="btn btn-neutral float-right" title="About" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
+        <a href="drivers.html" class="btn btn-neutral float-left" title="Lantz Drivers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
