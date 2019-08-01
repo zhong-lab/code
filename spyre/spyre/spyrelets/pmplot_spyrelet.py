@@ -1,6 +1,6 @@
 '''
 drawing distribution of our fiber coupling
-with a reak attocube and a fake pwm for testing
+with a attocube and a fake pwm for testing
 '''
 import numpy as np
 import pyqtgraph as pg
@@ -75,7 +75,24 @@ class Test(Spyrelet):
 		im = self.pw
 		w.set(im)
 		return
+	    def buttons(self):
 
+            button1 = QPushButton('x +',self)
+            button1.move(0, 20)
+            button2 = QPushButton('x -',self)
+            button2.move(0, 30)
+            button3 = QPushButton('z +',self)
+            button3.move(0, 40)
+            button4 = QPushButton('z -',self)
+            button4.move(0, 50)
+            button1.clicked.connect(self.move_x1)
+            button2.clicked.connect(self.move_x2)
+            button3.clicked.connect(self.move_z1)
+            button4.clicked.connect(self.move_z2)
+        return
+    	def move_x1(self):
+        	print("PyQt5 button click")
+	
 	def initialize(self):
 		return
 
