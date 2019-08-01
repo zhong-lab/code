@@ -30,30 +30,18 @@ class Test(Spyrelet):
 		'pmd': PM100D
 	}
 	'''
-	nx = 600
-	ny = 600
 	x_range = 6000
 	y_range = 6000
 	xs = np.arange(0,6000,10)
 	ys = np.arange(0,6000,10)
-	pw = np.zeros((nx,ny),dtype=float)
+	pw = np.zeros((len(xs),len(ys)),dtype=float)
 
 
 	@Task()
 	def ReflectionDistribution(self):
-		xpoint = 0
-		ypoint = 0
-		for pos_y in self.ys:
-			if xpoint>=600: xpoint=599
-			if ypoint>=600: ypoint=599
-			for pos_x in self.xs:
-				if xpoint>=600: xpoint=599
-				if ypoint>=600: ypoint=599
+		for ypoint in range(len(self.ys)):
+			for xpoint in range(len(self.xs)):
 				self.pw[xpoint,ypoint] = random.random()
-				xpoint = xpoint+1
-			ypoint = ypoint+1
-			if xpoint>=600: xpoint=599
-			if ypoint>=600: ypoint=599
 			values = {
 				'x': self.xs[xpoint],
 				'y': self.ys[ypoint],
@@ -64,37 +52,98 @@ class Test(Spyrelet):
 		return
 
   
-	@Element(name='2D plot')
-	def plot2d(self):
-		p = HeatmapPlotWidget()
-		return p
+    @Task(name = 'Single Step')
+        def RelectionvsTime(slef):
+            self.bs=[]
+            self.cs=[]
+            t0 = time.time()
+            while True:
+                t1 = time.time()
+                t = t1-t0
+                self.bs.append(t)
+                self.cs.append(random.random())
+                values = {
+                    'x': self.bs,
+                    'y': self.cs,
+                }
+                self.ReflectionvsTime.acquire(values)
+                if len(self.bs>50):
+                    self.bs=np.delete(bs,range(20))
+                    self.cs=np.delete(cs,range(20))
+        return    
 
-	@plot2d.on(ReflectionDistribution.acquired)
-	def _plot2d_update(self, ev):
-		w = ev.widget
-		im = self.pw
-		w.set(im)
-		return
-	    def buttons(self):
+  
+    @Element(name='2D plot')
+    def plot2d(self):
+        p = HeatmapPlotWidget()
+        return p
 
-            button1 = QPushButton('x +',self)
-            button1.move(0, 20)
-            button2 = QPushButton('x -',self)
-            button2.move(0, 30)
-            button3 = QPushButton('z +',self)
-            button3.move(0, 40)
-            button4 = QPushButton('z -',self)
-            button4.move(0, 50)
-            button1.clicked.connect(self.move_x1)
-            button2.clicked.connect(self.move_x2)
-            button3.clicked.connect(self.move_z1)
-            button4.clicked.connect(self.move_z2)
+    @plot2d.on(ReflectionDistribution.acquired)
+    def _plot2d_update(self, ev):
+        w = ev.widget
+        im = self.ReflectionDistribution.pw
+        w.set(im)
         return
-    	def move_x1(self):
-        	print("PyQt5 button click")
-	
-	def initialize(self):
-		return
 
-	def finalize(self):
-		return
+
+    @Element(name='1D plot')
+    def plot1d(self):
+        p = LinePlotWidget()
+        p.plot('Reflection Power')
+        params = [
+        ('step', {'type': float, 'default':0.01, '/um'}),
+        ]
+        w = ParamWidget(params)
+        button1 = QPushButton('x +')
+        button1.move(40, 20)
+        button2 = QPushButton('x -')
+        button2.move(0, 40)
+        button3 = QPushButton('z +')
+        button3.move(20, 0)
+        button4 = QPushButton('z -')
+        button4.move(20, 40)
+        button1.clicked.connect(self.move_x1) #direction :+x
+        button2.clicked.connect(self.move_x2) #direction :-x
+        button3.clicked.connect(self.move_z1) #direction: +z
+        button4.clicked.connect(self.move_z2) #direction :-z
+        return p,w
+
+    def move_x1(self):
+        delta = self.plot1d.widget.get()
+        print("move %f um along +x"%(delta))
+    def move_x2(self):
+        delta = self.plot1d.widget.get()
+        print("move %f um along -x"%(delta))
+    def move_z1(self):
+        delta = self.plot1d.widget.get()
+        print("move %f um along +z"%(delta))
+    def move_z2(self):
+        delta = self.plot1d.widget.get()
+        print("move %f um along -z"%(delta))
+
+    @plot1d.on(RelectionvsTime.acquired)
+    def _plot1d_update(self, ev):
+        w = ev.widget
+        xs = np.array(self.bs)
+        ys = np.array(self.cs)
+        w.set('Reflection Power',xs=xs,ys=ys)
+        return
+
+    @Element(name='Scan Parameters')
+    def scan_parameters(self)
+        params = [
+        ('Y position', {'type': float, 'default':1000, '/um'}),
+        ('X start', {'type': float, 'default':0 ,'/um'}),
+        ('X range', {'type': float, 'default':6000 ,'/um'}),
+        ('Z start', {'type': float, 'default':0 ,'/um'}),
+        ('Z range', {'type': float, 'default':6000 ,'/um'}),
+        ('Step', {'type': float, 'default':10 ,'/um'}),
+        ('Voltage', {'type': float, 'default':70,'/V'}),
+        ('Frequency', {'type': float, 'default':1000,'/Hz'}),
+        ]
+        w = ParamWidget(params)
+        return w
+    def initialize(self):
+	return
+    def finalize(self):
+	return
