@@ -48,7 +48,7 @@ class Test(Spyrelet):
 				'power': self.pw
 			}
 			self.ReflectionDistribution.acquire(values)
-			time.sleep(2) 
+			time.sleep(0.05) 
 		return
 
   
