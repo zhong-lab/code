@@ -63,9 +63,9 @@ class Test(Spyrelet):
 		return
 
 
-'''  
+  
 	@Task(name = 'Single Step')
-	def ReflectionvsTime(slef):
+	def ReflectionvsTime(self):
 		self.bs=[]
 		self.cs=[]
 		t0 = time.time()
@@ -99,14 +99,21 @@ class Test(Spyrelet):
 		return
 	def finalize(self):
 		return
-'''
-'''
+
+
 	@Element(name='botton')
 	def button1(self):
 		button1 = QPushButton('x-')
 		button1.move(0, 20)
 		button1.clicked.connect(self.move_x1)
 		return button1
+	@Element(name='botton2')
+	def button2(self):
+		button2 = QPushButton('x+')
+		button2.move(0, 20)
+		button2.clicked.connect(self.move_x1)
+		return button2
+
 
 
 	def move_x1(self):
@@ -127,8 +134,16 @@ class Test(Spyrelet):
 		delta = self.plot1d.widget.get()
 		print("move %f um along -z"%(delta))
 		return
-'''
 
+	@Element(name='Parameters')
+	def parameters(self):
+		params = [
+	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
+		('Y position', {'type': float, 'default': 1000, 'units':'um'}),
+		('X start', {'type': float, 'default': 0, 'units':'um'}),
+		]
+		w = ParamWidget(params)
+		return w
 '''
 	@Element(name='Scan Parameters')
 	def scan_parameters(self):
