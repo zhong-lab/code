@@ -14,7 +14,7 @@ class ANC350(LibraryDriver):
                      11:"ANC_OutOfRange", 12:"ANC_NotAvailable"}
 
     def __init__(self):
-        super(ANC350, self).__init__()
+        super().__init__()
 
         #Discover systems
         ifaces = c_uint(0x01) # USB interface
@@ -35,6 +35,12 @@ class ANC350(LibraryDriver):
         self.lib.setTargetPosition.argtypes = [c_void_p, c_uint, c_double]
         self.lib.setTargetRange.argtypes = [c_void_p, c_uint, c_double]
         self.lib.disconnect.argtypes = [c_void_p]
+
+        # TYPE SPECIFICATION FOR AMPLITUDE SETTER/GETTER #
+        ## WRITTEN BY PETER BEVINGTON ##
+        ### NOT TESTED AS OF 03/2/19 ###
+        self.lib.getAmplitude.argtypes = [c_void_p, c_uint, POINTER(c_double)]
+        self.lib.setAmplitude.argtypes = [c_void_p, c_uint, c_double]
         return
 
     def initialize(self, devNo=None):
@@ -65,6 +71,21 @@ class ANC350(LibraryDriver):
     def frequency(self, axis, freq):
         self.check_error(self.lib.setFrequency(self.device, axis, freq))
         return err
+
+    # FUNCTION FOR SETTING ATTOCUBE VOLTAGE FOR EACH POSITIONER #
+    ## WRITTEN BY PETER BEVINGTON ##
+    ### NOT TESTED AS OF 03/02/19 ###
+    @DictFeat(units='V')
+    def amplitude(self, axis):
+       ret_amp = c_double()
+       self.check_error(self.lib.getAmplitude(self.device, axis, pointer(ret_amp)))
+       return ret_amp.value
+
+    @amplitude.setter
+    def amplitude(self, axis, amp):
+       self.check_error(self.lib.setAmplitude(self.device, axis, amp))
+       return err
+    
 
     @DictFeat(units='um')
     def position(self, axis):
@@ -123,7 +144,7 @@ class ANC350(LibraryDriver):
         self.lib.startSingleStep(self.device, axis, backward)
         return
 
-    MAX_ABSOLUTE_MOVE = Q_(40, 'um')
+    MAX_ABSOLUTE_MOVE = Q_(1000, 'um')
     @Action()
     def absolute_move(self, axis, target, max_move=MAX_ABSOLUTE_MOVE):
         if not max_move is None:
@@ -135,7 +156,7 @@ class ANC350(LibraryDriver):
         self.check_error(self.lib.startAutoMove(self.device, axis, enable, relative))
         return
 
-    MAX_RELATIVE_MOVE = Q_(10e-6, 'um')
+    MAX_RELATIVE_MOVE = Q_(1000, 'um')
     @Action()
     def relative_move(self, axis, delta):
         delta = Q_(delta, 'um')
@@ -193,3 +214,5 @@ class ANC350(LibraryDriver):
     def stop(self):
         for axis in range(3):
             self.check_error(self.lib.startContinousMove(self.device, axis, 0, 1))
+
+
