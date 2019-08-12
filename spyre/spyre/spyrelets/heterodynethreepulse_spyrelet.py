@@ -30,7 +30,7 @@ class HeterodyneThreePulse(Spyrelet):
 	}
 
 	def saveData(self,x,y,index,ind):
-		out_name = "D:\\Data\\7.30.2019\\0.05T\\0.05ms"
+		out_name = "D:\\Data\\7.31.2019\\0.7T\\0.2ms"
 		index=str(round(index,8))
 		ind='.'+str(ind)
 		np.savez(os.path.join(out_name,str(index+ind)),x,y)
@@ -53,7 +53,7 @@ class HeterodyneThreePulse(Spyrelet):
 		pulse_width = params['pulse width'].magnitude
 		echo = params['echo'].magnitude
 		step_tau=params['step tau'].magnitude
-		waitTime=0.05e-3
+		waitTime=0.2e-3
 		for i in range(100):
 			self.dataset.clear()
 			self.fungen.output[1] = 'OFF'

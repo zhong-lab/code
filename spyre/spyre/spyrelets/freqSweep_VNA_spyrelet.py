@@ -16,7 +16,7 @@ from lantz import Q_
 import time
 import os
 
-from lantz.drivers.spectrum import MS2721B
+from lantz.drivers.VNA import P9371A
 from lantz.drivers.mwsource import SynthNVPro
 from lantz.log import log_to_screen, DEBUG
 
@@ -41,75 +41,52 @@ power=-40
 class Sweep(Spyrelet):
     
     requires = {
-        'analyzer': MS2721B,
+        'vna': P9371A,
         'source': SynthNVPro
     }
     qutag = None
-
-
+    freqs=[]
+    powers=[]
 
     @Task()
-    def set_analyzer_freq(self):
+    def set_vna_freq(self):
         self.dataset.clear()
         log_to_screen(DEBUG)
-        analyzer_freq_params = self.Analyzer_Frequency_Settings.widget.get()
+        vna_freq_params = self.VNA_Frequency_Settings.widget.get()
 
-        span = analyzer_freq_params['frequency span']
-        center = analyzer_freq_params['center freq']
+        span = vna_freq_params['frequency span']
+        center = vna_freq_params['center freq']
 
-        self.analyzer.freq_span = span
-        self.analyzer.freq_cent = center   
-
-        print('Setting frequency done!')
+        self.vna.freq_span = span
+        self.vna.freq_cent = center
         
-    @set_analyzer_freq.initializer
+    @set_vna_freq.initializer
     def initialize(self):
         return
 
-    @set_analyzer_freq.finalizer
+    @set_vna_freq.finalizer
     def finalize(self):
         return
 
-    @Task()
-    def set_analyzer_amp(self):
-        self.dataset.clear()
-        log_to_screen(DEBUG)
-        analyzer_amp_params = self.Analyzer_Amplitude_Settings.widget.get()
-        ref = analyzer_amp_params['ref level']
-        scale = analyzer_amp_params['scale']
 
-        self.analyzer.ref_level = ref*dBm
-        self.analyzer.Y_scale = scale*dBm
-
-
-    @set_analyzer_amp.initializer
-    def initialize(self):
-        print('set_amp initialize')
-        print('idn: {}'.format(self.analyzer.idn))
-        return
-
-    @set_analyzer_amp.finalizer
-    def finalize(self):
-        print('set_amp finalize')
-        return
 
 
     @Task()
-    def set_analyzer_marker(self):
+    def set_vna_marker(self):
         self.dataset.clear()
         log_to_screen(DEBUG)
-        analyzer_marker_params = self.Analyzer_Marker_Settings.widget.get()
-        chnl = analyzer_marker_params['channel']
-        stat = analyzer_marker_params['state']
+        vna_marker_params = self.VNA_Marker_Settings.widget.get()
+        chnl = vna_marker_params['channel']
+        stat = vna_marker_params['state']
 
-        self.analyzer.marker[chnl] = stat
+        self.vna.marker[chnl] = stat
 
 
-    @set_analyzer_marker.initializer
+    @set_vna_marker.initializer
     def initialize(self):
         return
 
-    @set_analyzer_marker.finalizer
+    @set_vna_marker.finalizer
     def finalize(self):
         return   
 
@@ -129,8 +106,8 @@ class Sweep(Spyrelet):
         pw = sweep_frequency_params['sweep power']
         name = sweep_frequency_params['txt name']
 
-        self.analyzer.marker[chnl] = 'ON'
-        self.analyzer.marker_X[chnl] = mk_freq
+        self.vna.marker[chnl] = 'ON'
+        self.vna.marker_X[chnl] = mk_freq
 
         self.source.sweep_lower=fr_low
         self.source.sweep_upper=fr_high
@@ -141,10 +118,12 @@ class Sweep(Spyrelet):
         self.source.output=1
         self.source.sweep_run=1
 
-        while(int(self.source.sweep_run)==1):
-            power=self.analyzer.marker_Y[chnl].magnitude
+        while(int(self.source.sweep_run)!=0):
+            power=self.vna.marker_Y[chnl].magnitude
             frequency=self.source.frequency.magnitude
-            with open('D:/MW data/test/20190805/frequency sweep/{}.txt'.format(name),'a') as file:
+            self.freqs.append(frequency)
+            self.powers.append(power)
+            with open('D:/MW data/test/20190809/frequency sweep/{}.txt'.format(name),'a') as file:
                 write_str='%f %f\n'%(frequency,power)
                 file.write(write_str)
         return
@@ -174,8 +153,8 @@ class Sweep(Spyrelet):
         stp_t = sweep_pw_fr_params['step time']
         name = sweep_pw_fr_params['txt name']
 
-        self.analyzer.marker[chnl] = 'ON'
-        self.analyzer.marker_X[chnl] = mk_freq
+        self.vna.marker[chnl] = 'ON'
+        self.vna.marker_X[chnl] = mk_freq
 
         self.source.sweep_lower=fr_low
         self.source.sweep_upper=fr_high
@@ -185,22 +164,23 @@ class Sweep(Spyrelet):
         self.source.output=1
 
         pw_count=(p_high-p_low)/p_stp
+        self.source.sweep_run=0
+        time.sleep(5)
         for pw_point in range(int(pw_count)):
             pw_current_value=p_low+pw_point*p_stp
             self.source.sweep_power_low=pw_current_value
             self.source.sweep_power_high=pw_current_value
             self.source.sweep_run=1
-            while(int(self.source.sweep_run)==1):
-                S=self.analyzer.marker_Y[chnl].magnitude
+            while(int(self.source.sweep_run)!=0):
+                self.vna.marker_peak_search[chnl]
+                S=self.vna.marker_Y[chnl].magnitude
                 frequency=self.source.frequency.magnitude
                 power=float(self.source.power)
-                with open('D:/MW data/test/20190805/power sweep/{}.txt'.format(name),'a') as file:
+                with open('D:/MW data/test/20190808/power sweep/{}.txt'.format(name),'a') as file:
                     write_str='%f %f %f\n'%(frequency,power,S)
                     file.write(write_str)
-                time.sleep(0.2)
+                time.sleep(0.1)
         return
-
-
 
 
     @sweep_power_frequency.initializer
@@ -257,30 +237,22 @@ class Sweep(Spyrelet):
 
 
     @Element()
-    def Analyzer_Frequency_Settings(self):
-        analyzer_freq_params = [
-        ('frequency span', {'type': float, 'default': 3000, 'units': 'Hz'}),
-        ('center freq', {'type': float, 'default': 30000000, 'units': 'Hz'}),
+    def VNA_Frequency_Settings(self):
+        vna_freq_params = [
+        ('frequency span', {'type': float, 'default': 1000000, 'units': 'Hz'}),
+        ('center freq', {'type': float, 'default': 4000000000, 'units': 'Hz'}),
         ]
-        w = ParamWidget(analyzer_freq_params)
+        w = ParamWidget(vna_freq_params)
         return w
 
-    @Element()
-    def Analyzer_Amplitude_Settings(self):
-        analyzer_amp_params = [
-        ('ref level', {'type': float, 'default': 0}),
-        ('scale', {'type': float, 'default': 0}),
-        ]
-        w = ParamWidget(analyzer_amp_params)
-        return w
 
     @Element()
-    def Analyzer_Marker_Settings(self):
-        analyzer_marker_params = [
+    def VNA_Marker_Settings(self):
+        vna_marker_params = [
         ('channel', {'type': int, 'default': 1}),
         ('state', {'type': str, 'default': 'OFF'}),
         ]
-        w = ParamWidget(analyzer_marker_params)
+        w = ParamWidget(vna_marker_params)
         return w
 
     @Element()
@@ -311,7 +283,7 @@ class Sweep(Spyrelet):
         ('sweep power', {'type': float, 'default': 0}),
         ('measure times', {'type': int, 'default': 3}),
         ('marker channel', {'type': int, 'default': 1}),
-        ('marker frequency', {'type': float, 'default': 30,'units':'MHz'}),
+        ('marker frequency', {'type': float, 'default': 4000,'units':'MHz'}),
         ('txt name', {'type': str, 'default': '11'}),
         ]
         w = ParamWidget(sweep_freq_params)

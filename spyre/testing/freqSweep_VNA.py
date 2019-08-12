@@ -2,9 +2,9 @@
 
 # Device List
 devices = {
-    'analyzer':[
-        'lantz.drivers.spectrum.MS2721B',
-        ['USB0::0x0B5B::0xFFF9::1118010_150_11::INSTR'],
+    'vna':[
+        'lantz.drivers.VNA.P9371A',
+        ['TCPIP0::DESKTOP-ER250Q8::hislip0,4880::INSTR'],
         {}
     ],
     'source':[
@@ -16,8 +16,8 @@ devices = {
 # Experiment List
 spyrelets = {
     'freqSweep':[
-        'spyre.spyrelets.freqSweep_spyrelet.Sweep',
-        {'analyzer': 'analyzer','source': 'source'}, 
+        'spyre.spyrelets.freqSweep_VNA_spyrelet.Sweep',
+        {'vna': 'vna','source': 'source'}, 
         {}
     ],
 

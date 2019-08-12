@@ -16,7 +16,7 @@ devices = {
 # Experiment List
 spyrelets = {
     'freqSweep':[
-        'spyre.spyrelets.freqSweep_spyrelet.Sweep',
+        'spyre.spyrelets.freqSweep_spyrelet_test.Sweep',
         {'analyzer': 'analyzer','source': 'source'}, 
         {}
     ],
