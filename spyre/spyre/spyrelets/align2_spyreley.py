@@ -38,49 +38,40 @@ class ALIGNMENT(Spyrelet):
 	axis_index_x=0
 	axis_index_y=1
 	axis_index_z=2 
+	F = open('C:\\Users\\Tian Zhong\\Tao\\scan2.txt', 'w')
 
 
 	@Task(name='Scan XZ')
 	def ReflectionDistribution(self):
-		self.attocube.DCvoltage(self.axis_index_x,40)
-		self.attocube.DCvoltage(self.axis_index_y,40)
-		self.attocube.DCvoltage(self.axis_index_z,40)
 		self.F = open(self.filename, 'w')
 		for zpoint in range(len(self.zpositions)):
-			self.attocube.absolute_move(self.axis_index_z,self.zpositions[zpoint],0.1)
+			self.attocube.absolute_move(self.axis_index_z,self.zpositions[zpoint],self.eps)
 			print("%d/%d"%(zpoint,len(self.zpositions)))
-			for xpoint in range(len(self.xpositions)):
-				self.attocube.absolute_move(self.axis_index_x,self.xpositions[xpoint],0.1)
-				if xpoint ==0:
-					time.sleep(3)
-					self.F.write("\n")
-				time.sleep(0.001)
-				self.pw[zpoint][xpoint] = self.powermeter.power.magnitude*1000
-			for item in self.pw[zpoint,:]:
+			xpoint=0
+			self.attocube.absolute_move(self.axis_index_x,self.x_start,self.eps)
+			for item in self.pw[zpoint-1,:]:
 				self.F.write("%f,"% item)
+			self.attocube.absolute_move(self.axis_index_x,self.x_end,self.eps) 
+			while xpoint<1000:             				
+				self.pw[zpoint][xpoint] = self.powermeter.power.magnitude*1000
+				time.sleep(0.0005)
+				xpoint=xpoint+1 
 			values = {
-					'x': self.xpositions[xpoint],
-					'z': self.zpositions[zpoint],
 					'power': self.pw
 				}
 			self.ReflectionDistribution.acquire(values)
-		#find the position with max reflection
-		(self.xmax,self.zmax)=np.where(self.pw==np.max(self.pw))
-		print(self.xmax,self.zmax)
-		F.close()
-
 		return
 
 
 	@Task(name = 'Single Step')
 	def ReflectionvsTime(self):
-		fieldValues = self.scan_parameters.widget.get()
-		FREQUENCY_x=fieldValues['Frequency'].magnitude
-		FREQUENCY_y=fieldValues['Frequency'].magnitude
-		FREQUENCY_z=fieldValues['Frequency'].magnitude
-		VOLTAGE_x=fieldValues['Voltage'].magnitude
-		VOLTAGE_y=fieldValues['Voltage'].magnitude
-		VOLTAGE_z=fieldValues['Voltage'].magnitude
+		fieldValues = self.step_parameters.widget.get()
+		FREQUENCY_x=fieldValues['x Frequency'].magnitude
+		FREQUENCY_y=fieldValues['y Frequency'].magnitude
+		FREQUENCY_z=fieldValues['z Frequency'].magnitude
+		VOLTAGE_x=fieldValues['x Voltage'].magnitude
+		VOLTAGE_y=fieldValues['y Voltage'].magnitude
+		VOLTAGE_z=fieldValues['z Voltage'].magnitude
 		self.attocube.frequency[self.axis_index_x]=Q_(FREQUENCY_x,'Hz')
 		self.attocube.frequency[self.axis_index_y]=Q_(FREQUENCY_y,'Hz')
 		self.attocube.frequency[self.axis_index_z]=Q_(FREQUENCY_z,'Hz')
@@ -150,16 +141,30 @@ class ALIGNMENT(Spyrelet):
 	@Element(name='Scan Parameters')
 	def scan_parameters(self):
 		params = [
-	    ('File name', {'type': str, 'default': 'C:\\Users\\Tian Zhong\\Tao\\scan'}),
-		('Y position', {'type': float, 'default': 1000*1e-6, 'units':'m'}),
-		('X start', {'type': float, 'default': 1*1e-6, 'units':'m'}),
-		('X range', {'type': float, 'default': 6000*1e-6, 'units':'m'}),
-		('Z start', {'type': float, 'default': 0, 'units':'um'}),
-		('Z range', {'type': float, 'default': 6000*1e-6, 'units':'m'}),
+	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
+		('File name', {'type': str, 'default': 'C:\\Users\\Tian Zhong\\Tao\\scan'}),
+		('X start', {'type': float, 'default': 2488*1e-6, 'units':'m'}),
+		('X end', {'type': float, 'default': 2498*1e-6, 'units':'m'}),
+		('Z start', {'type': float, 'default': 1062*1e-6, 'units':'m'}),
+		('Z range', {'type': float, 'default': 10*1e-6, 'units':'m'}),
 		('Step', {'type': float, 'default': 0.1*1e-6, 'units':'m'}),
-		('Voltage', {'type': float, 'default': 40, 'units':'V'}),
-		('x Voltage', {'type': float, 'default': 40, 'units':'V'})
+		('Voltage', {'type': float, 'default': 20, 'units':'V'}),
+		('x Voltage', {'type': float, 'default': 50, 'units':'V'}),
 		('Frequency', {'type': float, 'default': 200, 'units':'Hz'})
+		]
+		w = ParamWidget(params)
+		return w
+	@Element(name='Step Parameters')
+	def step_parameters(self):
+		params = [
+	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
+		('File name', {'type': str, 'default': 'C:\\Users\\Tian Zhong\\Tao\\scan2'}),
+		('x Voltage', {'type': float, 'default': 40, 'units':'V'}),
+		('x Frequency', {'type': float, 'default': 50, 'units':'Hz'}),
+		('y Voltage', {'type': float, 'default': 20, 'units':'V'}),
+		('y Frequency', {'type': float, 'default': 50, 'units':'Hz'}),
+		('z Voltage', {'type': float, 'default': 40, 'units':'V'}),
+		('z Frequency', {'type': float, 'default': 50, 'units':'Hz'})
 		]
 		w = ParamWidget(params)
 		return w
@@ -266,17 +271,15 @@ class ALIGNMENT(Spyrelet):
 		VOLTAGE_x=fieldValues['x Voltage'].magnitude
 		VOLTAGE_y=fieldValues['Voltage'].magnitude
 		VOLTAGE_z=fieldValues['Voltage'].magnitude
-		x_range = fieldValues['X range'].magnitude*1e6 
+		self.x_end = fieldValues['X end'].magnitude*1e6 
 		z_range = fieldValues['Z range'].magnitude *1e6
 		step = fieldValues['Step'].magnitude*1e6
-		x_start = fieldValues['X start'].magnitude*1e6
+		self.x_start = fieldValues['X start'].magnitude*1e6
 		z_start = fieldValues['Z start'].magnitude*1e6
-		y_pos = fieldValues['Y position'].magnitude*1e6
 		self.filename = fieldValues['File name']
-		print(x_start)
-		self.xpositions = np.arange(x_start,x_start+x_range+step,step) 
-		self.zpositions = np.arange(z_start,z_start+z_range+step,step)
-		self.pw = np.zeros((len(self.zpositions),len(self.xpositions)),dtype=float)
+		self.zpositions = np.arange(z_start,z_start+z_range+1,step)
+		self.pw = np.zeros((len(self.zpositions),1000),dtype=float)
+		self.eps=0.1
 
 		#initialize
 		self.attocube.frequency[self.axis_index_x]=Q_(FREQUENCY_x,'Hz')
@@ -285,8 +288,8 @@ class ALIGNMENT(Spyrelet):
 		self.attocube.amplitude[self.axis_index_x]=Q_(VOLTAGE_x,'V')
 		self.attocube.amplitude[self.axis_index_y]=Q_(VOLTAGE_y,'V')
 		self.attocube.amplitude[self.axis_index_z]=Q_(VOLTAGE_z,'V')
-		self.attocube.absolute_move(self.axis_index_x,x_start,0.1)
-		self.attocube.absolute_move(self.axis_index_z,z_start,0.1)
+		self.attocube.absolute_move(self.axis_index_x,self.x_start,self.eps)
+		self.attocube.absolute_move(self.axis_index_z,z_start,self.eps)
 		time.sleep(5)
 		print('initialized')
 		return

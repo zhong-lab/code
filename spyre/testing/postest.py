@@ -3,11 +3,14 @@ devices = {
 
 }
 
+
 # Experiment List
 spyrelets = {
-    'noise':[
-        'spyre.spyrelets.noise_spyrelet.Test',
+    'postest':[
+        'spyre.spyrelets.postest_spyrelet.POS',
         {},
         {}
     ],
+
+  
 }

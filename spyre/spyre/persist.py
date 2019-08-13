@@ -38,7 +38,7 @@ class Persister(object):
 
     def load(self):
         with self.config_path.open('r') as f:
-            loaded = yaml.load(f)
+            loaded = yaml.load(f, Loader=yaml.Loader)
         if loaded is None:
             self.config = {}
         else:

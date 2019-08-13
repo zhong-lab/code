@@ -47,20 +47,23 @@ class ALIGNMENT(Spyrelet):
 		self.attocube.DCvoltage(self.axis_index_z,40)
 		self.F = open(self.filename, 'w')
 		for zpoint in range(len(self.zpositions)):
-			self.attocube.absolute_move(self.axis_index_z,self.zpositions[zpoint],0.1)
+			self.attocube.absolute_move(self.axis_index_z,self.zpositions[zpoint],0.05)
+			time.sleep(1)
+			self.attocube.cl_move(self.axis_index_x,self.x_start)
+			xpoint=0
 			print("%d/%d"%(zpoint,len(self.zpositions)))
-			for xpoint in range(len(self.xpositions)):
-				self.attocube.absolute_move(self.axis_index_x,self.xpositions[xpoint],0.1)
-				if xpoint ==0:
-					time.sleep(3)
-					self.F.write("\n")
-				time.sleep(0.001)
-				self.pw[zpoint][xpoint] = self.powermeter.power.magnitude*1000
+			time.sleep(2)
+			self.F.write("\n")
+			for i in range(self.xsteps):
+				self.attocube.single_step(self.axis_index_x,+1)
+				for j in range(self.nx):
+					self.pw[zpoint][xpoint] = self.powermeter.power.magnitude*1000
+					xpoint=xpoint+1
+			time.sleep(0.01)
+			print(self.attocube.position[self.axis_index_x].magnitude)
 			for item in self.pw[zpoint,:]:
 				self.F.write("%f,"% item)
 			values = {
-					'x': self.xpositions[xpoint],
-					'z': self.zpositions[zpoint],
 					'power': self.pw
 				}
 			self.ReflectionDistribution.acquire(values)
@@ -152,13 +155,15 @@ class ALIGNMENT(Spyrelet):
 		params = [
 	    ('File name', {'type': str, 'default': 'C:\\Users\\Tian Zhong\\Tao\\scan'}),
 		('Y position', {'type': float, 'default': 1000*1e-6, 'units':'m'}),
-		('X start', {'type': float, 'default': 1*1e-6, 'units':'m'}),
-		('X range', {'type': float, 'default': 6000*1e-6, 'units':'m'}),
-		('Z start', {'type': float, 'default': 0, 'units':'um'}),
-		('Z range', {'type': float, 'default': 6000*1e-6, 'units':'m'}),
+		('X start', {'type': float, 'default': 2480*1e-6, 'units':'m'}),
+		('X steps', {'type': int, 'default': 20}),
+		('X num', {'type': int, 'default': 20}),
+		('X end', {'type': float, 'default': 2500*1e-6, 'units':'m'}),
+		('Z start', {'type': float, 'default': 1060*1e-6, 'units':'um'}),
+		('Z range', {'type': float, 'default': 10*1e-6, 'units':'m'}),
 		('Step', {'type': float, 'default': 0.1*1e-6, 'units':'m'}),
-		('Voltage', {'type': float, 'default': 40, 'units':'V'}),
-		('x Voltage', {'type': float, 'default': 40, 'units':'V'})
+		('Voltage', {'type': float, 'default': 30, 'units':'V'}),
+		('x Voltage', {'type': float, 'default': 40, 'units':'V'}),
 		('Frequency', {'type': float, 'default': 200, 'units':'Hz'})
 		]
 		w = ParamWidget(params)
@@ -263,20 +268,20 @@ class ALIGNMENT(Spyrelet):
 		FREQUENCY_x=fieldValues['Frequency'].magnitude
 		FREQUENCY_y=fieldValues['Frequency'].magnitude
 		FREQUENCY_z=fieldValues['Frequency'].magnitude
-		VOLTAGE_x=fieldValues['x Voltage'].magnitude
 		VOLTAGE_y=fieldValues['Voltage'].magnitude
 		VOLTAGE_z=fieldValues['Voltage'].magnitude
-		x_range = fieldValues['X range'].magnitude*1e6 
+		self.xsteps = fieldValues['X steps']
+		self.xend = fieldValues['X end']
+		self.nx = fieldValues['X num']
 		z_range = fieldValues['Z range'].magnitude *1e6
 		step = fieldValues['Step'].magnitude*1e6
-		x_start = fieldValues['X start'].magnitude*1e6
+		self.x_start = fieldValues['X start'].magnitude*1e6
 		z_start = fieldValues['Z start'].magnitude*1e6
 		y_pos = fieldValues['Y position'].magnitude*1e6
 		self.filename = fieldValues['File name']
-		print(x_start)
-		self.xpositions = np.arange(x_start,x_start+x_range+step,step) 
+		VOLTAGE_x = fieldValues['x Voltage'].magnitude
 		self.zpositions = np.arange(z_start,z_start+z_range+step,step)
-		self.pw = np.zeros((len(self.zpositions),len(self.xpositions)),dtype=float)
+		self.pw = np.zeros((len(self.zpositions),self.xsteps*self.nx),dtype=float)
 
 		#initialize
 		self.attocube.frequency[self.axis_index_x]=Q_(FREQUENCY_x,'Hz')
@@ -285,7 +290,7 @@ class ALIGNMENT(Spyrelet):
 		self.attocube.amplitude[self.axis_index_x]=Q_(VOLTAGE_x,'V')
 		self.attocube.amplitude[self.axis_index_y]=Q_(VOLTAGE_y,'V')
 		self.attocube.amplitude[self.axis_index_z]=Q_(VOLTAGE_z,'V')
-		self.attocube.absolute_move(self.axis_index_x,x_start,0.1)
+		self.attocube.absolute_move(self.axis_index_x,self.x_start,0.1)
 		self.attocube.absolute_move(self.axis_index_z,z_start,0.1)
 		time.sleep(5)
 		print('initialized')

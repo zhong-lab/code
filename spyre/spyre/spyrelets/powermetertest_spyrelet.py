@@ -39,7 +39,10 @@ class Test(Spyrelet):
                   }
 
             self.HardPull.acquire(values)
-            time.sleep(1)
+            time.sleep(0.05)
+            if(len(self.xs)>400):
+                self.xs=self.xs[300:]
+                self.ys=self.ys[300:]
         return
   
     @Element(name='Histogram')
@@ -53,6 +56,9 @@ class Test(Spyrelet):
         w = ev.widget
         xs = np.array(self.xs)
         ys = np.array(self.ys)
+        if(len(self.xs)>400):
+            self.xs=self.xs[300:]
+            self.ys=self.ys[300:]
         w.set('Transmission Power', xs=xs, ys=ys)
         return
 
