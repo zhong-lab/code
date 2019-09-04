@@ -81,6 +81,11 @@ class LaserScan(Spyrelet):
         plt.plot(self.wl,self.spec)
         plt.xlable('wavelength/nm')
         plt.ylable('transmission')
+        for item in self.spec:
+            F.write("%f,"%item)
+        F.write("\n")
+        for item in self.wl:
+            F.write("%f,"%item)
         return
 
     @Element(name='Params')
