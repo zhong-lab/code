@@ -141,12 +141,15 @@ class Sweep(Spyrelet):
         self.source.output=1
         self.source.sweep_run=1
 
+
         while(int(self.source.sweep_run)==1):
             power=self.analyzer.marker_Y[chnl].magnitude
             frequency=self.source.frequency.magnitude
-            with open('D:/MW data/test/20190805/frequency sweep/{}.txt'.format(name),'a') as file:
+
+            with open('D:/MW data/test/20190813/JTWPA/scan_1/{}.txt'.format(name),'a') as file:
                 write_str='%f %f\n'%(frequency,power)
                 file.write(write_str)
+
         return
 
     @sweep_frequency.initializer

@@ -138,7 +138,7 @@ class MS2721B(MessageBasedDriver):
 
     @Action()
     def savefile(self,value):
-        return self.write('MMEM:STOR:TRAC 0,"QvsT_{}"'.format(value))
+        return self.write('MMEM:STOR:TRAC 0,"PowM40dBmSA30sec_{}"'.format(value))
         # return self.write('MMEM:STOR:TRAC 0,"QvsBz_Rampdown_{}"'.format(value))
 
     # @Feat(units='W')

@@ -1,4 +1,4 @@
-##Riku FUkumori 2019
+##Riku Fukumori 2019
 ##Driver for magnet controller AMI 430
 #Not all commands are added. Refer to programming manual and
 #add any necessary additional commands
@@ -9,6 +9,7 @@ from time import sleep
 
 class AMI_430(MessageBasedDriver):
 
+	# DEFAULTS = {('TCPIP', 'SOCKET'):{'write_termination': '\n', 'read_termination': '\n'}}
 	DEFAULTS = {'COMMON':{'write_termination': '\n', 'read_termination': '\n'}}
 
 	@Feat()
@@ -64,6 +65,7 @@ class AMI_430(MessageBasedDriver):
 		#queries the target field
 		return self.query('FIELD:TARGet?')
 
+
 	@fieldTarget.setter
 	def fieldTarget(self, value):
 		#sets the target field, in whatever units specified
@@ -80,11 +82,11 @@ class AMI_430(MessageBasedDriver):
 		self.write('CONFigure:RAMP:RATE:SEGments {}'.format(value))
 
 	@Feat()
-	def rampRateField(self, segment):
+	def rampRateField(self):
 		#returns the ramp rate in field/time for specified units, for
 		#specified segment. segment is 1 to however many segments you made.
 		#if you only have 1 segment, then use 1
-		return self.query('RAMP:RATE:FIELD:{}?'.format(segment))
+		return self.query('RAMP:RATE:FIELD:{}?'.format(1))
 
 	@rampRateField.setter
 	def rampRateField(self, segment, rate, bound):
@@ -146,7 +148,16 @@ class AMI_430(MessageBasedDriver):
 	@quench.setter
 	def quench(self, value):
 		#0 to reset quench status, 1 to set quench status
-		self.write('QUench {}'.format(value))
+		return self.write('QUench {}'.format(value))
+
+
+	@Feat()
+	def min(self):
+		return self.query('SUPPly:VOLTage:MINimum?')
+
+	@Action()
+	def clear(self):
+		self.write('*CLS')
 
 
 if __name__ == '__main__':
@@ -155,8 +166,13 @@ if __name__ == '__main__':
 	from lantz.log import log_to_screen, DEBUG
 	log_to_screen(DEBUG)
 	# this is the USB VISA Address:
-	with AMI_430('ASRL19::INSTR') as inst:
-		print('The identification of this instrument is :' + inst.idn)
-		inst.fieldUnits = 1
-		inst.fieldTarget = 0.899
+	with AMI_430('TCPIP0::169.254.134.119::7180::SOCKET') as inst:
+		#print('The identification of this instrument is :' + inst.idn)
+		inst.fieldTarget=0.01
 		print(inst.field)
+		print(inst.field)
+		print(inst.field)
+		print(inst.time)
+		print(inst.time)
+		print(inst.time)
+

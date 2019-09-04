@@ -300,3 +300,32 @@ class DG645(MessageBasedDriver):
     def burst_config(self, value):
         self.write('BURT {:s}'.format(value))
         self.clear_errors()
+
+
+if __name__ == '__main__':
+    import time
+    from time import sleep
+    from lantz import Q_
+    from lantz.log import log_to_screen, DEBUG
+
+    volt = Q_(1, 'V')
+    milivolt = Q_(1, 'mV')
+    Hz = Q_(1, 'Hz')
+    kHz = Q_(1,'kHz')
+    MHz = Q_(1.0,'MHz')
+    GHz = Q_(1.0,'GHz')
+    dB = Q_(1,'dB')
+    dBm = Q_(1,'dB')
+    s = Q_(1,'s')
+    ms = Q_(1,'ms')
+    us = Q_(1,'us')
+
+    log_to_screen(DEBUG)
+
+    with DG645('TCPIP0::169.254.29.167::inst0::INSTR') as inst:
+        # print('The identification number of this instrument is :' + str(inst.idn))
+        inst.Clear_Status
+        # inst.Trigger_Source='Single shot'
+        # inst.Trigger_Source='Internal'
+        # inst.Trigger_Source='External falling edges'
+        inst.Trigger_Source='External rising edges'

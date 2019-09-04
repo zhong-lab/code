@@ -15,7 +15,7 @@ from lantz import Q_
 import time
 import os
 
-from lantz.drivers.anritsu import MS2721B
+from lantz.drivers.spectrum import MS2721B
 from lantz.log import log_to_screen, DEBUG
 
 class SpectrumAnalyzer(Spyrelet):
@@ -32,60 +32,43 @@ class SpectrumAnalyzer(Spyrelet):
         # amp_params = self.Frequency_Settings.widget.get()
         span = freq_params['frequency span']
         center = freq_params['center freq']
-        # ref = amp_params['ref level']
-        # span=3000000
-        # center=5000000
         self.spa.freq_span = span
         self.spa.freq_cent = center
         # self.spa.ref_level = ref
         # self.spa.freq_star = start
 
-
-        # span=1e6
-        # self.spa.freq_span = span
-        # freqstart=4e9+span/2
-        # freqstop=7e9-span/2
-
-        # nstep=(freqstop-freqstart)/span+1
-        # print("number of steps are {}".format(nstep))
-        # print('the loop')
-
-        # for x in range(0,3000):
-        #     try:
-        #         self.spa.freq_cent = freqstart+x*span
-        #     except:
-        #         print('failed')
-
-
-
-        # Need to figure out why doesn't the for loop work with number as arguments        
-
-
-           
-
-        # print('set frequency span to {}'.format(span))
-        # print('set center frequency to {}'.format(center))
-        print('done!')
-
-     
-        for x in range(1,20):
-            self.spa.savefile(x)
-            time.sleep(30)            
-        
-
-
-
-
     @set.initializer
     def initialize(self):
-        print('initialize')
-        print('idn: {}'.format(self.spa.idn))
         return
 
     @set.finalizer
     def finalize(self):
-        print('finalize')
         return
+
+
+
+    @Task()
+    def save(self):
+        self.dataset.clear()
+        log_to_screen(DEBUG)
+        save_params = self.Save_Settings.widget.get()
+
+        t = save_params['sleep time']
+        count = save_params['file count']
+
+        for x in range(count):
+            self.spa.savefile(x)
+            time.sleep(t)
+
+    @save.initializer
+    def initialize(self):
+        return
+
+    @save.finalizer
+    def finalize(self):
+        return
+
+
 
     @Element()
     def Frequency_Settings(self):
@@ -96,4 +79,12 @@ class SpectrumAnalyzer(Spyrelet):
         w = ParamWidget(freq_params)
         return w
 
-  
+
+    @Element()
+    def Save_Settings(self):
+        save_params = [
+        ('sleep time', {'type': float, 'default': 30}),
+        ('file count', {'type': int, 'default': 10}),
+        ]
+        w = ParamWidget(save_params)
+        return w  

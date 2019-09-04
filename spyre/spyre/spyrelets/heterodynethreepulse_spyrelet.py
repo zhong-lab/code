@@ -30,7 +30,7 @@ class HeterodyneThreePulse(Spyrelet):
 	}
 
 	def saveData(self,x,y,index,ind):
-		out_name = "D:\\Data\\7.31.2019\\0.7T\\0.2ms"
+		out_name = "D:\\Data\\8.27.2019\\0.1T\\0.02ms"
 		index=str(round(index,8))
 		ind='.'+str(ind)
 		np.savez(os.path.join(out_name,str(index+ind)),x,y)
@@ -53,7 +53,7 @@ class HeterodyneThreePulse(Spyrelet):
 		pulse_width = params['pulse width'].magnitude
 		echo = params['echo'].magnitude
 		step_tau=params['step tau'].magnitude
-		waitTime=0.2e-3
+		waitTime=0.02e-3
 		for i in range(100):
 			self.dataset.clear()
 			self.fungen.output[1] = 'OFF'
@@ -69,7 +69,7 @@ class HeterodyneThreePulse(Spyrelet):
 			chn1pulse.totaltime = pulse_width
 			chn1pulse.nrepeats = 0
 			chn1pulse.repeatstring = 'once'
-			chn1pulse.markerstring = 'highAtStartGoLow'
+			chn1pulse.markerstring = 'lowAtStart'
 			chn1pulse.markerloc = 0
 			chn1pulsewidth = pulse_width
 			chn1pulse.create_sequence()
@@ -121,7 +121,7 @@ class HeterodyneThreePulse(Spyrelet):
 			chn1pulse3width = pulse_width
 			chn1pulse3.nrepeats = 0
 			chn1pulse3.repeatstring = 'once'
-			chn1pulse3.markerstring = 'lowAtStart'
+			chn1pulse3.markerstring = 'highAtStartGoLow'
 			chn1pulse3.markerloc = 0
 			chn1pulse3.create_sequence()
 		
@@ -216,5 +216,5 @@ class HeterodyneThreePulse(Spyrelet):
 	def finalize(self):
 		#self.fungen.output[1] = 'OFF'
 		#self.fungen.output[2] = 'OFF'
-		print('Two Pulse measurements complete.')
+		print('Three Pulse measurements complete.')
 		return

@@ -43,8 +43,12 @@ class Record(Spyrelet):
         'vna': P9371A
     }
     qutag = None
+    times=[]
     freqs=[]
-    powers=[]
+    Qs=[]
+    Qis=[]
+    Qes=[]
+    dips=[]
 
     @Task()
     def set_vna_freq(self):
@@ -149,8 +153,8 @@ class Record(Spyrelet):
             power = self.vna.marker_Y[v_chnl].magnitude
             frequency = self.vna.marker_X[v_chnl].magnitude
 
-            start_field = 50
-            ramp_rate = 0.396/60
+            start_field = 240
+            ramp_rate = 0.2/60
             field = start_field + delta_time*ramp_rate
 
             Q = frequency/half
@@ -167,11 +171,27 @@ class Record(Spyrelet):
             delta_y = R_y - L_y
             self.vna.marker_X_second[v_chnl]=(L_x+R_x)/2*Hz
 
-            with open('D:/MW data/test/20190810/cavity/test/{}.txt'.format(name),'a') as file:
+            self.times.append(delta_time)
+            self.freqs.append(frequency)
+            self.Qs.append(Q)
+            self.Qis.append(Q_smaller)
+            self.Qes.append(Q_larger)
+            self.dips.append(A)
+            values = {
+                    't': self.times,
+                    'f': self.freqs,
+                    'Q': self.Qs,
+                    'Qi': self.Qis,
+                    'Qe': self.Qes,
+                    'dip': self.dips,
+                }
+            self.Record_data_time.acquire(values)
+
+            with open('D:/MW data/test/20190810/cavity/scan_5/YZscan/scan10/{}.txt'.format(name),'a') as file:
                 write_str='%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f\n'%(frequency,power,delta_time,A,half,Q,Q_smaller,Q_larger,L_x,L_y,R_x,R_y,field,delta_x,delta_y)
                 file.write(write_str)
-            self.vna.save_csv('D:/MW data/test/20190810/cavity/test/amplitude/{}.csv'.format(field))
-            self.vna.save_csv_second('D:/MW data/test/20190810/cavity/test/phase/{}.csv'.format(field))
+            self.vna.save_csv('D:/MW data/test/20190810/cavity/scan_5/YZscan/scan10/amplitude/{}.csv'.format(field))
+            self.vna.save_csv_second('D:/MW data/test/20190810/cavity/scan_5/YZscan/scan10/phase/{}.csv'.format(field))
             time.sleep(t)
         return
 
@@ -183,6 +203,54 @@ class Record(Spyrelet):
     def finalize(self):
         return
 
+    @Element(name='Histogram')
+    def Resonance_frequency(self):
+        p = LinePlotWidget()
+        p.plot('Channel 1')
+        return p
+
+    @Resonance_frequency.on(Record_data_time.acquired)
+    def Resonance_frequency_update(self, ev):
+        w = ev.widget
+        ts = np.array(self.times)
+        fs = np.array(self.freqs)
+        w.set('Channel 1', xs=ts, ys=fs)
+        return
+
+    @Element(name='Histogram')
+    def Q(self):
+        p = LinePlotWidget()
+        p.plot('Q')
+        p.plot('Qi')
+        p.plot('Qe')
+        return p
+
+    @Q.on(Record_data_time.acquired)
+    def Q_update(self, ev):
+        w = ev.widget
+        ts = np.array(self.times)
+        Qs = np.array(self.Qs)
+        Qes = np.array(self.Qes)
+        Qis = np.array(self.Qis)
+        w.set('Q', xs=ts, ys=Qs)
+        w.set('Qe', xs=ts, ys=Qes)
+        w.set('Qi', xs=ts, ys=Qis)         
+        return
+
+
+    @Element(name='Histogram')
+    def cavity_dip(self):
+        p = LinePlotWidget()
+        p.plot('Channel 1')
+        return p
+
+    @cavity_dip.on(Record_data_time.acquired)
+    def cavity_dip_update(self, ev):
+        w = ev.widget
+        ts = np.array(self.times)
+        dips = np.array(self.dips)
+        w.set('Channel 1', xs=ts, ys=dips)
+        return
 
     @Element()
     def VNA_Frequency_Settings(self):
@@ -215,3 +283,45 @@ class Record(Spyrelet):
         ]
         w = ParamWidget(record_cavity_params)
         return w
+
+    # @Element(name='Histogram')
+    # def Q(self):
+    #     p = LinePlotWidget()
+    #     p.plot('Channel 1')
+    #     return p
+
+    # @Q.on(Record_data_time.acquired)
+    # def Q_update(self, ev):
+    #     w = ev.widget
+    #     ts = np.array(self.times)
+    #     Qs = np.array(self.Qs)
+    #     w.set('Channel 1', xs=ts, ys=Qs)    
+    #     return
+
+    # @Element(name='Histogram')
+    # def Qi(self):
+    #     p = LinePlotWidget()
+    #     p.plot('Channel 1')
+    #     return p
+
+    # @Qi.on(Record_data_time.acquired)
+    # def Qi_update(self, ev):
+    #     w = ev.widget
+    #     ts = np.array(self.times)
+    #     Qis = np.array(self.Qis)
+    #     w.set('Channel 1', xs=ts, ys=Qis)
+    #     return
+
+    # @Element(name='Histogram')
+    # def Qe(self):
+    #     p = LinePlotWidget()
+    #     p.plot('Channel 1')
+    #     return p
+
+    # @Qe.on(Record_data_time.acquired)
+    # def Qe_update(self, ev):
+    #     w = ev.widget
+    #     ts = np.array(self.times)
+    #     Qes = np.array(self.Qes)
+    #     w.set('Channel 1', xs=ts, ys=Qes)
+    #     return

@@ -30,7 +30,7 @@ class HeterodyneEcho(Spyrelet):
 	}
 
 	def saveData(self,x,y,index,ind):
-		out_name = "D:\\Data\\7.31.2019\\250mTd3"
+		out_name = "D:\\Data\\8.26.2019\\200threepulse"
 		index=str(round(index,8))
 		ind='.'+str(ind)
 		np.savez(os.path.join(out_name,str(index+ind)),x,y)
@@ -54,6 +54,7 @@ class HeterodyneEcho(Spyrelet):
 		echo = params['echo'].magnitude
 		varwidth=pulse_width*2
 		step_tau=params['step tau'].magnitude
+		self.osc.datasource(1)
 		for i in range(100):
 			self.dataset.clear()
 			self.fungen.output[1] = 'OFF'
@@ -159,7 +160,8 @@ class HeterodyneEcho(Spyrelet):
 			maxIndex=np.argmax(y)
 			if maxIndex<1000:
 				self.osc.set_time(curTime-500e-9)
-			if np.max(y)<1.1*float(self.osc.scale_query(1)):
+			print(np.max(y),float(self.osc.scale_query(1)))
+			if np.max(y)<1.2*float(self.osc.scale_query(1)):
 				self.osc.scale(1,self.stepDown(1,float(self.osc.scale_query(1))))
 
 			for j in range(5):
@@ -173,7 +175,7 @@ class HeterodyneEcho(Spyrelet):
 
 			tau=tau+step_tau
 			curTime=float(self.osc.query_time())
-			self.osc.set_time(curTime+2.0*step_tau)
+			self.osc.set_time(curTime+2*step_tau)
 
 	@Element(name='Pulse parameters')
 	def pulse_parameters(self):

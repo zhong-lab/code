@@ -212,7 +212,7 @@ class MS2721B(MessageBasedDriver):
 
     @Action()
     def savefile(self,value):
-        return self.write('MMEM:STOR:TRAC 0,"Filename_{}"'.format(value))
+        return self.write('MMEM:STOR:TRAC 0,"{}"'.format(value))
         # return self.write('MMEM:STOR:TRAC 0,"QvsBz_Rampdown_{}"'.format(value))
 
     @Action()

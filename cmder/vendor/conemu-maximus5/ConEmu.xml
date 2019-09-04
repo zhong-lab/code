@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <key name="Software" modified="2019-06-26 14:19:54" build="180528">
 	<key name="ConEmu" modified="2019-06-26 14:19:54" build="180528">
-		<key name=".Vanilla" modified="2019-06-26 14:20:09" build="180528">
+		<key name=".Vanilla" modified="2019-08-26 14:56:32" build="180528">
 			<value name="UseCurrentSizePos" type="hex" data="01"/>
 			<value name="AutoSaveSizePos" type="hex" data="01"/>
 			<value name="Cascaded" type="hex" data="01"/>
 			<value name="IntegralSize" type="hex" data="00"/>
 			<value name="WindowMode" type="dword" data="0000051f"/>
-			<value name="ConWnd X" type="long" data="650"/>
-			<value name="ConWnd Y" type="long" data="0"/>
+			<value name="ConWnd X" type="long" data="686"/>
+			<value name="ConWnd Y" type="long" data="185"/>
 			<value name="LastMonitor" type="string" data="0,0,1600,1160"/>
 			<value name="ConWnd Width" type="dword" data="00000066"/>
 			<value name="ConWnd Height" type="dword" data="00000035"/>

@@ -21,7 +21,7 @@ class SynthNVPro(MessageBasedDriver):
 		"""
 		self.write('E{}r{}'.format(value,value))
 
-	@Feat(units='MHz', limits=(12.5,6400.0,1e-7))
+	@Feat(units='MHz', limits=(12.5,7000.0,1e-7))
 	def frequency(self):
 		"""returns current frequency setting
 		"""
@@ -97,7 +97,7 @@ class SynthNVPro(MessageBasedDriver):
 		self.write('w{}'.format(value))
 
 
-	@Feat(units='MHz', limits=(12.5,6400.0,1e-7))
+	@Feat(units='MHz', limits=(12.5,7000.0,1e-7))
 	def sweep_lower(self):
 		return self.query('l?')
 		"""return the lower sweep frequency in MHz
@@ -109,7 +109,7 @@ class SynthNVPro(MessageBasedDriver):
 		"""set the lower sweep frequency in MHz
 		"""	    
 		
-	@Feat(units='MHz', limits=(12.5,6400.0,1e-7))
+	@Feat(units='MHz', limits=(12.5,7000.0,1e-7))
 	def sweep_upper(self):
 		return self.query('u?')
 		"""return the lower sweep frequency in MHz

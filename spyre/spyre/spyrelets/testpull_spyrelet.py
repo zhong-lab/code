@@ -66,16 +66,6 @@ class FiberPulling(Spyrelet):
             time.sleep(0.05)
         return
 
-
-    @Task()
-    def Transform(self):
-        while True:
-            values1 = {
-                  'y1': fft(self.ys),
-                }
-            self.Transform.acquire(values1)
-            time.sleep(0.05)
-        return
         
     @Element(name='Histogram')
     def averaged(self):
@@ -89,20 +79,6 @@ class FiberPulling(Spyrelet):
         xs = np.array(self.xs)
         ys = np.array(self.ys)
         w.set('Transmission Power', xs=xs, ys=ys)
-        return
-
-    @Element(name='Histogram')
-    def transf(self):
-        p1 = LinePlotWidget()
-        p1.plot('Fast Fourier Transform')
-        return p1
-
-    @transf.on(Transform.acquired)
-    def transf_update(self, ev1):
-        w1 = ev1.widget
-        xs1 = np.arange(len(self.ys))
-        ys1 = np.array((self.ys)).real
-        w1.set('Fast Fourier Transform', xs=xs1, ys=ys1)
         return
 
     def initialize(self):

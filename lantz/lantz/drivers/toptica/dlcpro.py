@@ -12,15 +12,11 @@
 import numpy as np
 from lantz import Action, Feat, DictFeat, ureg
 from lantz.messagebased import MessageBasedDriver
+from toptica.lasersdk.client import NetworkConnection, Client
 
 class DLC(MessageBasedDriver):
 
-        DEFAULTS = {
-            'COMMON': {
-                'write_termination': '\n',
-                'read_termination': '\n',
-            }
-        }
+        DEFAULTS = {('TCPIP', 'SOCKET'):{'write_termination': '\n', 'read_termination': '\n'}}
 
         def initialize(self):
             super().initialize()
@@ -32,7 +28,7 @@ class DLC(MessageBasedDriver):
         def set_param(self, param_name, value):
             cmd = "(param-set! '{} {})".format(param_name, value)
             self.write(cmd)
-            retval = self.read()
+            retval = self.read('\n','utf-8')
             retval = retval.lstrip('> ')
             if retval.startswith('Error: '):
                 retval = retval.lstrip('Error: ')
@@ -243,30 +239,31 @@ class DLC(MessageBasedDriver):
             return self.set_param('laser1:scan:signal-type', val)
 
 
-        ###Set Wavelength
-        # @Feat()
-        # def set_wavelength(self):
-        #     return self.get_param('laser1:ctl:wavelength-set')
+        ##Set Wavelength
+        @Feat()
+        def set_wavelength(self):
+            return self.get_param('laser1:ctl:wavelength-set')
 
-        # @set_wavelength.setter
-        # def set_wavelength(self, val):
-        #     return self.set_param('laser1:ctl:wavelength-set', val)
-
+        @set_wavelength.setter
         def set_wavelength(self, val):
             return self.set_param('laser1:ctl:wavelength-set', val)
 
+        # def set_wavelength(self, val):
+        #     return self.set_param('laser1:ctl:wavelength-set', val)
+
         def set_output(self, val):
             return self.set_param('laser1:dl:cc:enabled', val)
+
 
 class DLCException(Exception):
     pass
 
 if __name__ == '__main__':
     import time
-    with DLC('TCPIP0::192.168.1.200::INSTR') as inst:
-        for i in range(5):
-            inst.set_wavelength(1530.000 + i*0.01)
-            time.sleep(2)
-        #inst.set_output('#t')
-        #print(inst.write("(param-set! 'laser1:ctl:wavelength-set 1500)"))
-        print(inst.read)
+    conn1=NetworkConnection('1.1.1.1')
+    with Client(conn1) as client:
+        idn=client.get('serial-number',str)
+        print(idn)
+
+        wl=client.set('laser1:ctl:wavelength-set', 1535)
+        print(wl)
