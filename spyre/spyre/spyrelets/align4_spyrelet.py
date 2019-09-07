@@ -6,7 +6,7 @@ from PyQt5.Qsci import QsciScintilla, QsciLexerPython
 from PyQt5.QtWidgets import QPushButton, QTextEdit, QVBoxLayout
 import time
 import random
-
+import nidaqmx
 
 from spyre import Spyrelet, Task, Element
 from spyre.widgets.task import TaskWidget
@@ -23,7 +23,6 @@ from lantz.drivers.thorlabs.pm100d import PM100D
 
 class ALIGNMENT(Spyrelet):
 	requires = {
-		'powermeter': PM100D
 	}
 	
 	attocube=ANC350()
@@ -39,11 +38,13 @@ class ALIGNMENT(Spyrelet):
 		self.pw=[]
 		for zpoint in range(len(self.zpositions)):
 			self.attocube.absolute_move(self.axis_index_z,self.zpositions[zpoint])
-			time.sleep(1)
+			time.sleep(0.1)		
+			self.attocube.cl_move(self.axis_index_z,self.zpositions[zpoint])
 			self.attocube.frequency[self.axis_index_x]=Q_(self.movef,'Hz')
 			self.attocube.amplitude[self.axis_index_x]=Q_(self.movev,'V')
 			self.attocube.absolute_move(self.axis_index_x,self.x_start)
-			time.sleep(1)
+			time.sleep(0.1)
+			self.attocube.cl_move(self.axis_index_x,self.x_start)
 			self.attocube.frequency[self.axis_index_x]=Q_(self.jogf,'Hz')
 			self.attocube.amplitude[self.axis_index_x]=Q_(self.movef,'Hz')
 			self.attocube.jog(self.axis_index_x,1)
@@ -52,7 +53,7 @@ class ALIGNMENT(Spyrelet):
 				data.append(self.powermeter.power.magnitude*1000)
 				time.sleep(1e-3)
 			self.attocube.stop()
-			time.sleep(1)
+			time.sleep(0.5)
 			print("%d/%d:%f"%(zpoint,len(self.zpositions),self.attocube.position[self.axis_index_x].magnitude))
 			for item in data:
 				self.F.write("%f,"% item)
