@@ -30,6 +30,7 @@ class ThinFilmHoleBurning(Spyrelet):
 	xs = np.array([])
 	ys= np.array([])
 	hist=[]
+	laser = NetworkConnection('1.1.1.1')
 
 	def configureQutag(self):
 		qutagparams = self.qutag_params.widget.get()
@@ -40,6 +41,17 @@ class ThinFilmHoleBurning(Spyrelet):
 		self.qutag.setSignalConditioning(stop,self.qutag.SIGNALCOND_MISC,True,0.1)
 		self.qutag.enableChannels((start,stop))
 
+	def homelaser(self,start):
+		current=self.wm.measure_wavelength()
+		with Client(self.laser) as client:
+			while current<start-0.001 or current>start+0.001:
+				setting=client.get('laser1:ctl:wavelength-set', float)
+				offset=current-start
+				client.set('laser1:ctl:wavelength-set', setting-offset)
+				time.sleep(3)
+				current=self.wm.measure_wavelength()
+				print(current, start)
+
 	def createHistogram(self,stoparray, timebase, bincount, totalWidth, tau):
 		hist = [0]*bincount
 		for stoptime in stoparray:
@@ -49,7 +61,7 @@ class ThinFilmHoleBurning(Spyrelet):
 				print('error')
 			else:
 				hist[binNumber]+=1
-		out_name = "D:\\Data\\9.1.2019\\thinfilmholeburningtest"
+		out_name = "D:\\Data\\9.04.2019\\0"
 		x=[]
 		for i in range(bincount):
 			x.append(i*totalWidth/bincount)
@@ -264,10 +276,8 @@ class ThinFilmHoleBurning(Spyrelet):
 			self.fungen.create_arbseq('shutter', seq2, 2)
 			self.fungen.wait()
 			self.fungen.voltage[1] = params['pulse height'].magnitude+0.000000000001*i
-			self.fungen.voltage[2] = 7.1+0.0000000000001*i
 			
 			print(self.fungen.voltage[1], self.fungen.voltage[2])
-			self.fungen.output[2] = 'ON'
 			#self.fungen.trigger_delay(1,shutter_offset)
 			self.fungen.sync()
 			time.sleep(1)

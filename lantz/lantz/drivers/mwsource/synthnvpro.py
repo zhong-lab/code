@@ -229,12 +229,55 @@ class SynthNVPro(MessageBasedDriver):
 
 	@channel_spacing.setter
 	def channel_spacing(self,value):
-		self.write('i{}'.format(value))
+		return self.write('i{}'.format(value))
 		"""sets the channel spacing
 		   you could see it on the synthnv Pro GUI->Extras->Step Size
 		   please set it to 100 Hz
 		"""
 
+	@Feat()
+	def Trigger_Setting(self):
+		return self.query('y?')
+
+	@Trigger_Setting.setter
+	def Trigger_Setting(self,value):
+		return self.write('y{}'.format(value))
+
+	@Feat(units='Hz')
+	def Ext_FM_Frquency(self):
+		return self.query('<?')
+
+	@Ext_FM_Frquency.setter
+	def Ext_FM_Frquency(self,value):
+		return self.write('<{}'.format(value))
+
+	@Feat(units='Hz')
+	def Ext_FM_Deviation(self):
+		return self.query('>?')
+
+	@Ext_FM_Deviation.setter
+	def Ext_FM_Deviation(self,value):
+		return self.write('>{}'.format(value))
+
+	@Feat()
+	def Ext_FM_Type(self):
+		return self.query(';?')
+
+	@Ext_FM_Type.setter
+	def Ext_FM_Type(self,value):
+		return self.write(';{}'.format(value))
+
+	@Feat()
+	def Sweep_Continuous(self):
+		return self.query('c?')
+
+	@Sweep_Continuous.setter
+	def Sweep_Continuous(self,value):
+		return self.write('c{}'.format(value))
+
+	@Feat()
+	def Default_Setting(self):
+		return self.write('e')
 
 if __name__=='__main__':
 	from lantz.log import log_to_screen, DEBUG
@@ -250,18 +293,17 @@ if __name__=='__main__':
 	log_to_screen(DEBUG)
 	with SynthNVPro('ASRL16::INSTR') as inst:
 		inst.frequency=70.2*MHz
-		# inst.power=0
-		# inst.output=1
-		# inst.sweep_lower=20*MHz
-		# inst.sweep_upper=50*MHz
-		# inst.sweep_size=0.1*MHz
-		print(inst.frequency)
+		inst.output=0 
+		inst.sweep_lower=5093*MHz
+		inst.sweep_upper=5100*MHz
+		inst.sweep_size= 0.1*MHz
+		# print(inst.frequency)
 		# print(inst.sweep_size)
-		# inst.sweep_step_time=100*ms
+		inst.sweep_step_time= 3*ms
 		# # print(inst.sweep_step_time)
-		# inst.sweep_direction=1
+		inst.sweep_direction = 1
 		# # print(inst.sweep_direction)
-		print(inst.sweep_run)
+		# print(inst.sweep_run)
 		# inst.PLL_charge_pump_current=5
 		# print(inst.PLL_charge_pump_current)
 		# inst.channel_spacing=100*Hz
@@ -270,6 +312,18 @@ if __name__=='__main__':
 		# inst.power=5.800
 		# print(inst.power)
 		# print(inst.sweep_power_high)
-		inst.sweep_run=1
-		print(inst.sweep_run)
+		inst.sweep_run = 0
+		inst.Sweep_Continuous = 0
+		# print(inst.sweep_run)
+		inst.Trigger_Setting= 0
+		print(inst.Trigger_Setting)
+		inst.Ext_FM_Frquency= 1 * Hz
+		print(inst.Ext_FM_Frquency)
+		inst.Ext_FM_Deviation = 4000000 * Hz
+		print(inst.Ext_FM_Deviation)
+		inst.Ext_FM_Type = 1
+		print(inst.Ext_FM_Type)
+		print(inst.Default_Setting)
+		inst.power=0
+		print(inst.power)
 

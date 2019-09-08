@@ -10,7 +10,7 @@ devices = {
 # Experiment List
 spyrelets = {
     'laserscan':[
-        'spyre.spyrelets.laserscan_spyrelet.LaserScan',
+        'spyre.spyrelets.laserscan2_spyrelet.LaserScan',
         {'wm': 'wm'}, 
         {}
     ],
