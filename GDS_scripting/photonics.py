@@ -1,5 +1,5 @@
 import gdspy
-
+import math
 
 def waveguide(w,l,layer):
 	""" waveguide rectangle """
@@ -54,7 +54,6 @@ def wg_support(wg_width,w,l,layer):
 	""" add a support at the top of the waveguide where it attaches to the
 	substrate.
 	"""
-	print(l)
 	support_pts=[(0,-wg_width/2),(0,wg_width/2),(l,wg_width/2+w/2),(l,-wg_width/2-w/2)]
 	support=gdspy.Polygon(support_pts,**layer)
 	return support
@@ -155,7 +154,6 @@ def phc_wg(normal_holes,taper_holes,radius,taper_depth,spacing,
 	# place the tether between the waveguide taper and photonic crystal
 	tether_ref=gdspy.CellReference(tether_cell,(-wg_l/2-extra_space/2,0))
 
-	print('tip space: '+str(tip_space))
 	# add the bounding box
 	# calculate the total pattern length
 	# add extra space to account for distance past tip
@@ -240,7 +238,242 @@ def cavity_text(text_box,cavity_cell,cell_name,opt_rectangle):
 	return total
 
 def alignment_mark(xw,xl,layer):
+	""" creates a cross alignment mark geometry, by taking the  union of 2 
+	rectangles.
+	"""
 	horizontal=gdspy.Rectangle((-xl/2,-xw/2),(xl/2,xw/2),**layer)
 	vertical=gdspy.Rectangle((-xw/2,-xl/2),(xw/2,xl/2),**layer)
 	cross=gdspy.boolean(horizontal,vertical,'or',**layer)
 	return cross
+
+def disc_resonator(radius,center,layer):
+	""" Creates a disk geometry at the specified location, given 
+	radius, center, and layer. 
+	"""
+	return gdspy.Round(center,radius,number_of_points=199,**layer)
+
+def ring_wg(wg_len,wg_width,radius,disc_loc,dist,layer):
+	""" creates a disk geometry next to a waveguide. disc_loc, is the
+	location along the length of the waveguide where the disc is placed,
+	dist is the distance from the edge of the disc to the waveguide. 
+	disc_loc is relative to the left edge of the waveguide. 
+	"""
+
+	# first create the waveguide
+	wg=waveguide(wg_width,wg_len,layer)
+
+	# next calculate the location of the center of the circle relative to the 
+	# waveguide's origin is it's center, and disc_loc is relative to the left 
+	# edge of the waveguide
+	x=wg_len/2-disc_loc
+
+	# calculate the location of the center of the circle relative to the 
+	# waveguide's origin
+	y=wg_width/2+dist+radius
+
+	# package the coordinates of the disc center
+	center=(x,y)
+
+	# create the disk geometry
+	disc=disc_resonator(radius,center,layer)
+
+	# return the two geometries
+	return wg,disc
+
+def phc_mirror(numholes,radius,spacing,layer,offset,taper_depth=0.25,taper_holes=3):
+	"""
+	creates a list of circle shapes specifying a photonic_crystal_mirror.
+	
+	Also returns the length of the mirror. 
+	"""
+	holes=[]
+
+	dist=0
+
+	# unpack the offset vector
+	x,y=offset
+
+	for i in range(taper_holes):
+		print('here')
+		rad=radius*taper_depth+(1-taper_depth)*radius*i/(taper_holes)
+		print('radius: '+str(rad))
+		hole=gdspy.Round((dist+x,0+y),rad,number_of_points=199,**layer)
+		dist+=spacing
+		holes.append(hole)
+
+	for j in range(taper_holes,numholes):
+		hole=gdspy.Round((dist+x,0+y),radius,number_of_points=199,**layer)
+		dist+=spacing
+		holes.append(hole)
+	# WANT TO ADD AN INPUT TAPER SECTION
+
+	return holes
+
+def boxed_ring(wg_len,wg_width,radius,disc_loc,dist,ebeam_layer,
+	opt_litho_layer,padding,clearance,supp_width,supp_len,tether_sp,tether_tri,
+	min_taper_width,taper_len,coupling_sp,mirror_holes,mirror_rad,mirror_sp,
+	name):
+	
+	""" #this function creates a disc resonator next to a waveguide, as in
+	#ring_wg, but also adds support tethers, and a bounding box for HSQ 
+	#patterning. 
+	#Calls txt_rect function and bounding_box function. 
+	#Padding is the width of the bounding rectangle. 
+	#Clearance is how much the PR pattern overlaps with the ebeam pattern
+
+	tether_tri refers to the length of the tapered part of the support tether
+	coupling_sp is the space left past the end of the taper tip
+
+	name is a list with parameters that identify the pattern
+	"""
+	
+	# Calculate the total pattern width and length
+	# add 5um of extra space on each side of the waveguide and disc
+	w_tot=wg_width+2*radius+dist+10
+	l_tot=wg_len+taper_len+coupling_sp+supp_len
+
+	# Calculate how much to shift the rectangle relative to the center of the
+	# pattern
+	shift=(-(taper_len+coupling_sp)/2,0)
+
+	# put all the relevant parameters in a dictonary
+	rect_args={}
+	rect_args['pattern_w']=2*w_tot
+	rect_args['pattern_l']=l_tot
+	rect_args['padding']=padding
+	rect_args['layer']=ebeam_layer
+	rect_args['rect_shift']=shift
+	rect_args['clearance']=clearance
+	rect_args['opt_litho_layer']=opt_litho_layer
+	rect,length,opt_rect=bounding_rectangle(**rect_args)
+
+	# create a text label for the pattern based on the spacing of the waveguide
+	# and name of pattern
+	# first cast the items in name into strings
+	str_name=[str(i) for i in name]
+	label=txt_label([str(dist)]+str_name)
+
+	txt_rect_args={}
+	txt_rect_args['bounding_box']=rect
+	txt_rect_args['box_length']=l_tot
+	txt_rect_args['box_width']=2*w_tot
+	txt_rect_args['txt_label']=label
+	txt_rect_args['layer']=ebeam_layer
+	txt_rect_args['rect_shift']=shift
+	txt_rect_args['txt_height']=1
+
+	txt_rect=text_rect(**txt_rect_args)
+
+	# create the disc and the waveguide
+	disc_args={}
+	disc_args['wg_len']=wg_len
+	disc_args['wg_width']=wg_width
+	disc_args['radius']=radius
+	disc_args['disc_loc']=disc_loc
+	disc_args['dist']=dist
+	disc_args['layer']=ebeam_layer
+	wg,disc=ring_wg(**disc_args)
+
+	# now add support structures
+	# support is a polygon
+	# because support is a polygon, it needs to be converted to a cell to be 
+	# properly offset relative to the waveguide
+	supp_args={}
+	supp_args['wg_width']=wg_width
+	supp_args['w']=supp_width
+	supp_args['l']=supp_len
+	supp_args['layer']=ebeam_layer
+	supp=wg_support(**supp_args)
+
+	supp_cell=gdspy.Cell('support structure'+' '+str(name))
+	supp_cell.add(supp)
+	supp_ref=gdspy.CellReference(supp_cell,(l_tot/2-supp_len-(taper_len+coupling_sp)/2,0))
+
+	# now add tethers to support the waveguide
+	tether_args={}
+	tether_args['width']=0.1
+
+	# length is full length of tether less the length of the triangular part
+	tether_args['length']=w_tot-tether_tri
+
+	# create a 1um wide tether
+	tether_args['max_width']=1
+	tether_args['taper_length']=tether_tri
+	tether_args['wg_width']=0.525
+	tether_args['layer']=ebeam_layer
+	supp_tether=support_tether(**tether_args)
+
+	# create a cell for the support tether
+	tether_cell=gdspy.Cell('support tether'+' '+str(name))
+	tether_cell.add(supp_tether)
+
+	# want to repeat this geoemtry so add a list of cell references every 
+	# tether_sp apart
+	# divide the waveguide length into a number of segments determined by
+	# tether spacing
+	# tether_list holds references to all the tethers
+	tether_list=[]
+
+	interval=math.floor(l_tot/tether_sp)
+	for i in range(interval):
+		loc=l_tot/2-taper_len/2-i*tether_sp
+
+		# now check if the tether is going to run through the disc
+		# determine the points around the disc
+		# keep a 5um space around the disc
+		disc_min=l_tot/2-disc_loc-radius-5
+		disc_max=l_tot/2-disc_loc+radius+5
+		if not(((loc>disc_min) and (loc<disc_max)) or (loc<-wg_len/2) or (loc>wg_len/2)):
+			tether_ref=gdspy.CellReference(tether_cell,(loc,0))
+			tether_list.append(tether_ref)
+
+	# now add tapered waveguide
+	# returns an input taper
+	taper_args={}
+	taper_args['min_width']=min_taper_width
+	taper_args['wg_width']=wg_width
+	taper_args['l']=taper_len
+	taper_args['layer']=ebeam_layer
+	taper=input_taper(**taper_args)
+
+	# need to create another cell reference too shift the taper to the end of the waveguide
+	taper_cell=gdspy.Cell('taper'+' '+str(name))
+	taper_cell.add(taper)
+	taper_ref=gdspy.CellReference(taper_cell,(-wg_len/2,0))
+
+	# add photonic crystal mirror
+	mirror_args={}
+	mirror_args['numholes']=mirror_holes
+	mirror_args['radius']=mirror_rad
+	mirror_args['spacing']=mirror_sp
+	mirror_args['layer']=opt_litho_layer
+
+	# define the offset of the mirror
+	# need to estimate the length of the mirror
+	# leave 1um of space between end of mirror from edge
+	mirror_len=mirror_args['spacing']*mirror_args['numholes']
+
+	mirror_args['offset']=(wg_len/2-mirror_len-1,0)
+
+	mirror=phc_mirror(**mirror_args)
+
+	# now subtract the mirror geometry from the waveguide
+	wg_sub=gdspy.boolean(wg,mirror,'not')
+
+	return wg_sub,disc,txt_rect,opt_rect,supp_ref,tether_list,taper_ref,l_tot,shift
+def dicing_street(w,l,offset,layer,rect_width=90,alignment_sp=40):
+	"""creates a trench for DSE etching with alingnment marks for the dicing
+	saw
+
+	offset is an iterable holding the x and y offset
+	"""
+	x,y=offset
+
+	# calculate the height of the alignment marks
+	h=(w-40)/2
+	DSE=gdspy.Rectangle((-l/2+x,-w/2+y),(l/2+x,w/2+y),**layer)
+	UL=gdspy.Rectangle((-l/2-rect_width+x-alignment_sp,alignment_sp/2+y),(-l/2-alignment_sp+x,alignment_sp/2+h+y),**layer)
+	LL=gdspy.Rectangle((-l/2-rect_width+x-alignment_sp,-alignment_sp/2-h+y),(-l/2-alignment_sp+x,-alignment_sp/2+y),**layer)
+	UR=gdspy.Rectangle((l/2+x+alignment_sp,alignment_sp/2+y),(l/2+x+alignment_sp+rect_width,alignment_sp/2+h+y),**layer)
+	LR=gdspy.Rectangle((l/2+x+alignment_sp,-alignment_sp/2-h+y),(l/2+x+alignment_sp+rect_width,-alignment_sp/2+y),**layer)
+	return DSE,UL,LL,UR,LR
