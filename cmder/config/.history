@@ -1,0 +1,1234 @@
+conda
+conda
+conda create --name spyre python=3.5
+activate spyre
+pip nump
+pip install numpy
+git clone https://github.com/awsch/lantz lantz
+cd lantz
+git checkout drivers_develop
+pip install pyqt5
+pip install ipython
+ipython
+git clone https://github.com/awsch/pyqtgraph pyqtgraph
+git clone https://github.com/awsch/spyre spyre
+cd pyqtgraph\
+pip install . -e
+cd lantz\
+cd ..
+cd spyre\
+pip install -e .
+git checkout devellop
+git checkout develop
+ls
+ls test
+subl
+pip install qscintilla
+pip install matplotlib
+python test\main.py
+python test\main.py
+cd ..
+conda
+cd lantz\
+cd ..
+cd spyre\
+git checkout devellop
+git checkout develop
+ls
+ls test
+subl
+pip install qscintilla
+pip install matplotlib
+python test\main.py
+conda
+activate spyre
+cd lantz
+quit
+cd spyre
+cd ..
+cd pyqtgraph\
+pip install -e .
+cd ..\spyre\
+ipython
+python test\main.py 
+python test\main.py
+quit
+cd spyre
+cd pyqtgraph\
+pip install -e .
+cd ..\spyre\
+ipython
+python test\main.py 
+python test\main.py
+active spyre
+activate spyre
+cd  ..
+cd ..
+cd Documents/
+cd drivers
+ls
+python Keysight_66322A.py
+echo "# Zhong-lab-drivers" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git remote add origin https://github.com/cwicker/Zhong-lab-drivers.git
+git push -u origin master
+git push origin master
+git remote add origin https://github.com/cwicker/Zhong-lab-drivers.git
+git push -u origin master
+git push origin master
+(spyre)
+cd 
+cd..
+cd Documents
+cd drivers
+python Keysight_66322A.py
+spyre
+./spyre_widget.py
+spyre_widget.py
+cd ..
+cd drivers\
+.\main.py
+python main.py
+clear
+python
+py.exe 
+conda
+conda
+conda create --name spyre python=3.5
+activate spyre
+pip nump
+pip install numpy
+git clone https://github.com/awsch/lantz lantz
+cd lantz
+git checkout drivers_develop
+pip install pyqt5
+pip install ipython
+ipython
+git clone https://github.com/awsch/pyqtgraph pyqtgraph
+git clone https://github.com/awsch/spyre spyre
+cd pyqtgraph\
+pip install . -e
+cd lantz\
+cd ..
+cd spyre\
+pip install -e .
+git checkout devellop
+git checkout develop
+ls
+ls test
+subl
+pip install qscintilla
+pip install matplotlib
+python test\main.py
+python test\main.py
+cd ..
+conda
+cd lantz\
+cd ..
+cd spyre\
+git checkout devellop
+git checkout develop
+ls
+ls test
+subl
+pip install qscintilla
+pip install matplotlib
+python test\main.py
+conda
+activate spyre
+quit
+cd spyre
+cd ..
+cd pyqtgraph\
+pip install -e .
+cd ..\spyre\
+ipython
+python test\main.py 
+python test\main.py
+quit
+cd spyre
+cd pyqtgraph\
+pip install -e .
+cd ..\spyre\
+ipython
+python test\main.py 
+python test\main.py
+active spyre
+activate spyre
+cd  ..
+cd ..
+cd Documents/
+cd drivers
+python Keysight_66322A.py
+echo "# Zhong-lab-drivers" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git remote add origin https://github.com/cwicker/Zhong-lab-drivers.git
+git push -u origin master
+git push origin master
+git remote add origin https://github.com/cwicker/Zhong-lab-drivers.git
+git push -u origin master
+git push origin master
+(spyre)
+cd 
+cd Documents
+cd drivers
+python Keysight_66322A.py
+spyre
+./spyre_widget.py
+spyre_widget.py
+cd drivers\
+.\main.py
+python
+py.exe 
+Activate spyre
+cd spyre/
+cd lantz
+ls
+cd C:\Users\zhong\code\spyre
+python test/main.py
+cd test
+main.py
+python main.py
+cd ..
+cd..
+git commit arbseq_spyrelet.py -m "updated spyrelet"
+clear
+python lantz/lantz/drivers/keysight/Keysight_66322A.py
+python spyre/test/main.py
+git add fungenvsosc.py 
+git commit fungenvsosc.py -m "test spyrelet"
+git commit laser_calibration.py -m "updated calibration file"
+git commit laser_calibration.py -m "updated calibration"
+git add Keysight_33622A.py 
+git commit Keysight_33622A.py seqbuild.py arbseq_class.py -m "updated files to work in spyre"
+git add tds2024c.py 
+git commit tds2024c.py -m "updated tekronix driver model c"
+git push
+pip install tables
+cd C:\Users\zhong\code
+python spyre\test\main.py
+cd C:\Users\zhong\Documents\drivers\Zhong-lab-drivers
+git pull
+pip install h5py
+python Keysight_66322A.py 
+cd users/zhong/Desktop
+cd C:\Users\zhong\Desktop
+cd calibration data\
+python read_h5.py amplitude_after_aom.h5 
+python read_h5.py driver_voltage.h5 
+python read_h5.py frequency_calibration.h5 
+git commit tds2024c.py -m "updated tekronix driver model c"
+git push
+pip install tables
+cd C:\Users\zhong\code
+python spyre\test\main.py
+cd C:\Users\zhong\Documents\drivers\Zhong-lab-drivers
+git pull
+pip install h5py
+python Keysight_66322A.py 
+cd users/zhong/Desktop
+cd C:\Users\zhong\Desktop
+cd calibration data\
+python read_h5.py amplitude_after_aom.h5 
+python read_h5.py driver_voltage.h5 
+python read_h5.py frequency_calibration.h5 
+cd ..
+cd Documents\
+cd drivers
+cd Zhong-lab-drivers\
+Python3 TopticaDLCpro.py 
+TopticaDLCpro.py
+py TopticaDLCpro.py 
+activate spyre
+TopticaDLCpro.py 
+python TopticaDLCpro.py 
+rm TopticaDLCpro.py 
+ls
+cd Documents\
+cd drivers
+Python3 TopticaDLCpro.py 
+TopticaDLCpro.py
+py TopticaDLCpro.py 
+TopticaDLCpro.py 
+rm TopticaDLCpro.py 
+activate spyre
+cd ..
+cd Documents
+ls
+cd drivers\
+cd Zhong-lab-drivers\
+python TopticaDLCpro.py 
+cd lantz
+quit
+cd spyre
+cd ..
+cd pyqtgraph\
+pip install -e .
+cd ..\spyre\
+ipython
+python test\main.py 
+python test\main.py
+quit
+cd spyre
+cd pyqtgraph\
+pip install -e .
+cd ..\spyre\
+ipython
+python test\main.py 
+python test\main.py
+active spyre
+activate spyre
+cd  ..
+cd ..
+cd Documents/
+cd drivers
+ls
+python Keysight_66322A.py
+echo "# Zhong-lab-drivers" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git remote add origin https://github.com/cwicker/Zhong-lab-drivers.git
+git push -u origin master
+git push origin master
+git remote add origin https://github.com/cwicker/Zhong-lab-drivers.git
+git push -u origin master
+git push origin master
+(spyre)
+cd 
+cd..
+cd Documents
+cd drivers
+python Keysight_66322A.py
+spyre
+./spyre_widget.py
+spyre_widget.py
+cd ..
+cd drivers\
+.\main.py
+python main.py
+clear
+python
+py.exe 
+conda
+conda
+conda create --name spyre python=3.5
+activate spyre
+pip nump
+pip install numpy
+git clone https://github.com/awsch/lantz lantz
+cd lantz
+git checkout drivers_develop
+pip install pyqt5
+pip install ipython
+ipython
+git clone https://github.com/awsch/pyqtgraph pyqtgraph
+git clone https://github.com/awsch/spyre spyre
+cd pyqtgraph\
+pip install . -e
+cd lantz\
+cd ..
+cd spyre\
+pip install -e .
+git checkout devellop
+git checkout develop
+ls
+ls test
+subl
+pip install qscintilla
+pip install matplotlib
+python test\main.py
+python test\main.py
+cd ..
+conda
+cd lantz\
+cd ..
+cd spyre\
+git checkout devellop
+git checkout develop
+ls
+ls test
+subl
+pip install qscintilla
+pip install matplotlib
+python test\main.py
+conda
+activate spyre
+quit
+cd spyre
+cd ..
+cd pyqtgraph\
+pip install -e .
+cd ..\spyre\
+ipython
+python test\main.py 
+python test\main.py
+quit
+cd spyre
+cd pyqtgraph\
+pip install -e .
+cd ..\spyre\
+ipython
+python test\main.py 
+python test\main.py
+active spyre
+activate spyre
+cd  ..
+cd ..
+cd Documents/
+cd drivers
+python Keysight_66322A.py
+echo "# Zhong-lab-drivers" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git remote add origin https://github.com/cwicker/Zhong-lab-drivers.git
+git push -u origin master
+git push origin master
+git remote add origin https://github.com/cwicker/Zhong-lab-drivers.git
+git push -u origin master
+git push origin master
+(spyre)
+cd Documents
+cd drivers
+python Keysight_66322A.py
+spyre
+./spyre_widget.py
+spyre_widget.py
+cd drivers\
+.\main.py
+python
+py.exe 
+Activate spyre
+cd spyre/
+ls
+cd C:\Users\zhong\code\spyre
+python test/main.py
+cd test
+main.py
+cd ..
+git commit arbseq_spyrelet.py -m "updated spyrelet"
+clear
+python lantz/lantz/drivers/keysight/Keysight_66322A.py
+python spyre/test/main.py
+git add fungenvsosc.py 
+git commit fungenvsosc.py -m "test spyrelet"
+git commit laser_calibration.py -m "updated calibration file"
+git commit laser_calibration.py -m "updated calibration"
+git add Keysight_33622A.py 
+git commit Keysight_33622A.py seqbuild.py arbseq_class.py -m "updated files to work in spyre"
+git add tds2024c.py 
+git commit tds2024c.py -m "updated tekronix driver model c"
+git push
+pip install tables
+cd C:\Users\zhong\code
+python spyre\test\main.py
+cd C:\Users\zhong\Documents\drivers\Zhong-lab-drivers
+git pull
+pip install h5py
+python Keysight_66322A.py 
+cd users/zhong/Desktop
+cd C:\Users\zhong\Desktop
+cd calibration data\
+python read_h5.py amplitude_after_aom.h5 
+python read_h5.py driver_voltage.h5 
+python read_h5.py frequency_calibration.h5 
+git commit tds2024c.py -m "updated tekronix driver model c"
+cd C:\Users\zhong\code
+python spyre\test\main.py
+pip install h5py
+python Keysight_66322A.py 
+cd users/zhong/Desktop
+cd C:\Users\zhong\Desktop
+cd calibration data\
+cd ..
+cd Documents\
+cd drivers
+cd Zhong-lab-drivers\
+Python3 TopticaDLCpro.py 
+TopticaDLCpro.py
+py TopticaDLCpro.py 
+activate spyre
+TopticaDLCpro.py 
+python TopticaDLCpro.py 
+rm TopticaDLCpro.py 
+ls
+Python3 TopticaDLCpro.py 
+TopticaDLCpro.py
+py TopticaDLCpro.py 
+TopticaDLCpro.py 
+rm TopticaDLCpro.py 
+cd Documents
+activate spyre
+cd Users
+cd..
+cd \Desktop
+cd Desktop
+cd "calibration data\
+python read_h5.py amplitude_after_aom.h5 
+python read_h5.py driver_voltage.h5 
+python read_h5.py driver_voltage.h5 .
+read_h5.py 
+python read_h5.py driver_voltage.h5
+cd ..
+cd drivers
+ls
+python toptic
+python TopticaDLCpro.py 
+cd C:\Users
+cd co
+cd code\
+cd lantz
+cd attocube\
+python main.py
+cd C
+cd 
+cd C:\Users\
+cd zhong
+cd Documents\
+cd drivers\
+cd Zhong-lab-drivers\
+git pull
+cd C:\Users\zhong\Documents\drivers\Zhong-lab-drivers
+git commit bristol771.py -m "updated bristol driver"
+git push
+cd C:\Users\zhong\code\lantz\lantz\drivers\bristol
+python bristol771.py 
+cd "C:\Users\zhong\Desktop\calibration data" 
+python read_h5.py frequency_calibration.h5 
+pip install tables
+python h5_to_csv.py frequency_calibration.h5 
+python h5_to_csv.py frequency_calibration.h5 data.csv 
+git commit bristol771.py -m "updated bristol driver"
+git push
+cd C:\Users\zhong\code\lantz\lantz\drivers\bristol
+python bristol771.py 
+python read_h5.py frequency_calibration.h5 
+pip install tables
+python h5_to_csv.py frequency_calibration.h5 
+activate sypre
+cd "C:\Users\zhong\Desktop\calibration data" 
+activate spyre
+python h5_to_csv.py frequency_calibration.h5 data.csv 
+python h5_to_csv.py frequency_calibration.h5 data.csv 
+cd C:\Users\zhong\Documents\drivers\Zhong-lab-drivers
+git pull
+git commit tds2024c.py Keysight_33622A.py ms2721b.py bristol771.py -m "updated driver descriptions"
+git push
+cd C:\Users\zhong\Documents\drivers\Zhong-lab-drivers
+git pull
+git commit tds2024c.py Keysight_33622A.py ms2721b.py bristol771.py -m "updated driver descriptions"
+git push
+cd ..
+cd spyre\
+c
+cd spyre
+cd spyrelets\
+ls
+pythong laser_calibration.py 
+python laser_calibration.py 
+Python laser_calibration.py 
+py laser_calibration.py 
+cd ..\..
+py laser_calibration.py
+cd C:\Users\zhong\Documents\drivers\Zhong-lab-drivers
+git pull
+git add messagebased.py
+git commit messagebased.py -m "added messagebased file"
+git push
+cd
+ls
+exit
+grep
+grep
+activate spyre
+cd code\
+cd lantz\
+cd ..
+ cd spyre\
+cd test\
+ls
+python main.py 
+pip install h5py
+python Keysight_66322A.py 
+cd users/zhong/Desktop
+cd C:\Users\zhong\Desktop
+cd calibration data\
+cd ..
+cd Documents\
+cd drivers
+cd Zhong-lab-drivers\
+Python3 TopticaDLCpro.py 
+TopticaDLCpro.py
+py TopticaDLCpro.py 
+activate spyre
+TopticaDLCpro.py 
+python TopticaDLCpro.py 
+rm TopticaDLCpro.py 
+ls
+Python3 TopticaDLCpro.py 
+TopticaDLCpro.py
+py TopticaDLCpro.py 
+TopticaDLCpro.py 
+rm TopticaDLCpro.py 
+cd Documents
+activate spyre
+cd Users
+cd..
+cd \Desktop
+cd Desktop
+cd "calibration data\
+python read_h5.py amplitude_after_aom.h5 
+python read_h5.py driver_voltage.h5 
+python read_h5.py driver_voltage.h5 .
+read_h5.py 
+python read_h5.py driver_voltage.h5
+cd ..
+cd drivers
+ls
+python toptic
+python TopticaDLCpro.py 
+cd C:\Users
+cd co
+cd lantz
+cd attocube\
+cd C
+cd 
+cd C:\Users\
+cd zhong
+cd Documents\
+cd drivers\
+cd Zhong-lab-drivers\
+git pull
+cd C:\Users\zhong\Documents\drivers\Zhong-lab-drivers
+git commit bristol771.py -m "updated bristol driver"
+git push
+cd C:\Users\zhong\code\lantz\lantz\drivers\bristol
+python bristol771.py 
+cd "C:\Users\zhong\Desktop\calibration data" 
+python read_h5.py frequency_calibration.h5 
+pip install tables
+python h5_to_csv.py frequency_calibration.h5 
+python h5_to_csv.py frequency_calibration.h5 data.csv 
+git commit bristol771.py -m "updated bristol driver"
+git push
+cd C:\Users\zhong\code\lantz\lantz\drivers\bristol
+python bristol771.py 
+python read_h5.py frequency_calibration.h5 
+pip install tables
+python h5_to_csv.py frequency_calibration.h5 
+activate sypre
+cd "C:\Users\zhong\Desktop\calibration data" 
+python h5_to_csv.py frequency_calibration.h5 data.csv 
+python h5_to_csv.py frequency_calibration.h5 data.csv 
+cd C:\Users\zhong\Documents\drivers\Zhong-lab-drivers
+git pull
+git commit tds2024c.py Keysight_33622A.py ms2721b.py bristol771.py -m "updated driver descriptions"
+git push
+cd C:\Users\zhong\Documents\drivers\Zhong-lab-drivers
+git pull
+git commit tds2024c.py Keysight_33622A.py ms2721b.py bristol771.py -m "updated driver descriptions"
+git push
+c
+cd spyre
+cd spyrelets\
+ls
+python laser_calibration.py 
+Python laser_calibration.py 
+py laser_calibration.py 
+cd ..\..
+py laser_calibration.py
+cd C:\Users\zhong\Documents\drivers\Zhong-lab-drivers
+git pull
+git add messagebased.py
+git commit messagebased.py -m "added messagebased file"
+git push
+exit
+pythong laser_calibration.py 
+cd Desktop\
+cd A
+cd Anritsu\
+cd .
+cd
+cd code\
+pwd
+cd lantz\
+cd spyre\
+device
+QEventLoop: Cannot be used without QApplicationQEventLoop: Cannot be used without QApplicationQEventLoop: Cannot be used without QApplication
+python C:\Users\zhong\code\lantz\lantz\drivers\anritsu\MS2721b.py 
+python main_config
+python "C:\Users\zhong\code\spyre\spyre\spyrelets\spectrumanalyzer.py" 
+cd C:\Users\zhong\code\spyre\spyre\spyrelets 
+python spectrumanalyzer.py 
+ls ..\
+cd ..
+cd test\
+python main_config.py 
+ipython 
+ipython main_config.py 
+activate spyre
+phyton "..\spyre\spyrelets\spectrumanalyzer.py" 
+spyre load
+spyre load "..\spyre\spyrelets\spectrumanalyzer.py" 
+python spyre/test/main.py
+ls
+python main.py 300
+CLEAR
+ python main.py
+ python main.py
+ python main.py
+ python main.py
+ python main.py
+ python main.py
+ python main.py
+python "..\spyre\spyrelets\spectrumanalyzer.py" 
+ python main.py
+ python main.py
+ python main.py
+ python main.py
+ python main.py
+ python main.py
+celar
+clear
+python main.py 
+python main.py 
+activate spyre
+LS
+cd code\
+cd spyre\
+cd test\
+ls
+pip
+pip install paramiko
+ssh plbevington@midway.rcc.uchicago.edu
+pip
+pip install paramiko
+ssh plbevington@midway.rcc.uchicago.edu
+cd code\lantz\lantz\drivers\stanford\
+ls
+pip install lantz
+python3 srs900.py 
+python srs900.py 
+conda
+conda python sr9
+anaconda
+activate spyre
+activate spyre
+cd code\lantz\lantz\drivers\stanford\
+dir
+C:\Python3\python.exe C:\Users\zhong\code\lantz\lantz\drivers\stanford\srs900.py
+C:\Python34\python.exe C:\Users\zhong\code\lantz\lantz\drivers\stanford\srs900.py
+C:\path\where\wheel\is\> pip install PyQt4-4.11.4-cp35-none-win_amd64.whl
+cd
+pip3 install PyQt4-4.11.4-cp35-none-win_amd64.whl
+pip3 install PyQt4
+python configure.py --sip-module PyQt4.sip --no-dist-info --no-tools
+python configure.py --sip-module PyQt4.sip --no-dist-info --no-tools
+cd docs
+cd source
+cd ..
+cd build
+dir
+start html
+cd html
+start index.html 
+pip3 install PyQt4
+python configure.py --sip-module PyQt4.sip --no-dist-info --no-tools
+cd docs
+cd build
+cd ..
+make html
+cd Desktop\
+cd A
+cd Anritsu\
+cd
+cd code\
+pwd
+cd spyre\
+device
+QEventLoop: Cannot be used without QApplicationQEventLoop: Cannot be used without QApplicationQEventLoop: Cannot be used without QApplication
+python C:\Users\zhong\code\lantz\lantz\drivers\anritsu\MS2721b.py 
+python main_config
+python "C:\Users\zhong\code\spyre\spyre\spyrelets\spectrumanalyzer.py" 
+cd C:\Users\zhong\code\spyre\spyre\spyrelets 
+python spectrumanalyzer.py 
+ls ..\
+cd ..
+cd test\
+python main_config.py 
+ipython 
+ipython main_config.py 
+activate spyre
+phyton "..\spyre\spyrelets\spectrumanalyzer.py" 
+spyre load
+spyre load "..\spyre\spyrelets\spectrumanalyzer.py" 
+python spyre/test/main.py
+ls
+python main.py 300
+CLEAR
+ python main.py
+ python main.py
+ python main.py
+ python main.py
+ python main.py
+ python main.py
+ python main.py
+python "..\spyre\spyrelets\spectrumanalyzer.py" 
+ python main.py
+ python main.py
+ python main.py
+ python main.py
+ python main.py
+ python main.py
+celar
+clear
+python main.py 
+python main.py 
+activate spyre
+LS
+cd code\
+cd test\
+ls
+pip
+pip install paramiko
+ssh plbevington@midway.rcc.uchicago.edu
+pip
+pip install paramiko
+ssh plbevington@midway.rcc.uchicago.edu
+cd code\lantz\lantz\drivers\stanford\
+ls
+pip install lantz
+python3 srs900.py 
+python srs900.py 
+conda
+conda python sr9
+anaconda
+activate spyre
+cd code\lantz\lantz\drivers\stanford\
+dir
+C:\Python3\python.exe C:\Users\zhong\code\lantz\lantz\drivers\stanford\srs900.py
+C:\Python34\python.exe C:\Users\zhong\code\lantz\lantz\drivers\stanford\srs900.py
+C:\path\where\wheel\is\> pip install PyQt4-4.11.4-cp35-none-win_amd64.whl
+cd
+pip3 install PyQt4-4.11.4-cp35-none-win_amd64.whl
+pip3 install PyQt4
+python configure.py --sip-module PyQt4.sip --no-dist-info --no-tools
+python configure.py --sip-module PyQt4.sip --no-dist-info --no-tools
+cd docs
+cd source
+cd ..
+cd build
+dir
+start html
+cd html
+start index.html 
+pip3 install PyQt4
+python configure.py --sip-module PyQt4.sip --no-dist-info --no-tools
+cd docs
+cd build
+make html
+activate spyre
+conda info --envs
+activate C:\Miniconda3\envs\spyre
+cd bristol\
+python bristol771.py 
+cd .
+cd spyre
+cd .. 
+python qutools\
+python qutag.py 
+cd spyre\
+cd testing\
+python main.py lifetime
+cd ..
+cd lantz\
+cd lantz
+cd drivers\
+cd qutools\
+python qutag.py
+<<<<<<< HEAD
+activate C:\\Miniconda3\envs/spyre
+cd code
+cd lantz\
+cd lantz
+cd drivers\
+cd windfreak\
+python synthnvpro.py 
+python main.py 
+activate spyre
+LS
+cd code\
+cd test\
+ls
+pip
+pip install paramiko
+ssh plbevington@midway.rcc.uchicago.edu
+pip
+pip install paramiko
+ssh plbevington@midway.rcc.uchicago.edu
+cd code\lantz\lantz\drivers\stanford\
+ls
+pip install lantz
+python3 srs900.py 
+python srs900.py 
+conda
+conda python sr9
+anaconda
+activate spyre
+cd code\lantz\lantz\drivers\stanford\
+dir
+C:\Python3\python.exe C:\Users\zhong\code\lantz\lantz\drivers\stanford\srs900.py
+C:\Python34\python.exe C:\Users\zhong\code\lantz\lantz\drivers\stanford\srs900.py
+C:\path\where\wheel\is\> pip install PyQt4-4.11.4-cp35-none-win_amd64.whl
+cd
+pip3 install PyQt4-4.11.4-cp35-none-win_amd64.whl
+pip3 install PyQt4
+python configure.py --sip-module PyQt4.sip --no-dist-info --no-tools
+python configure.py --sip-module PyQt4.sip --no-dist-info --no-tools
+cd docs
+cd source
+cd ..
+cd build
+dir
+start html
+cd html
+start index.html 
+pip3 install PyQt4
+python configure.py --sip-module PyQt4.sip --no-dist-info --no-tools
+cd docs
+cd build
+make html
+activate spyre
+conda info --envs
+activate C:\Miniconda3\envs\spyre
+cd bristol\
+=======
+>>>>>>> 39f5e9b79ae884bba12f8d3ae161628e31246c36
+python bristol771.py 
+cd .
+cd spyre
+cd .. 
+python qutools\
+python qutag.py 
+python main.py lifetime
+<<<<<<< HEAD
+cd ..
+cd lantz\
+cd lantz
+cd drivers\
+cd qutools\
+python qutag.py
+cd lantz\
+cd lantz
+cd drivers\
+cd windfreak\
+python synthnvpro.py 
+activate C:\\Miniconda3\envs/spyre
+cd code
+cd spyre\
+cd testing\
+python main.py twopulsephotonecho
+python main.py photoncounts.py 
+python main.py photoncounts]
+python main.py photoncounts
+python main.py darkcount
+python main.py spectrum
+           time.sleep(360)
+cd lantz
+cd drivers\
+cd qutools\
+python qutag.py
+cd lantz\
+cd lantz
+cd drivers\
+cd windfreak\
+python synthnvpro.py 
+activate C:\\Miniconda3\envs/spyre
+cd code
+cd spyre\
+cd testing\
+python main.py twopulsephotonecho
+python main.py photoncounts.py 
+python main.py photoncounts]
+python main.py photoncounts
+python main.py darkcount
+python main.py spectrum
+           time.sleep(360)
+cd Downloads\
+cd Python_Pull\
+conda activate C:\\Miniconda3\envs\spyre\
+which python
+cd thorlabs_apt
+vi core.py 
+conda deactivate
+py3.7
+python3.7
+py-3.7
+find python
+python 3.7
+py-3
+python3
+python
+python process.py
+python -v process.py 
+vi thorlabs_apt\core.py 
+nano thorlabs_apt\core.py 
+python process.py 
+cd ~
+cd C:\\
+find lantz
+cd ..
+where zhong
+ls
+conda info --envs
+activate C:\Miniconda3\envs\spyre
+cd bristol\
+python bristol771.py 
+cd .
+cd spyre
+cd .. 
+python qutools\
+python qutag.py 
+python main.py lifetime
+cd lantz\
+cd lantz
+cd drivers\
+cd qutools\
+python qutag.py
+cd windfreak\
+python synthnvpro.py 
+activate C:\\Miniconda3\envs/spyre
+cd code
+LS
+python main.py spectrum
+deactivate spyre
+conda deactivate spyre
+activate spyre
+activate C:\\Miniconda3\envs\spyre
+cd lantz\
+cd lantz
+cd drivers\
+cd thorlabs\
+python pm100d.py 
+cd ..
+cd spyre\
+cd testing\
+python main.py fiberpulling
+conda deactivate
+cd ../..
+ls
+python pm100d.py 
+cd spyre\
+cd testing\
+python main.py fiberpulling
+conda deactivate
+cd ../..
+cd code\
+cd lantz\
+cd lantz\drivers\
+mkdir gwinstek
+cd ..\attocube\
+vi __init__.py 
+vi anc350
+vi anc350.py 
+cd ..
+cd gwinstek\
+vi powersupply.py
+vi __init__.py
+ls
+cd qutools\
+python qutag.py
+cd windfreak\
+python synthnvpro.py 
+activate C:\\Miniconda3\envs/spyre
+cd code
+LS
+python main.py spectrum
+deactivate spyre
+conda deactivate spyre
+activate spyre
+activate C:\\Miniconda3\envs\spyre
+cd lantz\
+cd lantz
+cd drivers\
+cd thorlabs\
+python pm100d.py 
+cd ..
+cd spyre\
+cd testing\
+python main.py fiberpulling
+conda deactivate
+cd ../..
+ls
+python pm100d.py 
+conda deactivate
+cd ../..
+mkdir gwinstek
+cd ..\attocube\
+vi __init__.py 
+vi anc350
+vi anc350.py 
+cd gwinstek\
+vi powersupply.py
+vi __init__.py
+cd code\
+cd lantz\
+python main.py fiberpulling.py 
+cd ..\..\lantz\docs\
+cd lantz\drivers\
+cd ..
+cd ../../
+cd spyre\
+cd testing\
+ls
+python main.py fiberpulling\
+python main.py itc4020
+python main.py fiberpulling
+I can see you
+=======
+cd lantz\
+cd lantz
+cd drivers\
+cd qutools\
+python qutag.py
+activate spyre
+cd ..
+cd code
+dir
+cd spyre\
+cd testing\
+python main.py heterodyneecho\
+python main.py heterodyneecho
+python main.py heterodyneecho\
+cd ..
+activate spyre
+cd test
+cd spyre\
+cd testing\
+dir
+python main.py heterodyneecho
+cd ..
+cd zhong
+activate spyre
+conda activate spyre
+conda
+conda
+cd ..
+cd zhong
+cd code\
+python
+activate spyre
+>>>>>>> 39f5e9b79ae884bba12f8d3ae161628e31246c36
+cd drivers\
+cd qutools\
+python qutag.py
+cd windfreak\
+python synthnvpro.py 
+activate C:\\Miniconda3\envs/spyre
+cd code
+LS
+python main.py spectrum
+deactivate spyre
+conda deactivate spyre
+activate spyre
+activate C:\\Miniconda3\envs\spyre
+cd lantz\
+cd lantz
+cd drivers\
+cd thorlabs\
+python pm100d.py 
+cd ..
+cd spyre\
+cd testing\
+python main.py fiberpulling
+conda deactivate
+cd ../..
+ls
+python pm100d.py 
+cd spyre\
+cd testing\
+python main.py fiberpulling
+conda deactivate
+cd ../..
+cd code\
+cd lantz\
+cd lantz\drivers\
+mkdir gwinstek
+cd ..\attocube\
+vi __init__.py 
+vi anc350
+vi anc350.py 
+cd ..
+cd gwinstek\
+vi powersupply.py
+vi __init__.py
+ls
+cd qutools\
+python qutag.py
+cd windfreak\
+python synthnvpro.py 
+activate C:\\Miniconda3\envs/spyre
+cd code
+LS
+python main.py spectrum
+deactivate spyre
+conda deactivate spyre
+activate spyre
+activate C:\\Miniconda3\envs\spyre
+cd lantz\
+cd lantz
+cd drivers\
+cd thorlabs\
+python pm100d.py 
+cd ..
+cd spyre\
+cd testing\
+python main.py fiberpulling
+conda deactivate
+cd ../..
+ls
+conda deactivate
+cd ../..
+mkdir gwinstek
+cd ..\attocube\
+vi __init__.py 
+vi anc350
+vi anc350.py 
+vi powersupply.py
+vi __init__.py
+cd code\
+cd lantz\
+python main.py fiberpulling.py 
+cd ..\..\lantz\docs\
+cd lantz\drivers\
+cd ..
+cd ../../
+cd spyre\
+cd testing\
+python main.py fiberpulling\
+python main.py itc4020
+I can see you
+cd code\lantz\lantz\drivers\gwinstek\
+cd ..\thorlabs\
+python pm100d.py 
+cd ..\gwinstek\
+python powersupply.py 
+mv powersupply.py g3303s.py
+python main.py fiberpulling
+cd ..\..\lantz\lantz\drivers\
+cd gwinstek\
+rm powersupply.py 
+python g3303s.py 
+python g3303s.py \
+python g3303s.py \\
+python g3303s.py
+cd ..\..\..\..\spyre\testing\
+ls
+python main.py powertest.py 
+python main.py powertest\
+python main.py powertest

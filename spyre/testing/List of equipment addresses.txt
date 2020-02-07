@@ -1,0 +1,11 @@
+Terrence: Oscilloscope, TDS 2024C
+Visa Address 
+'USB0::0x0699::0x03A6::C030873::INSTR'
+
+Kylie: Arbitrary Waveform Generator, Keysight 33622A
+Visa Address
+'USB0::0x0957::0x5707::MY53801461::INSTR'
+
+Bristol Wavemeter: Bristol 771
+Serial Number, dll required.
+Serial Number: 6535
