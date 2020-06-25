@@ -29,10 +29,10 @@ from toptica.lasersdk.client import NetworkConnection, Client
 from lantz.drivers.thorlabs.pm100d import PM100D
 class LaserScan(Spyrelet):
     requires = {
-        'wm': Bristol_771,
+        #'wm': Bristol_771,
         'pmd': PM100D
     }
-    conn1 = NetworkConnection('1.1.1.1')
+    conn1 = NetworkConnection('1.1.1.2')
 
     dlc = Client(conn1)
 
@@ -63,7 +63,7 @@ class LaserScan(Spyrelet):
                     xx.append(self.pmd.power.magnitude * 1000)
                 act_stop = self.wm.measure_wavelength()
                 print('%f,%f'%(act_start,act_stop))
-                wl = np.linspace(act_start,act_stop,len(xx))
+                wl = np.linspace(act_wavelength,act_wavelength,len(xx))
                 for item in xx:
                     F.write("%f,"%item)
                 for item in wl:

@@ -52,7 +52,7 @@ class HoleBurningSNSPD(Spyrelet):
 				continue
 			else:
 				hist[binNumber]+=1
-		out_name = "D:\\Data\\8.2.2019\\thinfilm\\holeburning\\test"
+		out_name = "D:\\Data\\1.19.2020\\testholeburning"
 		np.savez(os.path.join(out_name,str(index)),hist,wls)
 		#np.savez(os.path.join(out_name,str(index+40)),hist,wls)
 		print('Data stored under File Name: ' + self.exp_parameters.widget.get()['File Name'] + str(index))
@@ -64,8 +64,8 @@ class HoleBurningSNSPD(Spyrelet):
 		self.fungen.output[2] = 'OFF'
 		repeat_unit = 50e-9
 		buffer_time = 100e-6
-		pulse_width = 500e-9
-		period = 200e-3
+		pulse_width = 1e-6
+		period = 1.0
 		self.fungen.clear_mem(1)
 		self.fungen.clear_mem(2)
 		params = self.pulse_parameters.widget.get()
@@ -73,37 +73,49 @@ class HoleBurningSNSPD(Spyrelet):
 		chn1buffer = Arbseq_Class('chn1buffer', timestep)
 		chn1buffer.delays = [0]
 		chn1buffer.heights = [0]
-		chn1buffer.widths = [repeat_unit]
-		chn1buffer.totaltime = repeat_unit
-		chn1buffer.nrepeats = buffer_time/repeat_unit
-		chn1buffer.repeatstring = 'repeat'
-		chn1buffer.markerstring = 'lowAtStart'
+		chn1buffer.widths = [1e-5]
+		chn1buffer.totaltime = 1e-5
+		chn1buffer.nrepeats = 0
+		chn1buffer.repeatstring = 'once'
+		chn1buffer.markerstring = 'highAtStartGoLow'
 		chn1buffer.markerloc = 0
-		chn1bufferwidth = repeat_unit*chn1buffer.nrepeats
+		chn1bufferwidth = 1e-5
 		chn1buffer.create_sequence()
 
-		pulse = Arbseq_Class('pulse', timestep)
-		pulse.delays = [0]
-		pulse.heights = [0]
-		pulse.widths = [repeat_unit]
-		pulse.totaltime = repeat_unit
-		pulserepeat = 400000
-		pulse.nrepeats = pulserepeat
-		chn1pulsewidth=pulserepeat*repeat_unit
-		pulse.repeatstring = 'repeat'
-		pulse.markerstring = 'lowAtStart'
-		pulse.markerloc = 0
-		pulse.create_sequence()
+		chn1buffer2 = Arbseq_Class('chn1buffer2', timestep)
+		chn1buffer2.delays = [0]
+		chn1buffer2.heights = [0]
+		chn1buffer2.widths = [1e-6]
+		chn1buffer2.totaltime = 1e-6
+		chn1buffer2.nrepeats = 3000
+		chn1buffer2.repeatstring = 'repeat'
+		chn1buffer2.markerstring = 'lowAtStart'
+		chn1buffer2.markerloc = 0
+		chn1buffer2width = 1e-6*1000
+		chn1buffer2.create_sequence()
+
+		chn1pulse = Arbseq_Class('chn1pulse', timestep)
+		chn1pulse.delays = [0]
+		chn1pulse.heights = [0]
+		chn1pulse.widths = [1e-5]
+		chn1pulse.totaltime = 1e-5
+		pulserepeat = 5000
+		chn1pulse.nrepeats = pulserepeat
+		chn1pulsewidth=pulserepeat*1e-5
+		chn1pulse.repeatstring = 'repeat'
+		chn1pulse.markerstring = 'lowAtStart'
+		chn1pulse.markerloc = 0
+		chn1pulse.create_sequence()
 
 		chn1dc = Arbseq_Class('chn1dc', timestep)
 		chn1dc.delays = [0]
 		chn1dc.heights = [0]
-		chn1dc.widths = [repeat_unit]
-		chn1dc.totaltime = repeat_unit
+		chn1dc.widths = [1e-5]
+		chn1dc.totaltime = 1e-5
 		chn1dc.repeatstring = 'repeat'
 		chn1dc.markerstring = 'lowAtStart'
 		chn1dc.markerloc = 0
-		chn1dcrepeats = 200000
+		chn1dcrepeats = 10000
 		chn1dc.nrepeats = chn1dcrepeats
 		chn1dcwidth = repeat_unit*chn1dcrepeats
 		chn1dc.create_sequence()
@@ -113,10 +125,10 @@ class HoleBurningSNSPD(Spyrelet):
 		chn1pulse2.heights = [1]
 		chn1pulse2.widths = [pulse_width]
 		chn1pulse2.totaltime = pulse_width
-		chn1pulse2width = pulse_width
-		chn1pulse2.nrepeats = 0
-		chn1pulse2.repeatstring = 'once'
-		chn1pulse2.markerstring = 'highAtStartGoLow'
+		chn1pulse2width = pulse_width*10000
+		chn1pulse2.nrepeats = 10000
+		chn1pulse2.repeatstring = 'repeat'
+		chn1pulse2.markerstring = 'lowAtStart'
 		chn1pulse2.markerloc = 0
 		chn1pulse2.create_sequence()
 
@@ -135,12 +147,12 @@ class HoleBurningSNSPD(Spyrelet):
 		chn1dc2 = Arbseq_Class('chn1dc2', timestep)
 		chn1dc2.delays = [0]
 		chn1dc2.heights = [0]
-		chn1dc2.widths = [pulse_width]
-		chn1dc2.totaltime = pulse_width
+		chn1dc2.widths = [1e-5]
+		chn1dc2.totaltime = 1e-5
 		chn1dc2.repeatstring = 'repeat'
 		chn1dc2.markerstring = 'lowAtStart'
-		chn1dc2repeats = 2e5
-		ch1dc2width=chn1dc2repeats*pulse_width
+		chn1dc2repeats = 1e5
+		ch1dc2width=chn1dc2repeats*1e-5
 		chn1dc2.nrepeats = chn1dc2repeats
 		chn1dc2.markerloc = 0
 		#print((chn1dc2repeats*params['repeat unit'].magnitude) + tau.magnitude + params['pulse width'].magnitude)
@@ -148,92 +160,20 @@ class HoleBurningSNSPD(Spyrelet):
 
 		totalTime=chn1bufferwidth+chn1pulsewidth+chn1dcwidth+chn1pulse2width+ch1dc2width
 
-		chn2buffer = Arbseq_Class('chn2buffer', timestep)
-		chn2buffer.delays = [0]
-		chn2buffer.heights = [1]
-		chn2buffer.widths = [repeat_unit]
-		chn2buffer.totaltime = repeat_unit
-		chn2buffer.nrepeats = buffer_time/repeat_unit
-		chn2buffer.repeatstring = 'repeat'
-		chn2buffer.markerstring = 'lowAtStart'
-		chn2buffer.markerloc = 0
-		chn2bufferwidth = repeat_unit*chn2buffer.nrepeats
-		chn2buffer.create_sequence()
-
-		chn2pulse1 = Arbseq_Class('chn2pulse1', timestep)
-		chn2pulse1.delays = [0]
-		chn2pulse1.heights = [1]
-		chn2pulse1.widths = [repeat_unit]
-		chn2pulse1.totaltime = repeat_unit
-		chn2pulse1.nrepeats = pulserepeat
-		chn2pulse1width = pulse_width
-		chn2pulse1.repeatstring = 'repeat'
-		chn2pulse1.markerstring = 'lowAtStart'
-		chn2pulse1.markerloc = 0
-		chn2pulse1.create_sequence()
-
-		chn2dc1 = Arbseq_Class('chn2dc1', timestep)
-		chn2dc1.delays = [0]
-		chn2dc1.heights = [1]
-		chn2dc1.widths = [repeat_unit]
-		chn2dc1.totaltime = repeat_unit
-		chn2dc1.repeatstring = 'repeat'
-		chn2dc1.markerstring = 'lowAtStart'
-		chn2dc1.markerloc = 0
-		chn2dc1repeats = chn1dcrepeats
-		chn2dc1.nrepeats = chn1dcrepeats
-		chn2dc1width = repeat_unit*chn2dc1repeats
-		chn2dc1.create_sequence()
-	
-		chn2pulse2 = Arbseq_Class('chn2pulse2', timestep)
-		chn2pulse2.delays = [0]
-		chn2pulse2.heights = [-1]
-		chn2pulse2.widths = [pulse_width]
-		chn2pulse2.totaltime = pulse_width
-		chn2pulse2width = pulse_width
-		chn2pulse2.nrepeats = 0
-		chn2pulse2.repeatstring = 'once'
-		chn2pulse2.markerstring = 'highAtStartGoLow'
-		chn2pulse2.markerloc = 0
-		chn2pulse2.create_sequence()
-
-		chn2dc2 = Arbseq_Class('chn2dc2', timestep)
-		chn2dc2.delays = [0]
-		chn2dc2.heights = [-1]
-		chn2dc2.widths = [pulse_width]
-		chn2dc2.totaltime = pulse_width
-		chn2dc2.repeatstring = 'repeat'
-		chn2dc2.markerstring = 'lowAtStart'
-		chn2dc2repeats = chn1dc2repeats
-		chn2dc2.nrepeats = chn2dc2repeats
-		chn2dc2.markerloc = 0
-		chn2dc2.create_sequence()
-
-
 		self.fungen.send_arb(chn1buffer, 1)
-		self.fungen.send_arb(pulse, 1)
+		self.fungen.send_arb(chn1buffer2, 1)
+		self.fungen.send_arb(chn1pulse, 1)
 		self.fungen.send_arb(chn1dc, 1)
 		self.fungen.send_arb(chn1pulse2, 1)
 		self.fungen.send_arb(chn1dc2, 1)
-		self.fungen.send_arb(chn2buffer, 2)
-		self.fungen.send_arb(chn2pulse1, 2)
-		self.fungen.send_arb(chn2dc1, 2)
-		self.fungen.send_arb(chn2pulse2, 2)
-		self.fungen.send_arb(chn2dc2, 2)
 
-		seq = [chn1buffer, pulse, chn1dc, chn1pulse2, chn1dc2]
-		seq2=[chn2buffer,chn2pulse1,chn2dc1,chn2pulse2,chn2dc2]
+		seq = [chn1buffer, chn1buffer2, chn1pulse, chn1dc, chn1pulse2, chn1dc2]
 
-		self.fungen.create_arbseq('pulsetest', seq2, 2)
-		self.fungen.wait()
-		self.fungen.voltage[2] = 7.1
-		self.fungen.output[2] = 'ON'
-		#self.fungen.sync()
-
-		self.fungen.create_arbseq('pulsetest', seq, 1)
+		self.fungen.create_arbseq('holeburn', seq, 1)
 		self.fungen.wait()
 		self.fungen.voltage[1] = params['pulse height']
 		self.fungen.sync()
+		time.sleep(3)
 		self.fungen.output[1] = 'ON'
 
 		#time.sleep(100000)
@@ -258,7 +198,7 @@ class HoleBurningSNSPD(Spyrelet):
 			lost = self.qutag.getLastTimestamps(True)
 			while time.time()-startTime < expparams['Measurement Time'].magnitude:
 				lost = self.qutag.getLastTimestamps(True)
-				time.sleep(30*totalTime)
+				time.sleep(50*totalTime)
 				timestamps = self.qutag.getLastTimestamps(True)
 
 				tstamp = timestamps[0] # array of timestamps

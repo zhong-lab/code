@@ -9,8 +9,7 @@ devices = {
 
 # Experiment List
 spyrelets = {
-    'darkcount':[
-        'spyre.spyrelets.darkcount_spyrelet.DarkCount',
+        'darkcount':['spyre.spyrelets.darkcount_spyrelet.DarkCount',
         {'srs': 'srs'},
         {}
     ],

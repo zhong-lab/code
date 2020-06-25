@@ -68,6 +68,14 @@ class FiberPulling(Spyrelet):
         motor2.move_velocity(0.2)
         motor2.move_to(20)
 
+
+        input("Press any key to start stop")
+        motor1.stop_profiled()
+        motor2.stop_profiled()
+
+
+
+
         t0 = time.time()
         while True:
             t1 = time.time()

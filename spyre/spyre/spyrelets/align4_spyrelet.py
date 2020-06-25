@@ -23,48 +23,53 @@ from lantz.drivers.thorlabs.pm100d import PM100D
 
 class ALIGNMENT(Spyrelet):
 	requires = {
-	}
-	
+	}	
 	attocube=ANC350()
 	attocube.initialize()
 	axis_index_x=0
 	axis_index_y=1
 	axis_index_z=2 
-
+	daq = nidaqmx.Task()
+	daq.ai_channels.add_ai_voltage_chan("Dev1/ai0")
 
 	@Task(name='Scan XZ')
 	def ReflectionDistribution(self):
-		self.F = open(self.filename, 'w')
-		self.pw=[]
+		self.F = open(self.filename+'.dat', 'w')
+		f = self.filename+'index.dat'
+		self.F2 = open(f,'w')
+		self.pw=np.zeros((len(self.zpositions),2500))
 		for zpoint in range(len(self.zpositions)):
+			i=0
 			self.attocube.absolute_move(self.axis_index_z,self.zpositions[zpoint])
-			time.sleep(0.1)		
+			time.sleep(0.2)     
 			self.attocube.cl_move(self.axis_index_z,self.zpositions[zpoint])
 			self.attocube.frequency[self.axis_index_x]=Q_(self.movef,'Hz')
 			self.attocube.amplitude[self.axis_index_x]=Q_(self.movev,'V')
-			self.attocube.absolute_move(self.axis_index_x,self.x_start)
+			self.attocube.absolute_move(self.axis_index_x,self.x_start-10)
 			time.sleep(0.1)
+			self.attocube.absolute_move(self.axis_index_x,self.x_start)
+			time.sleep(0.3)
 			self.attocube.cl_move(self.axis_index_x,self.x_start)
 			self.attocube.frequency[self.axis_index_x]=Q_(self.jogf,'Hz')
-			self.attocube.amplitude[self.axis_index_x]=Q_(self.movef,'Hz')
+			self.attocube.amplitude[self.axis_index_x]=Q_(self.jogv,'V')
 			self.attocube.jog(self.axis_index_x,1)
 			t0=time.time()
 			while time.time()-t0<self.x_time:
-				data.append(self.powermeter.power.magnitude*1000)
-				time.sleep(1e-3)
+				self.pw[zpoint,i]=self.daq.read()
+				i = i+1
 			self.attocube.stop()
-			time.sleep(0.5)
+			time.sleep(0.3)
 			print("%d/%d:%f"%(zpoint,len(self.zpositions),self.attocube.position[self.axis_index_x].magnitude))
-			for item in data:
+			for item in self.pw[zpoint,:]:
 				self.F.write("%f,"% item)
-			F.write('\n')
-			self.pw.append(data)
+			self.F2.write("%f,"%i)
+			self.F.write('\n')
 			values = {
 					'power': self.pw
 				}
 			self.ReflectionDistribution.acquire(values)
 
-		F.close()
+		self.F.close()
 
 		return
 
@@ -72,12 +77,12 @@ class ALIGNMENT(Spyrelet):
 	@Task(name = 'Single Step')
 	def ReflectionvsTime(self):
 		fieldValues = self.scan_parameters.widget.get()
-		FREQUENCY_x=fieldValues['Frequency'].magnitude
-		FREQUENCY_y=fieldValues['Frequency'].magnitude
-		FREQUENCY_z=fieldValues['Frequency'].magnitude
-		VOLTAGE_x=fieldValues['Voltage'].magnitude
-		VOLTAGE_y=fieldValues['Voltage'].magnitude
-		VOLTAGE_z=fieldValues['Voltage'].magnitude
+		FREQUENCY_x=fieldValues['Move Frequency'].magnitude
+		FREQUENCY_y=fieldValues['Move Frequency'].magnitude
+		FREQUENCY_z=fieldValues['Move Frequency'].magnitude
+		VOLTAGE_x=fieldValues['Move Voltage'].magnitude
+		VOLTAGE_y=fieldValues['Move Voltage'].magnitude
+		VOLTAGE_z=fieldValues['Move Voltage'].magnitude
 		self.attocube.frequency[self.axis_index_x]=Q_(FREQUENCY_x,'Hz')
 		self.attocube.frequency[self.axis_index_y]=Q_(FREQUENCY_y,'Hz')
 		self.attocube.frequency[self.axis_index_z]=Q_(FREQUENCY_z,'Hz')
@@ -91,7 +96,7 @@ class ALIGNMENT(Spyrelet):
 			t1 = time.time()
 			t = t1-t0
 			self.xs.append(t)
-			self.ys.append(self.powermeter.power.magnitude * 1000)
+			self.ys.append(self.daq.read())
 			values = {
 				'x': self.xs,
 				'y': self.ys,
@@ -147,12 +152,12 @@ class ALIGNMENT(Spyrelet):
 	@Element(name='Scan Parameters')
 	def scan_parameters(self):
 		params = [
-	    ('File name', {'type': str, 'default': 'C:\\Users\\Tian Zhong\\Tao\\scan'}),
+		('File name', {'type': str, 'default': 'D:\\Data\\09.06.2019\\scan'}),
 		('X start', {'type': float, 'default': 2480*1e-6, 'units':'m'}),
 		('X seconds', {'type': int, 'default': 2}),
 		('Z start', {'type': float, 'default': 1045*1e-6, 'units':'um'}),
 		('Z range', {'type': float, 'default': 10*1e-6, 'units':'m'}),
-		('Step', {'type': float, 'default': 0.1*1e-6, 'units':'m'}),
+		('Step', {'type': float, 'default': 1*1e-6, 'units':'m'}),
 		('Jog Voltage', {'type': float, 'default': 30, 'units':'V'}),
 		('Move Voltage', {'type': float, 'default': 50, 'units':'V'}),
 		('Jog Frequency', {'type': float, 'default': 300, 'units':'Hz'}),
@@ -261,14 +266,11 @@ class ALIGNMENT(Spyrelet):
 		self.movev=fieldValues['Move Voltage'].magnitude
 		self.jogv=fieldValues['Jog Voltage'].magnitude
 		self.jogf = fieldValues['Jog Frequency'].magnitude
-		self.xsteps = fieldValues['X steps']
-		self.nx = fieldValues['X num']
 		z_range = fieldValues['Z range'].magnitude *1e6
 		step = fieldValues['Step'].magnitude*1e6
 		self.x_start = fieldValues['X start'].magnitude*1e6
 		z_start = fieldValues['Z start'].magnitude*1e6
 		self.filename = fieldValues['File name']
-		x_num = fieldValues['X num']
 		self.x_time = fieldValues['X seconds']
 		self.zpositions = np.arange(z_start,z_start+z_range+step,step)
 		#initialize

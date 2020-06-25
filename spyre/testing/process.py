@@ -27,8 +27,8 @@ input("Press any key to start readying")
 # ready motors and then pull on user input
 print("Motor 1 velocity parameters:", motor1.get_velocity_parameters())
 print("Motor 2 velocity parameters:", motor2.get_velocity_parameters())
-motor1.move_to(40)
-motor2.move_to(40)
+motor1.move_to(20)
+motor2.move_to(20)
 print("Readying...\n")
 
 while (motor1.is_in_motion or motor2.is_in_motion):
@@ -39,10 +39,17 @@ input("Press any key to start pulling")
 
 # pull
 print("Pulling...\n")
-motor1.set_velocity_parameters(0, 0.01, 0.1) #(minimum_velocity, acceleration, maximum_velocity) in mm
-motor2.set_velocity_parameters(0, 0.01, 0.1)
+motor1.set_velocity_parameters(0, 0.01, 0.05) #(minimum_velocity, acceleration, maximum_velocity) in mm
+motor2.set_velocity_parameters(0, 0.01, 0.05)
 motor1.move_velocity(2)
-motor1.move_to(20) # move to relative/absolute position
+motor1.move_to(10) # move to relative/absolute position
 motor2.move_velocity(2)
-motor2.move_to(20)
+motor2.move_to(10)
 
+
+#input("Press any key to stop pulling")
+
+#motor1.stop_profiled()
+#motor2.stop_profiled()
+
+#print("motors have stopped")

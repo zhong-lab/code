@@ -41,22 +41,24 @@ class Record(Spyrelet):
     theta_s=[]
 
 
-    def slope(self,value):
+    def up_0(self,value):
         self.dataset.clear()
         log_to_screen(DEBUG)
 
-        frequency_start = 5090 * MHz
-        frequency_stop = 5110 * MHz
-        frequency_step = 0.1 * MHz
+        offset = value * Hz
+        frequency_start = 5122.612 * MHz
+        frequency_stop = 5122.612 * MHz + offset
+        frequency_step = offset/100
 
         self.source.output = 1
+        self.source.power = 9
         self.source.Trigger_Setting = 9
         self.source.Ext_FM_Type = 1
-        self.source.Ext_FM_Deviation = value * Hz
+        self.source.Ext_FM_Deviation = 200000 * Hz
         self.source.frequency = frequency_start
         time.sleep(5)
 
-        with open('D:/MW data/test/20190907/slope/2/{}.txt'.format(value),'a') as file:
+        with open('D:/MW data/test/20190909/offset/1/{}.txt'.format(value),'a') as file:
             write_str='%f %f %f %f %f\n'%(0,0,0,0,0)
             file.write(write_str)
 
@@ -69,11 +71,11 @@ class Record(Spyrelet):
             RValue = part[2]
             thetaValue = part[3]
 
-            with open('D:/MW data/test/20190907/slope/2/{}.txt'.format(value),'a') as file:
+            with open('D:/MW data/test/20190909/offset/1/{}.txt'.format(value),'a') as file:
                 write_str='%s %s %s %s %f\n'%(part[0],part[1],part[2],part[3],self.source.frequency.magnitude)
                 file.write(write_str)
 
-            a = np.loadtxt('D:/MW data/test/20190907/slope/2/{}.txt'.format(value))
+            a = np.loadtxt('D:/MW data/test/20190909/offset/1/{}.txt'.format(value))
             self.X_s = a[1:,0]
             self.Y_s = a[1:,1]
             self.R_s = a[1:,2]
@@ -92,11 +94,110 @@ class Record(Spyrelet):
             self.source.frequency = self.source.frequency + frequency_step
         return
 
+    def up(self,value):
+        self.dataset.clear()
+        log_to_screen(DEBUG)
+
+        offset = value * Hz
+        frequency_start = 5122.612 * MHz - offset
+        frequency_stop = 5122.612 * MHz
+        frequency_step = offset/100
+
+        self.source.output = 1
+        self.source.power = 9
+        self.source.Trigger_Setting = 9
+        self.source.Ext_FM_Type = 1
+        self.source.Ext_FM_Deviation = 200000 * Hz
+        self.source.frequency = frequency_start
+        # time.sleep(5)
+
+        while(self.source.frequency<frequency_stop):
+            buffer_D = self.lockin.Data_Four
+            part = buffer_D.split(',')
+
+            XValue = part[0]
+            YValue = part[1]
+            RValue = part[2]
+            thetaValue = part[3]
+
+            with open('D:/MW data/test/20190909/offset/1/{}.txt'.format(value),'a') as file:
+                write_str='%s %s %s %s %f\n'%(part[0],part[1],part[2],part[3],self.source.frequency.magnitude)
+                file.write(write_str)
+
+            a = np.loadtxt('D:/MW data/test/20190909/offset/1/{}.txt'.format(value))
+            self.X_s = a[1:,0]
+            self.Y_s = a[1:,1]
+            self.R_s = a[1:,2]
+            self.theta_s = a[1:,3]
+            self.time_s = a[1:,4]
+
+            values = {
+                    't': self.time_s,
+                    'Y':self.Y_s,
+                    'R':self.R_s,
+                    'X': self.X_s,
+                    'theta':self.theta_s,
+                }
+
+            self.Record_data_time.acquire(values)
+            self.source.frequency = self.source.frequency + frequency_step
+        return
+
+    def down(self,value):
+        self.dataset.clear()
+        log_to_screen(DEBUG)
+
+        offset = value * Hz
+        frequency_start = 5122.612 * MHz - offset
+        frequency_stop = 5122.612 * MHz + offset
+        frequency_step = offset/100
+
+        self.source.output = 1
+        self.source.power = 9
+        self.source.Trigger_Setting = 9
+        self.source.Ext_FM_Type = 1
+        self.source.Ext_FM_Deviation = 200000 * Hz
+        self.source.frequency = frequency_stop
+        # time.sleep(5)
+
+        while(self.source.frequency>frequency_start):
+            buffer_D = self.lockin.Data_Four
+            part = buffer_D.split(',')
+
+            XValue = part[0]
+            YValue = part[1]
+            RValue = part[2]
+            thetaValue = part[3]
+
+            with open('D:/MW data/test/20190909/offset/1/{}.txt'.format(value),'a') as file:
+                write_str='%s %s %s %s %f\n'%(part[0],part[1],part[2],part[3],self.source.frequency.magnitude)
+                file.write(write_str)
+
+            a = np.loadtxt('D:/MW data/test/20190909/offset/1/{}.txt'.format(value))
+            self.X_s = a[1:,0]
+            self.Y_s = a[1:,1]
+            self.R_s = a[1:,2]
+            self.theta_s = a[1:,3]
+            self.time_s = a[1:,4]
+
+            values = {
+                    't': self.time_s,
+                    'Y':self.Y_s,
+                    'R':self.R_s,
+                    'X': self.X_s,
+                    'theta':self.theta_s,
+                }
+
+            self.Record_data_time.acquire(values)
+            self.source.frequency = self.source.frequency - frequency_step
+        return
 
     @Task()
     def Record_data_time(self):
-        for D in range(100000,5000000,100000):
-            self.slope(D)
+        for D in range(100,10000,100):
+            self.up_0(D)
+            self.down(D)
+            self.up(D)
         return
 
     @Record_data_time.initializer

@@ -48,6 +48,8 @@ class FiberPulling(Spyrelet):
             t = t1 - t0
             self.xs.append(t)
             self.ys.append(self.pmd.power.magnitude * 1000)
+            while len(self.xs) != len(self.ys):
+                del self.xs[-1]
 
             values = {
                   'x': self.xs,

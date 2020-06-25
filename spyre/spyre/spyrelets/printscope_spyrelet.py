@@ -18,23 +18,23 @@ from spyre.widgets.repository_widget import RepositoryWidget
 from lantz import Q_
 import time
 
-from lantz.drivers.tektronix import TDS2024C
+from lantz.drivers.tektronix.tds5104 import TDS5104
 
 class PrintScope(Spyrelet):
 	requires = {
-		'osc': TDS2024C
+		'osc': TDS5104
 	}
 	xs=[]
 	ys=[]
 	x1s=[]
 	y1s=[]
-	field='2.05T'
+	field='2'
 
 	def saveData(self,x,y,x1,y1,index,field):
-		out_name = "D:\\Data\\8.23.2019\\motorscan\\ch1\\1"
-		np.savez(os.path.join(out_name,str(field+index)),x,y)
-		out_name = "D:\\Data\\8.23.2019\\motorscan\\ch3\\1"
-		np.savez(os.path.join(out_name,str(field+index)),x1,y1)
+		out_name = "D:\\Data\\1.19.2020\\holewidth"
+		np.savez(os.path.join(out_name,"trace"),x,y)
+		#out_name = "D:\\Data\\1.16.2020\\ch2"
+		np.savez(os.path.join(out_name,"sweep"),x1,y1)
 		print('Data stored')
 
 	@Task()
@@ -46,7 +46,7 @@ class PrintScope(Spyrelet):
 				if msvcrt.getwche() == '\r':
 					self.osc.datasource(1)
 					self.xs,self.ys=self.osc.curv()
-					self.osc.datasource(3)
+					self.osc.datasource(4)
 					self.x1s,self.y1s=self.osc.curv()
 					values = {
 							'x': self.xs,

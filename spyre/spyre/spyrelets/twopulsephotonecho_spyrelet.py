@@ -21,7 +21,6 @@ from lantz.drivers.keysight import Arbseq_Class
 from lantz.drivers.keysight.seqbuild import SeqBuild
 
 from lantz.drivers.keysight import Keysight_33622A
-from lantz.drivers.stanford.srs900 import SRS900
 
 class TwoPulsePhotonEcho(Spyrelet):
 	requires = {
@@ -53,7 +52,7 @@ class TwoPulsePhotonEcho(Spyrelet):
 				print('error')
 			else:
 				hist[binNumber]+=1
-		out_name = "D:\\Data\\7.31.2019\\250mTSNSPD"
+		out_name = "D:\\Data\\12.18.2019\\230_20dB"
 		x=[]
 		for i in range(bincount):
 			x.append(i*totalWidth/bincount)
@@ -74,7 +73,7 @@ class TwoPulsePhotonEcho(Spyrelet):
 	@Task()
 	def startpulse(self, timestep=1e-9):
 		params = self.pulse_parameters.widget.get()
-		tau=params['start tau']
+		tau = params['start tau']
 		period = params['period'].magnitude
 		repeat_unit = params['repeat unit'].magnitude
 		pulse_width = params['pulse width'].magnitude
@@ -138,7 +137,7 @@ class TwoPulsePhotonEcho(Spyrelet):
 		
 			chn1pulse2 = Arbseq_Class('chn1pulse2', timestep)
 			chn1pulse2.delays = [0]
-			chn1pulse2.heights = [1]
+			chn1pulse2.heights = [0]
 			chn1pulse2.widths = [pulse_width*2]
 			chn1pulse2.totaltime = pulse_width*2 
 			chn1pulse2width = pulse_width*2
@@ -272,12 +271,13 @@ class TwoPulsePhotonEcho(Spyrelet):
 			self.fungen.voltage[2] = 7.1+0.0000000000001*i
 			
 			print(self.fungen.voltage[1], self.fungen.voltage[2])
-			self.fungen.output[2] = 'ON'
+			self.fungen.output[2] = 'OFF'
 			self.fungen.trigger_delay(1,shutter_offset)
 			self.fungen.sync()
 			time.sleep(1)
 			self.fungen.output[1] = 'ON'
 			#self.fungen.output[2] = 'OFF'
+			time.sleep(1)
 			
 
 			##Qutag Part
@@ -337,6 +337,7 @@ class TwoPulsePhotonEcho(Spyrelet):
 					# 	continue
 					
 			self.createHistogram(stoparray, timebase, bincount,wholeRange,tau.magnitude)
+			print("here")
 
 
 			tau+=params['step tau']
@@ -351,7 +352,7 @@ class TwoPulsePhotonEcho(Spyrelet):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
 		('Start Channel', {'type': int, 'default': 0}),
-		('Stop Channel', {'type': int, 'default': 1}),
+		('Stop Channel', {'type': int, 'default': 2}),
 		('Total Hist Width Multiplier', {'type': int, 'default': 5}),
 		('Bin Count', {'type': int, 'default': 1000})
 		]

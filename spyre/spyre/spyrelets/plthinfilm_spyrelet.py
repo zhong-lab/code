@@ -30,7 +30,7 @@ class PLThinFilm(Spyrelet):
 		'wm': Bristol_771
 	}
 	qutag = None
-	laser = NetworkConnection('1.1.1.1')
+	laser = NetworkConnection('1.1.1.2')
 
 	def configureQutag(self):
 		qutagparams = self.qutag_params.widget.get()
@@ -60,8 +60,8 @@ class PLThinFilm(Spyrelet):
 				continue
 			else:
 				hist[binNumber]+=1
-		out_name = "D:\\Data\\9.04.2019\\1T"
-		np.savez(os.path.join(out_name,str(index+59)),hist,wls)
+		out_name = "D:\\Data\\12.22.2019_PL_34\\0field"
+		np.savez(os.path.join(out_name,str(index+52)),hist,wls)
 		#np.savez(os.path.join(out_name,str(index+40)),hist,wls)
 		print('Data stored under File Name: ' + self.exp_parameters.widget.get()['File Name'] + str(index))
 
@@ -109,7 +109,7 @@ class PLThinFilm(Spyrelet):
 			print(i)
 			with Client(self.laser) as client:
 				setting=client.get('laser1:ctl:wavelength-set', float)
-				client.set('laser1:ctl:wavelength-set', setting-0.008)
+				client.set('laser1:ctl:wavelength-set', setting-0.006)
 				time.sleep(1)
 
 	@Task()

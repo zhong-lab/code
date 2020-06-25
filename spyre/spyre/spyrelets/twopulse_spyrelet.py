@@ -322,7 +322,7 @@ class TwoPulse(Spyrelet):
 		('pulse width', {'type': float, 'default': 500e-9, 'units':'s'}),
 		('period', {'type': float, 'default': 0.05, 'units':'s'}),
 		('repeat unit', {'type': float, 'default': 50e-9, 'units':'s'}),
-		('start tau', {'type': float, 'default': 2e-6, 'units':'s'}),
+		('start tau', {'type': float, 'default': 5e-6, 'units':'s'}),
 		('stop tau', {'type': float, 'default': 10e-6, 'units':'s'}),
 		('step tau', {'type': float, 'default': 1e-6, 'units':'s'}),
 		('srs bias', {'type': float, 'default': 0.7, 'units':'V'})

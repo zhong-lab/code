@@ -14,7 +14,7 @@ class ANC350(LibraryDriver):
                      11:"ANC_OutOfRange", 12:"ANC_NotAvailable"}
 
     def __init__(self):
-        super().__init__()
+        super(ANC350, self).__init__()
 
         #Discover systems
         ifaces = c_uint(0x01) # USB interface
@@ -35,12 +35,6 @@ class ANC350(LibraryDriver):
         self.lib.setTargetPosition.argtypes = [c_void_p, c_uint, c_double]
         self.lib.setTargetRange.argtypes = [c_void_p, c_uint, c_double]
         self.lib.disconnect.argtypes = [c_void_p]
-
-        # TYPE SPECIFICATION FOR AMPLITUDE SETTER/GETTER #
-        ## WRITTEN BY PETER BEVINGTON ##
-        ### NOT TESTED AS OF 03/2/19 ###
-        self.lib.getAmplitude.argtypes = [c_void_p, c_uint, POINTER(c_double)]
-        self.lib.setAmplitude.argtypes = [c_void_p, c_uint, c_double]
         return
 
     def initialize(self, devNo=None):
@@ -70,22 +64,24 @@ class ANC350(LibraryDriver):
     @frequency.setter
     def frequency(self, axis, freq):
         self.check_error(self.lib.setFrequency(self.device, axis, freq))
-        return err
+        return
 
-    # FUNCTION FOR SETTING ATTOCUBE VOLTAGE FOR EACH POSITIONER #
-    ## WRITTEN BY PETER BEVINGTON ##
-    ### NOT TESTED AS OF 03/02/19 ###
     @DictFeat(units='V')
     def amplitude(self, axis):
-       ret_amp = c_double()
-       self.check_error(self.lib.getAmplitude(self.device, axis, pointer(ret_amp)))
-       return ret_amp.value
+        ret_ampl = c_double()
+        self.check_error(self.lib.getAmplitude(self.device, axis, pointer(ret_freq)))
+        return ret_ampl.value
 
     @amplitude.setter
-    def amplitude(self, axis, amp):
-       self.check_error(self.lib.setAmplitude(self.device, axis, amp))
-       return err
-    
+    def amplitude(self, axis, ampl):
+        self.check_error(self.lib.setAmplitude(self.device, axis, ampl))
+        return
+
+
+    def DCvoltage(self, axis,vol):
+        self.check_error(self.lib.setDcVoltage(self.device, axis, vol))
+        return
+
 
     @DictFeat(units='um')
     def position(self, axis):
@@ -95,7 +91,7 @@ class ANC350(LibraryDriver):
 
     @position.setter
     def position(self, axis, pos):
-        return self.absolute_move(axis, pos*1e-6)
+        return self.absolute_move(axis, pos)
 
 
     @DictFeat(units='F')
@@ -137,19 +133,37 @@ class ANC350(LibraryDriver):
         start = 1 if speed != 0.0 else 0
         self.check_error(self.lib.startContinousMove(self.device, axis, start, backward))
         return
+    @Action()
+    def continousmove(self, axis,direction):
+        self.lib.startContinousMove(self.device, axis,True,direction)
+        return
+    @Action()
+    def stopmove(self, axis):
+        self.lib.startContinousMove(self.device, axis,False,1)
+        return
+
+
 
     @Action()
     def single_step(self, axis, direction):
+        # if direction<=0 then True
+        ## then backward = True
+        # if direction is not <=0 then False
+        ## then backward = False
+        # so pass a number >0 into single step to specify the forward direction
         backward = direction <= 0
         self.lib.startSingleStep(self.device, axis, backward)
         return
 
     MAX_ABSOLUTE_MOVE = Q_(1000, 'um')
     @Action()
-    def absolute_move(self, axis, target, max_move=MAX_ABSOLUTE_MOVE):
+    def absolute_move(self, axis, target, eps=0.1, max_move=MAX_ABSOLUTE_MOVE):
         if not max_move is None:
-            if abs(self.position[axis]-Q_(target, 'm')) > max_move:
-                raise Exception("Relative move (target-current) is greater then the max_move")
+            if abs(self.position[axis]-Q_(target, 'um')) > max_move:
+                raise Exception("Relative move %f-%f um is greater then the %f um"%(self.position[axis].magnitude,Q_(target, 'm').magnitude,max_move.magnitude))
+        target = target*1e-6
+        eps = eps*1e-6
+        self.check_error(self.lib.setTargetRange(self.device, axis, eps))
         self.check_error(self.lib.setTargetPosition(self.device, axis, target))
         enable = 0x01
         relative = 0x00
@@ -161,7 +175,7 @@ class ANC350(LibraryDriver):
     def relative_move(self, axis, delta):
         delta = Q_(delta, 'um')
         if abs(delta) > MAX_RELATIVE_MOVE:
-            raise Exception("Relative move <delta> is greater then the MAX_RELATIVE_MOVE")
+            raise Exception("Relative move %f is greater then the MAX_RELATIVE_MOVE"%(delta))
         else:
             target = self.position + delta
             target = target.to('m').magnitude
@@ -171,8 +185,8 @@ class ANC350(LibraryDriver):
 
     @Action()
     def relative_move(self, axis, delta, max_move=MAX_RELATIVE_MOVE):
-        target = self.position[axis] + delta
-        target = target.to('m').magnitude
+        target = self.position[axis].magnitude + delta
+        #target = target.to('um').magnitude
         print("Moving to {}".format(target))
         self.absolute_move(axis, target, max_move=max_move)
 
@@ -190,18 +204,19 @@ class ANC350(LibraryDriver):
     # Closed-loop Actions
     # These action are much slower but they ensure the move completed
     @Action(units=(None, 'um', 'um', None, 'seconds', None, None))
-    def cl_move(self, axis, pos, delta_z=Q_(0.1,'um'), iter_n=10, delay=Q_(0.01, 's'), debug=False, max_iter=1000):
+    def cl_move(self, axis, pos, delta_z=Q_(0.1,'um'), iter_n=4, delay=Q_(0.05, 's'), debug=False, max_iter=1000):
         i = 0
-        while(not self.at_pos(Q_(pos, 'um'), delta_z=Q_(delta_z, 'um'), iter_n=iter_n, delay=Q_(delay,'s'))):
+        while(not self.at_pos(axis=axis,pos=Q_(pos, 'um'), delta_z=Q_(delta_z, 'um'), iter_n=iter_n, delay=Q_(delay,'s'))):
             self.position[axis] = Q_(pos, 'um')
+            time.sleep(0.2)
             i += 1
-            if i>=max_iter:
-                raise Exception("Reached max_iter")
+            #if i>=max_iter:
+            #    raise Exception("Reached max_iter")
         if debug: print("It took {} iterations to move to position".format(i))
         return
 
     @Action(units=(None, 'um', 'um', None, 'seconds'))
-    def at_pos(self, axis, pos, delta_z=Q_(0.1,'um'), iter_n=10, delay=Q_(0.01, 's')):
+    def at_pos(self, axis, pos, delta_z=Q_(0.2,'um'), iter_n=2, delay=Q_(0.1, 's')):
         for i in range(iter_n):
             time.sleep(delay)
             if abs(self.position[axis].to('um').magnitude-pos)>delta_z:
@@ -214,5 +229,3 @@ class ANC350(LibraryDriver):
     def stop(self):
         for axis in range(3):
             self.check_error(self.lib.startContinousMove(self.device, axis, 0, 1))
-
-

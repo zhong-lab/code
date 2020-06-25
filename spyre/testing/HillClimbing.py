@@ -2,11 +2,13 @@
 devices = {
 
 }
+
 # Experiment List
 spyrelets = {
-    'HillClimbing':[
-        'spyre.spyrelets.HillClimbing2_spyrelet.HillClimbing',
-        {}, 
+    'hillclimbing':[
+    	'spyre.spyrelets.hillclimbing2_spyrelet.HillClimbing',
+        {
+        }, 
         {}
     ],
 

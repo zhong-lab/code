@@ -1,0 +1,19 @@
+Metadata-Version: 1.1
+Name: thorlabs-apt
+Version: 0.1
+Summary: python wrapper for Thorlabs' APT library
+Home-page: https://github.com/qpit/thorlabs_apt
+Author: Tobias Gehring
+Author-email: tobias.gehring@fysik.dtu.dk
+License: GPLv2
+Description: thorlabs_apt provides a wrapper for Thorlabs' APT, a library to control different Thorlabs motors.
+        
+Platform: Windows
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: GNU General Public License v2 (GPLv2)
+Classifier: Programming Language :: Python
+Classifier: Topic :: Scientific/Engineering
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: System :: Hardware
+Classifier: Operating System :: Microsoft :: Windows

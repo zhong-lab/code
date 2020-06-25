@@ -69,23 +69,24 @@ class Record(Spyrelet):
         self.dataset.clear()
         log_to_screen(DEBUG)
 
-        frequency_center = 5104.1 * MHz
+        frequency_center = 5097.0 * MHz
 
         self.source.output = 1
+        self.source.power = 0
         self.source.Trigger_Setting = 9
         self.source.Ext_FM_Type = 1
-        self.source.Ext_FM_Deviation = 180000 * Hz
+        self.source.Ext_FM_Deviation = 200000 * Hz
         self.lockin.Internal_Frequency = value * Hz
         self.source.frequency = frequency_center
-        time.sleep(5)
+        time.sleep(2)
 
         t = 0
 
-        with open('D:/MW data/test/20190907/noise/1/{}.txt'.format(value),'a') as file:
+        with open('D:/MW data/test/20191012/noise/scan1/{}.txt'.format(self.source.frequency.magnitude),'a') as file:
             write_str='%f %f %f %f %f\n'%(0,0,0,0,0)
             file.write(write_str)
 
-        while(t<600):
+        while(1):
             buffer_D = self.lockin.Data_Four
             part = buffer_D.split(',')
 
@@ -94,11 +95,11 @@ class Record(Spyrelet):
             RValue = part[2]
             thetaValue = part[3]
 
-            with open('D:/MW data/test/20190907/noise/1/{}.txt'.format(value),'a') as file:
+            with open('D:/MW data/test/20191012/noise/scan1/{}.txt'.format(self.source.frequency.magnitude),'a') as file:
                 write_str='%s %s %s %s %f\n'%(part[0],part[1],part[2],part[3],t)
                 file.write(write_str)
 
-            a = np.loadtxt('D:/MW data/test/20190907/noise/1/{}.txt'.format(value))
+            a = np.loadtxt('D:/MW data/test/20191012/noise/scan1/{}.txt'.format(self.source.frequency.magnitude,value))
             self.X_s = a[1:,0]
             self.Y_s = a[1:,1]
             self.R_s = a[1:,2]
@@ -121,7 +122,7 @@ class Record(Spyrelet):
 
     @Task()
     def Record_data_time(self):
-        for D in range(1000,10000,1000):
+        for D in range(10000,11000,1000):
             self.noise(D)
         return
 

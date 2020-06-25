@@ -1,8 +1,3 @@
-
-"""
-Smart loading of a spyre app
-"""
-
 import time
 import sys
 from importlib import import_module
@@ -75,7 +70,7 @@ def main():
 
                     # Instanciate the class
                     class_name = sclass.split('.')[-1]
-                    mod = import_module(sclass.replace('.'+class_name, ''))
+                    mod = import_module(sclass.replace('.'+ class_name, ''))
                     s = getattr(mod, class_name)()
 
 

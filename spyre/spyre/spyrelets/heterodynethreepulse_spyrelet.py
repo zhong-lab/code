@@ -21,16 +21,16 @@ from lantz.drivers.keysight import Arbseq_Class
 from lantz.drivers.keysight.seqbuild import SeqBuild
 
 from lantz.drivers.keysight import Keysight_33622A
-from lantz.drivers.tektronix import TDS2024C
+from lantz.drivers.tektronix.tds5104 import TDS5104
 
 class HeterodyneThreePulse(Spyrelet):
 	requires = {
 		'fungen': Keysight_33622A,
-		'osc': TDS2024C
+		'osc': TDS5104
 	}
 
 	def saveData(self,x,y,index,ind):
-		out_name = "D:\\Data\\8.27.2019\\0.1T\\0.02ms"
+		out_name = "D:\\Data\\10.9.2019\\3pulse\\0.1ms"
 		index=str(round(index,8))
 		ind='.'+str(ind)
 		np.savez(os.path.join(out_name,str(index+ind)),x,y)
@@ -53,7 +53,7 @@ class HeterodyneThreePulse(Spyrelet):
 		pulse_width = params['pulse width'].magnitude
 		echo = params['echo'].magnitude
 		step_tau=params['step tau'].magnitude
-		waitTime=0.02e-3
+		waitTime=0.01e-3
 		for i in range(100):
 			self.dataset.clear()
 			self.fungen.output[1] = 'OFF'
@@ -154,7 +154,7 @@ class HeterodyneThreePulse(Spyrelet):
 			self.fungen.sync()
 			self.fungen.output[1] = 'ON'
 			# self.osc.set_time(tau*2+pulse_width*3-tau/20)
-			#time.sleep(100000)
+			time.sleep(100000)
 			# if tau>6.0e-6:
 			# 	if tau>60e-6:
 			# 		self.osc.scale(1,0.01)
@@ -170,9 +170,9 @@ class HeterodyneThreePulse(Spyrelet):
 			y = np.array(y)
 			curTime=float(self.osc.query_time())
 			maxIndex=np.argmax(y)
-			if maxIndex<800:
-				self.osc.set_time(curTime-500e-9)
-			if np.max(y)<1.1*float(self.osc.scale_query(1)):
+			if maxIndex<1500:
+				self.osc.set_time(curTime-700e-9)
+			if np.max(y)<1.25*float(self.osc.scale_query(1)):
 				self.osc.scale(1,self.stepDown(1,float(self.osc.scale_query(1))))
 
 			for j in range(5):
@@ -186,7 +186,7 @@ class HeterodyneThreePulse(Spyrelet):
 
 			tau=tau+step_tau
 			curTime=float(self.osc.query_time())
-			self.osc.set_time(curTime+1.98*step_tau)
+			self.osc.set_time(curTime+2*step_tau)
 
 	@Element(name='Pulse parameters')
 	def pulse_parameters(self):

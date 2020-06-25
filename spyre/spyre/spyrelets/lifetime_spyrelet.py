@@ -26,16 +26,18 @@ import time
 from lantz.drivers.keysight import Arbseq_Class
 from lantz.drivers.keysight.seqbuild import SeqBuild
 
-
-from lantz.drivers.keysight import Keysight_33622A
 from lantz.drivers.bristol import Bristol_771
+from toptica.lasersdk.client import NetworkConnection, Client
+from toptica.lasersdk.client import SerialConnection
 
 class Lifetime(Spyrelet):
 	requires = {
-		'fungen': Keysight_33622A,
 		'wm': Bristol_771
 	}
 	qutag = None
+	conn1 = NetworkConnection('1.1.1.2')
+	#conn1 = conn1 = SerialConnection('COM1') 
+	dlc = Client(conn1)
 
 	def configureQutag(self):
 		qutagparams = self.qutag_params.widget.get()
@@ -54,7 +56,7 @@ class Lifetime(Spyrelet):
 				continue
 			else:
 				hist[binNumber]+=1
-		out_name = "D:\\Data\\9.1.2019\\T1"
+		out_name = "D:\\Data\\10.9.2019\\film"
 		np.savez(os.path.join(out_name,str(index)),hist,wls)
 		#np.savez(os.path.join(out_name,str(index+40)),hist,wls)
 		print('Data stored under File Name: ' + self.exp_parameters.widget.get()['File Name'] + str(index))
@@ -62,68 +64,10 @@ class Lifetime(Spyrelet):
 
 	@Task()
 	def startpulse(self, timestep=1e-9):
-		self.fungen.output[1] = 'OFF'
-		self.fungen.output[2] = 'OFF'
-		self.fungen.clear_mem(1)
-		self.fungen.clear_mem(2)
-		params = self.pulse_parameters.widget.get()
-		pulse = Arbseq_Class('pulse', timestep)
-		pulse.delays = [0]
-		pulse.heights = [1]
-		pulse.widths = [params['pulse width'].magnitude]
-		pulse.totaltime = params['pulse width'].magnitude
-		pulse.nrepeats = 0
-		pulse.repeatstring = 'once'
-		pulse.markerstring = 'highAtStartGoLow'
-		pulse.markerloc = 0
-		pulse.create_sequence()
+		with Client(self.conn1) as dlc:
+			print(dlc.get("laser1:ctl:wavelength"))
 
-		dc = Arbseq_Class('dc', timestep)
-		dc.delays = [0]
-		dc.heights = [0]
-		dc.widths = [params['pulse width'].magnitude]
-		dc.totaltime = params['pulse width'].magnitude
-		dc.repeatstring = 'repeat'
-		dc.markerstring = 'lowAtStart'
-		dc.markerloc = 0
-		period = params['period'].magnitude
-		width = params['pulse width'].magnitude
-		repeats = period/width - 1
-		dc.nrepeats = repeats
-		dc.create_sequence()
-
-		dc2 = Arbseq_Class('dc', timestep)
-		dc2.delays = [0]
-		dc2.heights = [1]
-		dc2.widths = [params['pulse width'].magnitude]
-		dc2.totaltime = params['pulse width'].magnitude
-		dc2.repeatstring = 'repeat'
-		dc2.markerstring = 'lowAtStart'
-		dc2.markerloc = 0
-		period = params['period'].magnitude
-		print(period)
-		width = params['pulse width'].magnitude
-		repeats = period/width 
-		dc2.nrepeats = repeats
-		dc2.create_sequence()
-
-		self.fungen.send_arb(pulse, 1)
-		self.fungen.send_arb(dc, 1)
-		self.fungen.send_arb(dc2, 2)
-
-		seq1 = [pulse,dc]
-
-		self.fungen.create_arbseq('pulsetest', seq1, 1)
-		self.fungen.wait()
-		self.fungen.voltage[1] = params['pulse height']
-		self.fungen.output[1] = 'ON'
-
-		dcparams = self.DC_parameters.widget.get()
-
-		self.fungen.create_arbseq('dc2', [dc2], 2)
-		self.fungen.wait()
-		self.fungen.voltage[2] = dcparams['DC height']
-		self.fungen.output[2] = 'ON'
+		time.sleep(1000)
 
 		self.configureQutag()
 
@@ -145,7 +89,7 @@ class Lifetime(Spyrelet):
 			lost = self.qutag.getLastTimestamps(True)
 			while time.time()-startTime < expparams['Measurement Time'].magnitude:
 				lost = self.qutag.getLastTimestamps(True)
-				time.sleep(30*period)
+				time.sleep(30*100e-3)
 				timestamps = self.qutag.getLastTimestamps(True)
 
 				tstamp = timestamps[0] # array of timestamps
@@ -159,12 +103,11 @@ class Lifetime(Spyrelet):
 						stoptimestamp = tstamp[k]
 						stoparray.append(stoptimestamp)
 				wls.append(str(self.wm.measure_wavelength()))
-			self.createHistogram(stoparray, timebase, bincount, period,i, wls)
+			self.createHistogram(stoparray, timebase, bincount, 100e-3,i, wls)
 			print(i)
-			self.fungen.voltage[2] = self.fungen.voltage[2].magnitude + 2*dcparams['DC step size'].magnitude
-			time.sleep(100000)
+			#self.fungen.voltage[2] = self.fungen.voltage[2].magnitude + 2*dcparams['DC step size'].magnitude
+			#time.sleep(100000)
 
-		self.fungen.output[1] = 'OFF'
 
 	@Task()
 	def qutagInit(self):
@@ -217,17 +160,10 @@ class Lifetime(Spyrelet):
 	@startpulse.initializer
 	def initialize(self):
 		self.wm.start_data()
-		self.fungen.output[1] = 'OFF'
-		self.fungen.output[2] = 'OFF'
-		self.fungen.clear_mem(1)
-		self.fungen.clear_mem(2)
-		self.fungen.wait()
 
 	@startpulse.finalizer
 	def finalize(self):
 		self.wm.stop_data()
-		self.fungen.output[1] = 'OFF'
-		self.fungen.output[2] = 'OFF'
 		print('Lifetime measurements complete.')
 		return
 

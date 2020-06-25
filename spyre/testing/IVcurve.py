@@ -9,8 +9,7 @@ devices = {
 
 # Experiment List
 spyrelets = {
-    'IVcurve':[
-        'spyre.spyrelets.darkcount_spyrelet.IVcurve',
+        'IV_Curve':['spyre.spyrelets.IV_Curve_spyrelet.IV_Curve',
         {'srs': 'srs'},
         {}
     ],

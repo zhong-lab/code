@@ -21,12 +21,12 @@ from lantz.drivers.keysight import Arbseq_Class
 from lantz.drivers.keysight.seqbuild import SeqBuild
 
 from lantz.drivers.keysight import Keysight_33622A
-from lantz.drivers.tektronix import TDS2024C
+from lantz.drivers.tektronix.tds5104 import TDS5104
 
 class HoleBurning(Spyrelet):
 	requires = {
 		'fungen': Keysight_33622A,
-		'osc': TDS2024C
+		'osc': TDS5104
 	}
 	out_name = "D:\\Data\\6.7.2019\\HoleBurning"
 	xs = []
@@ -284,11 +284,11 @@ class HoleBurning(Spyrelet):
 	def pump(self, timestep):
 		for i in range(70):
 			params = self.parameters.widget.get()
-			per=200e-3
+			per=1
 
 			chn2pulse2 = Arbseq_Class('chn2pulse2', timestep)
 			tri_time = 1000e-6
-			offset=0.2
+			offset=0
 			height = 0.73-offset
 			heights = list()
 			heights.append(height)
@@ -321,7 +321,7 @@ class HoleBurning(Spyrelet):
 			print('chn2 len(heights) is:' + str(len(heights)))
 			chn2pulse2.totaltime = len(heights) * timestep
 			print('chn2_shb totaltime is:' + str(chn2pulse2.totaltime))
-			chn2pulse2.nrepeats = 3
+			chn2pulse2.nrepeats = 1
 			print('chn2_shb nrepeats is:' + str(chn2pulse2.nrepeats))
 			chn2pulse2.repeatstring = 'repeat'
 			chn2pulse2.markerstring = 'lowAtStart'
@@ -349,7 +349,7 @@ class HoleBurning(Spyrelet):
 			chn1off1.totaltime = params['ramp time'].magnitude
 			chn1off1.nrepeats = 0
 			chn1off1.repeatstring = 'once'
-			chn1off1.markerstring = 'highAtStartGoLow'
+			chn1off1.markerstring = 'lowAtStart'
 			chn1off1.markerloc = 0
 			chn1off1.create_sequence()
 
@@ -358,7 +358,7 @@ class HoleBurning(Spyrelet):
 			chn1pulse.heights = [1]
 			chn1pulse.widths = [params['pump width'].magnitude]
 			chn1pulse.totaltime = params['pump width'].magnitude
-			chn1pulse.nrepeats = 10
+			chn1pulse.nrepeats = 100
 			chn1pulse.repeatstring = 'repeat'
 			chn1pulse.markerstring = 'lowAtStart'
 			chn1pulse.markerloc = 0
@@ -371,7 +371,7 @@ class HoleBurning(Spyrelet):
 			chn1off2.totaltime = params['ramp time'].magnitude
 			chn1off2.nrepeats = 0
 			chn1off2.repeatstring = 'once'
-			chn1off2.markerstring = 'lowAtStart'
+			chn1off2.markerstring = 'highAtStartGoLow'
 			chn1off2.markerloc = 0
 			chn1off2.create_sequence()
 
@@ -392,7 +392,7 @@ class HoleBurning(Spyrelet):
 			chn1dc.heights = [0]
 			chn1dc.widths = [params['wait time unit'].magnitude]
 			chn1dc.totaltime = params['wait time unit'].magnitude
-			chn1dc.nrepeats = i+1
+			chn1dc.nrepeats = 500
 			chn1dc.repeatstring = 'repeat'
 			chn1dc.markerstring = 'lowAtStart'
 			chn1dc.markerloc = 0
@@ -400,10 +400,10 @@ class HoleBurning(Spyrelet):
 
 			chn1pulse2 = Arbseq_Class('chn1pulse2', timestep)
 			chn1pulse2.delays = [0]*len(heights)
-			chn1pulse2.heights = [0.4]*10+ [0.4]*(len(heights)-10)
+			chn1pulse2.heights = [1]*10+ [1]*(len(heights)-10)
 			chn1pulse2.widths = [timestep] * len(heights)
 			chn1pulse2.totaltime = tri_time
-			chn1pulse2.nrepeats = 3
+			chn1pulse2.nrepeats = 1
 			chn1pulse2.repeatstring = 'repeat'
 			chn1pulse2.markerstring = 'lowAtStart'
 			chn1pulse2.markerloc = 0
@@ -417,7 +417,7 @@ class HoleBurning(Spyrelet):
 			chn1dc2.repeatstring = 'repeat'
 			chn1dc2.markerstring = 'lowAtStart'
 			chn1dc2.markerloc = 0
-			chn1dc2.nrepeats = int((per-tri_time-(i+1)*params['wait time unit'].magnitude-10*params['pump width'].magnitude)/params['pump width'].magnitude)
+			chn1dc2.nrepeats = int((per-tri_time-(500)*params['wait time unit'].magnitude-10*params['pump width'].magnitude)/params['pump width'].magnitude)
 			chn1dc2.create_sequence()
 
 			chn2off1 = Arbseq_Class('chn2off1', timestep)
@@ -433,12 +433,12 @@ class HoleBurning(Spyrelet):
 
 			chn2pulse = Arbseq_Class('chn2pulse', timestep)
 			chn2pulse.delays = [0]
-			chn2pulse.heights = [0.65]
+			chn2pulse.heights = [0.9]
 			chn2pulse.widths = [params['pump width'].magnitude]
 			chn2pulse.totaltime = params['pump width'].magnitude
-			chn2pulse.nrepeats = 10
+			chn2pulse.nrepeats = 100
 			chn2pulse.repeatstring = 'repeat'
-			chn2pulse.markerstring = 'highAtStartGoLow'
+			chn2pulse.markerstring = 'lowAtStart'
 			chn2pulse.markerloc = 0
 			chn2pulse.create_sequence()
 
@@ -449,7 +449,7 @@ class HoleBurning(Spyrelet):
 			chn2off2.totaltime = params['ramp time'].magnitude
 			chn2off2.nrepeats = 0
 			chn2off2.repeatstring = 'once'
-			chn2off2.markerstring = 'lowAtStart'
+			chn2off2.markerstring = 'highAtStartGoLow'
 			chn2off2.markerloc = 0
 			chn2off2.create_sequence()
 
@@ -458,7 +458,7 @@ class HoleBurning(Spyrelet):
 			chn2dc.heights = [0]
 			chn2dc.widths = [params['wait time unit'].magnitude]
 			chn2dc.totaltime = params['wait time unit'].magnitude
-			chn2dc.nrepeats = i+1
+			chn2dc.nrepeats = 500
 			chn2dc.repeatstring = 'repeat'
 			chn2dc.markerstring = 'lowAtStart'
 			chn2dc.markerloc = 0
@@ -473,7 +473,7 @@ class HoleBurning(Spyrelet):
 			chn2dc2.repeatstring = 'repeat'
 			chn2dc2.markerstring = 'lowAtStart'
 			chn2dc2.markerloc = 0
-			chn2dc2.nrepeats = int((per-tri_time-(i+1)*params['wait time unit'].magnitude-10*params['pump width'].magnitude)/params['pump width'].magnitude)
+			chn2dc2.nrepeats = int((per-tri_time-(500)*params['wait time unit'].magnitude-10*params['pump width'].magnitude)/params['pump width'].magnitude)
 			chn2dc2.create_sequence()
 
 			self.fungen.send_arb(chn1off1,1)
@@ -498,15 +498,15 @@ class HoleBurning(Spyrelet):
 			self.fungen.create_arbseq('freq', seq2, 2)
 			self.fungen.sync()
 			self.fungen.wait()
-			self.fungen.voltage[1] = 1+0.00000001*i
+			self.fungen.voltage[1] = 0.5+0.00000001*i
 			self.fungen.voltage[2] = 3.6+0.00000001*i
 			self.fungen.wait()
 			self.fungen.output[2] = 'ON'
 			time.sleep(1)
 			self.fungen.output[1] = 'ON'
-			self.osc.triggersource = 'CH4'
-			self.osc.set_time((i+1)*params['wait time unit'].magnitude + 0.0208)
-			# time.sleep(10000)
+#			self.osc.triggersource = 'CH4'
+			#self.osc.set_time((i+1)*params['wait time unit'].magnitude + 0.0208)
+			time.sleep(10000)
 
 			time.sleep(10)
 			x,y=self.osc.curv()

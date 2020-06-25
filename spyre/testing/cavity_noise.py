@@ -3,7 +3,7 @@
 devices = {
     'lockin':[
         'lantz.drivers.lockin.SR865A',
-        ['GPIB1::4::INSTR'],
+        ['GPIB2::4::INSTR'],
         {}
     ],
     'source':[
@@ -14,7 +14,7 @@ devices = {
 }
 # Experiment List
 spyrelets = {
-    'noise':[
+    'cavity_noise':[
         'spyre.spyrelets.cavity_noise_spyrelet.Record',
         {'lockin': 'lockin','source': 'source'},
         {}

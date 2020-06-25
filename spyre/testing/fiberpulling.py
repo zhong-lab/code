@@ -2,7 +2,7 @@
 devices = {
     'gpd':[
         'lantz.drivers.gwinstek.g3303s.GPD3303S',
-        ['ASRL22::INSTR'],
+        ['ASRL32::INSTR'],
         {}
     ],
     'pmd':[

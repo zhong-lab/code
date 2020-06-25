@@ -20,9 +20,11 @@ from lantz.drivers.qutools import QuTAG
 
 class DarkCount(Spyrelet):
 	requires = {
-    	'srs': SRS900
-    }
+		'srs': SRS900
+	}
 	qutag = None
+	currents=[]
+	darkcountspercurrent=[]
 
 	@Task()
 	def qutagInit(self):
@@ -48,17 +50,17 @@ class DarkCount(Spyrelet):
 	@Task()
 	def getDarkCounts(self):
 		self.srs.SIM928_voltage[5]=0
-		self.srs.SIM928_voltage[6]=0
-		self.srs.module_reset[6]
+		#self.srs.SIM928_voltage[6]=0
+		#self.srs.module_reset[6]
 		self.srs.module_reset[5]
 		self.srs.wait_time(100000)
 		qutagparams = self.qutag_params.widget.get()
 		start = qutagparams['Start Channel']
 		stop_1 = qutagparams['Stop Channel 1']
-		stop_2 = qutagparams['Stop Channel 2']
-        ##True = rising edge, False = falling edge. Final value is threshold voltage
+		#stop_2 = qutagparams['Stop Channel 2']
+		##True = rising edge, False = falling edge. Final value is threshold voltage
 		self.qutag.setSignalConditioning(start,self.qutag.SIGNALCOND_MISC,True,0.1)
-		self.qutag.setSignalConditioning(stop_1,self.qutag.SIGNALCOND_MISC,True,0.1)
+		#self.qutag.setSignalConditioning(stop_1,self.qutag.SIGNALCOND_MISC,True,0.1)
 		self.qutag.enableChannels((start,stop_1))
 		biasCurrentParams = self.bias_current.widget.get()
 		qutagParams = self.qutag_params.widget.get()
@@ -71,8 +73,8 @@ class DarkCount(Spyrelet):
 		print('stop current is'+ str(stopCurrent))
 		expParams = self.exp_params.widget.get()
 		currentCurrent = startCurrent
-		self.srs.SIM928_voltage[6] = currentCurrent*resistance
-		self.srs.SIM928_on[6]
+		self.srs.SIM928_voltage[5] = currentCurrent*resistance
+		self.srs.SIM928_on[5]
 		self.srs.wait_time(100000)
 		points = ((stopCurrent-startCurrent)/stepSize)+(1+stepSize)
 		print(points)
@@ -88,44 +90,23 @@ class DarkCount(Spyrelet):
 			print(tchannel)
 			darkcounts = values
 			BC.append(currentCurrent)
+			self.currents.append(currentCurrent*resistance)
 			DCR_1.append(darkcounts/expParams['Exposure Time'].magnitude)
-			currentCurrent += stepSize
-			self.srs.SIM928_voltage[6] = currentCurrent*resistance
-		self.srs.SIM928_voltage[6]=0
-		self.srs.module_reset[6]
-		currentCurrent = startCurrent	
-		self.srs.module_reset[5]
-		self.srs.wait_time(100000)
-		self.srs.SIM928_voltage[5] = currentCurrent*resistance
-		self.srs.SIM928_on[5]	
-		self.srs.wait_time(100000)
-		BC =[]
-		DCR_2 =[]
-		self.qutag.setSignalConditioning(stop_2,self.qutag.SIGNALCOND_MISC,True,0.1)
-		self.qutag.enableChannels((start,stop_2))
-		#print(self.qutag.getChannelsEnabled())	
-		for i in range(int(points)):
-			lost = self.qutag.getLastTimestamps(True)
-			time.sleep(expParams['Exposure Time'].magnitude)
-			timestamps = self.qutag.getLastTimestamps(True)
-			tstamp = timestamps[0] # array of timestamps
-			tchannel = timestamps[1] # array of channels
-			values = timestamps[2] # number of recorded timestamps
-			print(tchannel)
-			darkcounts = values
-			BC.append(currentCurrent)
-			DCR_2.append(darkcounts/expParams['Exposure Time'].magnitude)
+			self.darkcountspercurrent.append(darkcounts/expParams['Exposure Time'].magnitude)
 			currentCurrent += stepSize
 			self.srs.SIM928_voltage[5] = currentCurrent*resistance
+			values = {
+					'bc': self.currents,
+					'dc': self.darkcountspercurrent,
+			}
+			self.getDarkCounts.acquire(values)
 		self.srs.SIM928_voltage[5]=0
 		self.srs.module_reset[5]
-		datadir = 'D:\Data\\'
+		datadir = 'D:\Data\\09.09.2019\\'
 		print(BC)
 		print(DCR_1)
-		print(DCR_2)
-		np.savetxt(datadir+expParams['File Name']+'SNSPD1'+'.csv', (BC,DCR_1), delimiter=',')
-		np.savetxt(datadir+expParams['File Name']+'SNSPD2'+'.csv', (BC,DCR_2), delimiter=',')
-		print('Data stored under File Name: ' + expParams['File Name'] + 'SNSPD1 and ' + expParams['File Name'] + 'SNSPD2')	
+		np.savetxt(datadir+expParams['File Name']+'.csv', (BC,DCR_1), delimiter=',')
+		print('Data stored under File Name: ' + expParams['File Name'])	
 		return
 
 
@@ -133,22 +114,22 @@ class DarkCount(Spyrelet):
 	@Element(name = 'Bias Current')
 	def bias_current(self):
 		params = [
-    #    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
-        ('Start Current', {'type': float, 'default': 2, 'units': 'uA'}),
-        ('Step Size', {'type': float, 'default': 0.2, 'units': 'uA'}),
-        ('Stop Current', {'type': float, 'default': 10, 'units': 'uA'})
-        ]
+	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
+		('Start Current', {'type': float, 'default': 2, 'units': 'uA'}),
+		('Step Size', {'type': float, 'default': 0.2, 'units': 'uA'}),
+		('Stop Current', {'type': float, 'default': 10, 'units': 'uA'})
+		]
 		w = ParamWidget(params)
 		return w
 
 	@Element(name = 'Experimental Parameters')
 	def exp_params(self):
 		params = [
-    #    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
-        ('Exposure Time', {'type': int, 'default': 10, 'units': 's'}),
-        ('Points per Bias Current',{'type':int, 'default': 1.0}),
-        ('File Name', {'type': str})
-        ]
+	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
+		('Exposure Time', {'type': int, 'default': 10, 'units': 's'}),
+		('Points per Bias Current',{'type':int, 'default': 1.0}),
+		('File Name', {'type': str})
+		]
 		w = ParamWidget(params)
 		return w
 
@@ -165,7 +146,6 @@ class DarkCount(Spyrelet):
 		w = ParamWidget(params)
 		return w	
 
-
 	@getDarkCounts.initializer
 	def initialize(self):
 		print('The identification of this instrument is : ' + self.srs.idn)
@@ -175,6 +155,22 @@ class DarkCount(Spyrelet):
 	@getDarkCounts.finalizer
 	def finalize(self):
 		return
+
+	@Element(name='Histogram')
+	def darkcountsplot(self):
+		p=LinePlotWidget()
+		p.plot('Dark Counts vs. Bias Current')
+		return p
+
+	@darkcountsplot.on(getDarkCounts.acquired)
+	def darkcountsplot_update(self, ev):
+		w=ev.widget
+		bc=np.array(self.currents)
+		cs=np.array(self.darkcountspercurrent)
+		w.set('Dark Counts vs. Bias Current', xs=bc, ys=cs)
+		return
+
+
 
 
 
