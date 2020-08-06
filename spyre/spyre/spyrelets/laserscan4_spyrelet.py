@@ -25,43 +25,54 @@ from lantz.drivers.keysight import Keysight_33622A
 from lantz.drivers.tektronix import TDS2024C
 from lantz.drivers.thorlabs.pm100d import PM100D
 from lantz.drivers.bristol import Bristol_771
-from toptica.lasersdk.client import NetworkConnection, Client
-from lantz.drivers.thorlabs.pm100d import PM100D
+from toptica.lasersdk.client import NetworkConnection, Client, SerialConnection
+from lantz.drivers.tektronix.tds5104 import TDS5104
+#from lantz.drivers.thorlabs.pm100d import PM100D
+
 class LaserScan(Spyrelet):
+    # delete if not using power meter
     requires = {
-        'pmd': PM100D
+        'osc': TDS5104
     }
     conn1 = NetworkConnection('1.1.1.2')
 
     dlc = Client(conn1)
-
+    
+    #daq = nidaqmx.Task()
+    #daq.ai_channels.add_ai_voltage_chan("Dev1/ai3")
     
     @Task()
     def scan(self):
         param=self.parameters.widget.get()     
         filename = param['Filename']
         F =open(filename+'.dat','w')
-        f=filename+'\'.dat'
+        f=filename+'\'.dat' 
         F2 = open(f,'w')
         start_wavelength = param['Start'].magnitude*1e9
         stop_wavelength = param['Stop'].magnitude*1e9
         step = param['Step'].magnitude*1e9
         n = param['Num Scan']
-        self.wv = np.arange(start_wavelength,stop_wavelength+step,step)
-
+        self.wv = np.arange(start_wavelength,stop_wavelength,step)
+        #self.daq.start()
+        print('here')
         with Client(self.conn1) as dlc:
+            print('here')
             for x in range(n):
                 xx=[]            
                 dlc.set("laser1:ctl:wavelength-set",start_wavelength)
-                time.sleep(10)
-                #act_start = self.wm.measure_wavelength()
-                time.sleep(2)
+                time.sleep(8)
                 for item in self.wv:
                     dlc.set("laser1:ctl:wavelength-set",item)
-                    time.sleep(0.0001)
-                    xx.append(self.pmd.power.magnitude * 1000)
-                #act_stop = self.wm.measure_wavelength()
-                #print('%f,%f'%(act_start,act_stop))
+                    time.sleep(0.01)
+                    #xx.append(self.daq.read()) #daq    
+                    self.osc.datasource(1)
+                    x,y=self.osc.curv()
+                    ave = np.mean(y)
+                    xx.append(ave)
+                    # xx.append(self.pmd.power.magnitude)# powermeter
+                    time.sleep(0.1)
+                time.sleep(1)
+
                 wl = np.linspace(start_wavelength,stop_wavelength,len(xx))
                 for item in xx:
                     F.write("%f,"%item)
@@ -69,7 +80,7 @@ class LaserScan(Spyrelet):
                     F2.write("%f,"%item)
                 F.write("\n")
                 F2.write("\n")
-
+        #self.daq.stop()
         return
 
     @Element(name='Params')
