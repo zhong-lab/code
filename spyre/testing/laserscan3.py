@@ -1,12 +1,11 @@
 # Device List
 devices = {
 
-
-    # 'wm':[
-    #     'lantz.drivers.bristol.bristol771.Bristol_771',
-    #     [6535],
-    #     {}
-    # ],
+    #'wm':[
+    #    'lantz.drivers.bristol.bristol771.Bristol_771',
+    #    [6535],
+    #    {}
+    #],
 
     'pmd':[
         'lantz.drivers.thorlabs.pm100d.PM100D',
