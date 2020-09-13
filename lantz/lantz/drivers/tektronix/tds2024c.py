@@ -134,8 +134,8 @@ class TDS2024C(MessageBasedDriver):
         xdata = np.arange(len(data)) * xin + xze
         return list(xdata), list(ydata)
 
-    def _measure(self, type, source):
-        self.write('MEASUrement:IMMed:TYPe {}'.format(type))
+    def _measure(self, typ, source):
+        self.write('MEASUrement:IMMed:TYPe {}'.format(typ))
         self.write('MEASUrement:IMMed:SOUrce1 CH{}'.format(source))
         return self.query('MEASUrement:IMMed:VALue?')
 

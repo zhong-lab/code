@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
     log_to_screen(DEBUG)
     # this is the USB VISA Address:
-    with PM100D('USB0::0x1313::0x8078::P0019269::INSTR') as inst:
+    with PM100D('USB0::0x1313::0x8078::P0022812::INSTR') as inst:
         print('The identification of this instrument is :' + inst.idn)
         print(inst.power)
         # inst.format()

@@ -39,10 +39,10 @@ input("Press any key to start pulling")
 
 # pull
 print("Pulling...\n")
-motor1.set_velocity_parameters(0, 0.01, 0.04)
-motor2.set_velocity_parameters(0, 0.01, 0.04)
+motor1.set_velocity_parameters(0, 0.01, 0.1) #(minimum_velocity, acceleration, maximum_velocity) in mm
+motor2.set_velocity_parameters(0, 0.01, 0.1)
 motor1.move_velocity(2)
-motor1.move_to(20)
+motor1.move_to(20) # move to relative/absolute position
 motor2.move_velocity(2)
 motor2.move_to(20)
 

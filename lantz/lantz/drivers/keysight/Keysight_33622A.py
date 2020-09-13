@@ -1,6 +1,7 @@
 from lantz import Feat, DictFeat, Action
 from lantz.messagebased import MessageBasedDriver
-from lantz.drivers.keysight.arbseq_class import Arbseq_Class
+from lantz.drivers.keysight.arbseq_class_mw import Arbseq_Class_MW
+# from lantz.drivers.keysight.arbseq_class import Arbseq_Class
 from time import sleep
 
 class Keysight_33622A(MessageBasedDriver):
@@ -143,7 +144,7 @@ class Keysight_33622A(MessageBasedDriver):
 		"""
 		self.write('SOURCE{}:VOLT {}'.format(key, value))
 	
-	@DictFeat(units='V', limits=(-5, 5, .01), keys=(1, 2))
+	@DictFeat(units='V', limits=(-5, 5, .001), keys=(1, 2))
 	def offset(self, key):
 		"""returns current voltage offset
 		"""
@@ -155,7 +156,7 @@ class Keysight_33622A(MessageBasedDriver):
 		"""
 		self.write('SOURCE{}:VOLT:OFFS {}'.format(key, value))
 
-	@DictFeat(units='Hz', limits=(1, 1e+5), keys=(1, 2))
+	@DictFeat(units='Hz', limits=(1, 120e+6), keys=(1, 2))
 	def frequency(self, key):
 		"""returns current frequency
 		"""
@@ -178,6 +179,18 @@ class Keysight_33622A(MessageBasedDriver):
 		"""waveform function setter
 		"""
 		self.write('SOURCE{}:FUNC {}'.format(key, value))
+
+	@DictFeat(keys=(1, 2))
+	def awave(self, key):
+		"""returns current waveform function
+		"""
+		return self.query('SOURCE{}:APPL?'.format(key))
+	
+	@waveform.setter
+	def awave(self, key, value):
+		"""waveform function setter
+		"""
+		self.write('SOURCE{}:APPL {}'.format(key, value))
 				   
 	@Action()
 	def abort(self):
@@ -341,10 +354,6 @@ class Keysight_33622A(MessageBasedDriver):
 		sleep(1)
 		return self.query_binary('HCOP:SDUM:DATA?', delay=3)
 
-	# def triangular_wave(self,chn=1,freq=10,apt=5,ofs=0):
-
-	# 	self.write('SOURCE{}:APPLy:TRIangle:F [,{} [,{}]]]'.format(chn,freq,apt,ofs))
-	# 	return
 
 
 
@@ -359,7 +368,7 @@ if __name__ == '__main__':
 
 	log_to_screen(DEBUG)
 	# this is the USB VISA Address:
-	with Keysight_33622A('USB0::0x0957::0x5707::MY53801461::INSTR') as inst:
+	with Keysight_33622A('TCPIP0::A-33622A-01461.local::inst0::INSTR') as inst:
 		print('The identification of this instrument is :' + inst.idn)
 		#print(str(inst.read_standard_event_status_register))
 		#inst.output[1] = 'ON'
@@ -371,10 +380,10 @@ if __name__ == '__main__':
 		#print('Current voltage: ' + str(inst.voltage[1]))
 		#print('Current frequency: ' + str(inst.frequency[1]))
 		#print('Current offset: ' + str(inst.offset[1]))
-		print('ERROR: ' + inst.get_error)
-		inst.triangular_wave(1,10,5,0)
+		#print('ERROR: ' + inst.get_error)
 		#inst.operation_complete
 		#inst.clear_status
 		#inst.test
-		image = inst.get_image('BMP')
+		#image = inst.get_image('BMP')
+		inst.sync()
 		#print(inst.get_image('PNG'))

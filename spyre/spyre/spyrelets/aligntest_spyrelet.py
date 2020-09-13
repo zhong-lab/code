@@ -54,7 +54,7 @@ class ALIGNMENT(Spyrelet):
 				if xpoint ==0:
 					time.sleep(3)
 					self.F.write("\n")
-				time.sleep(0.001)
+				time.sleep(0.05)
 				self.pw[zpoint][xpoint] = self.powermeter.power.magnitude*1000
 			for item in self.pw[zpoint,:]:
 				self.F.write("%f,"% item)
@@ -157,8 +157,7 @@ class ALIGNMENT(Spyrelet):
 		('Z start', {'type': float, 'default': 0, 'units':'um'}),
 		('Z range', {'type': float, 'default': 6000*1e-6, 'units':'m'}),
 		('Step', {'type': float, 'default': 0.1*1e-6, 'units':'m'}),
-		('Voltage', {'type': float, 'default': 40, 'units':'V'}),
-		('x Voltage', {'type': float, 'default': 40, 'units':'V'})
+		('Voltage', {'type': float, 'default': 20, 'units':'V'}),
 		('Frequency', {'type': float, 'default': 200, 'units':'Hz'})
 		]
 		w = ParamWidget(params)
@@ -263,7 +262,7 @@ class ALIGNMENT(Spyrelet):
 		FREQUENCY_x=fieldValues['Frequency'].magnitude
 		FREQUENCY_y=fieldValues['Frequency'].magnitude
 		FREQUENCY_z=fieldValues['Frequency'].magnitude
-		VOLTAGE_x=fieldValues['x Voltage'].magnitude
+		VOLTAGE_x=fieldValues['Voltage'].magnitude
 		VOLTAGE_y=fieldValues['Voltage'].magnitude
 		VOLTAGE_z=fieldValues['Voltage'].magnitude
 		x_range = fieldValues['X range'].magnitude*1e6 

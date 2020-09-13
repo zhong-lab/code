@@ -24,6 +24,7 @@ class Test(Spyrelet):
 
     xs = []
     ys = []
+    f = open('D:\\Data\\8.19.2019\\powertest.dat','w')
 
     @Task()
     def HardPull(self):
@@ -32,17 +33,17 @@ class Test(Spyrelet):
             t1 = time.time()
             t = t1 - t0
             self.xs.append(t)
-            self.ys.append(self.pmd.power.magnitude * 1000)
+            power = self.pmd.power.magnitude * 1000
+            self.ys.append(power)
             values = {
                   'x': self.xs,
                   'y': self.ys,
                   }
 
             self.HardPull.acquire(values)
-            time.sleep(0.05)
-            if(len(self.xs)>400):
-                self.xs=self.xs[300:]
-                self.ys=self.ys[300:]
+            time.sleep(0.005)
+            self.f.write('%f,'%power)
+
         return
   
     @Element(name='Histogram')
@@ -56,9 +57,14 @@ class Test(Spyrelet):
         w = ev.widget
         xs = np.array(self.xs)
         ys = np.array(self.ys)
-        if(len(self.xs)>400):
-            self.xs=self.xs[300:]
-            self.ys=self.ys[300:]
+        
+        if(len(self.xs)>1000):
+            self.xs=[]
+            self.ys=[]
+        if len(xs)>len(ys):
+            xs=xs[:len(ys)]
+        if len(ys)>len(xs):
+            ys=ys[:len(xs)]        
         w.set('Transmission Power', xs=xs, ys=ys)
         return
 

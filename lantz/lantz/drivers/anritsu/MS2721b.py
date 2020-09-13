@@ -138,7 +138,7 @@ class MS2721B(MessageBasedDriver):
 
     @Action()
     def savefile(self,value):
-        return self.write('MMEM:STOR:TRAC 0,"QvsT_{}"'.format(value))
+        return self.write('MMEM:STOR:TRAC 0,"S21_vs_T_{}"'.format(value))
         # return self.write('MMEM:STOR:TRAC 0,"QvsBz_Rampdown_{}"'.format(value))
 
     # @Feat(units='W')
@@ -169,7 +169,7 @@ if __name__ == '__main__':
 
     log_to_screen(DEBUG)
     # this is the USB VISA Address:
-    with MS2721B('USB0::0x0B5B::0xFFF9::1118010_150_11::INSTR') as inst:
+    with MS2721B('TCPIP0::169.254.13.29::inst0::INSTR') as inst:
         print('The identification of this instrument is :' + inst.idn)
         # inst.format()
         # print(inst.acquireData())

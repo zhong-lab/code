@@ -230,7 +230,7 @@ class DG645(MessageBasedDriver):
 
     @trigger_rate.setter
     def trigger_rate(self,rate):
-        self.write("TRAT {:d}".format(rate))
+        self.write("TRAT {:f}".format(rate))
         self.clear_errors()
 
     @Feat(units="V", limits=(0,3.5))
@@ -300,3 +300,40 @@ class DG645(MessageBasedDriver):
     def burst_config(self, value):
         self.write('BURT {:s}'.format(value))
         self.clear_errors()
+
+
+if __name__ == '__main__':
+    import time
+    from time import sleep
+    from lantz import Q_
+    from lantz.log import log_to_screen, DEBUG
+
+    volt = Q_(1, 'V')
+    milivolt = Q_(1, 'mV')
+    Hz = Q_(1, 'Hz')
+    kHz = Q_(1,'kHz')
+    MHz = Q_(1.0,'MHz')
+    GHz = Q_(1.0,'GHz')
+    dB = Q_(1,'dB')
+    dBm = Q_(1,'dB')
+    s = Q_(1,'s')
+    ms = Q_(1,'ms')
+    us = Q_(1,'us')
+
+    log_to_screen(DEBUG)
+
+    with DG645('TCPIP0::169.254.29.167::inst0::INSTR') as inst:
+        # print('The identification number of this instrument is :' + str(inst.idn))
+        inst.clear_errors()
+        # inst.Trigger_Source='Single shot'
+        inst.Trigger_Source='Internal'
+
+        inst.delay['D']=5e-6
+
+        delaya=inst.delay['A']
+        delayb=inst.delay['B']
+        delayc=inst.delay['C']
+        delayd=inst.delay['D']
+        print("Delay for a,b,c,d is {}, {}, {}, {}".format(delaya,delayb,delayc,delayd))
+        # inst.Trigger_Source='External falling edges'
+        #inst.Trigger_Source='External rising edges'

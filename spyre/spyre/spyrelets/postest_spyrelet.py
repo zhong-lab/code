@@ -91,8 +91,8 @@ class POS(Spyrelet):
 		self.attocube.amplitude[self.axis_index_x]=Q_(VOLTAGE_x,'V')
 		self.attocube.amplitude[self.axis_index_y]=Q_(VOLTAGE_y,'V')
 		self.attocube.amplitude[self.axis_index_z]=Q_(VOLTAGE_z,'V')
-		self.attocube.absolute_move(self.axis_index_x,x_start)
-		self.attocube.absolute_move(self.axis_index_z,z_start)
+		self.attocube.absolute_move(self.axis_index_x,x_start,1)
+		self.attocube.absolute_move(self.axis_index_z,z_start,1)
 		time.sleep(5)
 		print('initialized')
 		return
@@ -122,6 +122,7 @@ class POS(Spyrelet):
 		('Z range', {'type': float, 'default': 6000*1e-6, 'units':'m'}),
 		('Step', {'type': float, 'default': 0.1*1e-6, 'units':'m'}),
 		('Voltage', {'type': float, 'default': 20, 'units':'V'}),
+		('DCVoltage', {'type': float, 'default': 20, 'units':'V'}),
 		('Frequency', {'type': float, 'default': 200, 'units':'Hz'})
 		]
 		w = ParamWidget(params)

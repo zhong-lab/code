@@ -1,10 +1,3 @@
-'''
-needs test
-for fiber coupling
-needs an attocube and a powermeter
-scan XZ
-might have awful interface
-'''
 import numpy as np
 import pyqtgraph as pg
 import csv
@@ -13,7 +6,7 @@ from PyQt5.Qsci import QsciScintilla, QsciLexerPython
 from PyQt5.QtWidgets import QPushButton, QTextEdit, QVBoxLayout
 import time
 import random
-
+import nidaqmx
 
 from spyre import Spyrelet, Task, Element
 from spyre.widgets.task import TaskWidget
@@ -22,7 +15,6 @@ from spyre.widgets.rangespace import Rangespace
 from spyre.widgets.param_widget import ParamWidget
 from spyre.widgets.repository_widget import RepositoryWidget
 
-#from attocube_spyrelet import Attocube  #has touble with finding this, not used though?
 
 from lantz import Q_
 from lantz.drivers.attocube import ANC350
@@ -30,48 +22,62 @@ from lantz.drivers.thorlabs.pm100d import PM100D
 
 class ALIGNMENT(Spyrelet):
 	requires = {
-		'powermeter': PM100D
-	}
-	
+		'pmd': PM100D
+	}	
 	attocube=ANC350()
 	attocube.initialize()
 	axis_index_x=0
 	axis_index_y=1
 	axis_index_z=2 
-	F = open('C:\\Users\\Tian Zhong\\Tao\\scan2.txt', 'w')
 
 
 	@Task(name='Scan XZ')
 	def ReflectionDistribution(self):
-		self.F = open(self.filename, 'w')
-		for zpoint in range(len(self.zpositions)):
-			self.attocube.absolute_move(self.axis_index_z,self.zpositions[zpoint],self.eps)
-			print("%d/%d"%(zpoint,len(self.zpositions)))
-			xpoint=0
-			self.attocube.absolute_move(self.axis_index_x,self.x_start,self.eps)
-			for item in self.pw[zpoint-1,:]:
+		self.F = open(self.filename+'.dat', 'w')
+		f = self.filename+'index.dat'
+		self.F2 = open(f,'w')
+		self.pw=np.zeros((self.z_steps,self.x_steps))
+		self.attocube.frequency[self.axis_index_z]=Q_(self.jogf,'Hz')
+		self.attocube.amplitude[self.axis_index_z]=Q_(self.jogv,'V')
+		for zpoint in range(self.z_steps):
+			i=0
+			self.attocube.frequency[self.axis_index_x]=Q_(self.movef,'Hz')
+			self.attocube.amplitude[self.axis_index_x]=Q_(self.movev,'V')
+
+			time.sleep(0.8)
+			self.attocube.absolute_move(self.axis_index_x,self.x_start)
+			time.sleep(0.5)
+			self.attocube.cl_move(self.axis_index_x,self.x_start)
+			self.attocube.frequency[self.axis_index_x]=Q_(self.jogf,'Hz')
+			self.attocube.amplitude[self.axis_index_x]=Q_(self.jogv,'V')			
+			self.attocube.single_step(self.axis_index_z,+1)
+			for xpoint in range(self.x_steps):
+				self.attocube.single_step(self.axis_index_x,+1)
+				time.sleep(0.1)
+				self.pw[zpoint,xpoint] = self.pmd.power.magnitude * 1000
+			time.sleep(0.3)
+			print("%d/%d:%f"%(zpoint,self.z_steps,self.attocube.position[self.axis_index_x].magnitude))
+			for item in self.pw[zpoint,:]:
 				self.F.write("%f,"% item)
-			self.attocube.absolute_move(self.axis_index_x,self.x_end,self.eps) 
-			while xpoint<1000:             				
-				self.pw[zpoint][xpoint] = self.powermeter.power.magnitude*1000
-				time.sleep(0.0005)
-				xpoint=xpoint+1 
+			self.F2.write("%f,"%i)
+			self.F.write('\n')
 			values = {
 					'power': self.pw
 				}
 			self.ReflectionDistribution.acquire(values)
+		self.F.close()
 		return
 
 
 	@Task(name = 'Single Step')
 	def ReflectionvsTime(self):
-		fieldValues = self.step_parameters.widget.get()
-		FREQUENCY_x=fieldValues['x Frequency'].magnitude
-		FREQUENCY_y=fieldValues['y Frequency'].magnitude
-		FREQUENCY_z=fieldValues['z Frequency'].magnitude
-		VOLTAGE_x=fieldValues['x Voltage'].magnitude
-		VOLTAGE_y=fieldValues['y Voltage'].magnitude
-		VOLTAGE_z=fieldValues['z Voltage'].magnitude
+		fieldValues = self.scan_parameters.widget.get()
+		FREQUENCY_x=fieldValues['Move Frequency'].magnitude
+		FREQUENCY_y=fieldValues['Move Frequency'].magnitude
+		FREQUENCY_z=fieldValues['Move Frequency'].magnitude
+		VOLTAGE_x=fieldValues['Move Voltage'].magnitude
+		VOLTAGE_y=fieldValues['Move Voltage'].magnitude
+		VOLTAGE_z=fieldValues['Move Voltage'].magnitude
 		self.attocube.frequency[self.axis_index_x]=Q_(FREQUENCY_x,'Hz')
 		self.attocube.frequency[self.axis_index_y]=Q_(FREQUENCY_y,'Hz')
 		self.attocube.frequency[self.axis_index_z]=Q_(FREQUENCY_z,'Hz')
@@ -85,7 +91,7 @@ class ALIGNMENT(Spyrelet):
 			t1 = time.time()
 			t = t1-t0
 			self.xs.append(t)
-			self.ys.append(self.powermeter.power.magnitude * 1000)
+			self.ys.append(self.daq.read())
 			values = {
 				'x': self.xs,
 				'y': self.ys,
@@ -122,7 +128,7 @@ class ALIGNMENT(Spyrelet):
 	@plot2d.on(ReflectionDistribution.acquired)
 	def _plot2d_update(self, ev):
 		w = ev.widget
-		im = self.pw
+		im = np.array(self.pw)
 		w.set(im)
 		return
 
@@ -141,30 +147,15 @@ class ALIGNMENT(Spyrelet):
 	@Element(name='Scan Parameters')
 	def scan_parameters(self):
 		params = [
-	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
-		('File name', {'type': str, 'default': 'C:\\Users\\Tian Zhong\\Tao\\scan'}),
-		('X start', {'type': float, 'default': 2488*1e-6, 'units':'m'}),
-		('X end', {'type': float, 'default': 2498*1e-6, 'units':'m'}),
-		('Z start', {'type': float, 'default': 1062*1e-6, 'units':'m'}),
-		('Z range', {'type': float, 'default': 10*1e-6, 'units':'m'}),
-		('Step', {'type': float, 'default': 0.1*1e-6, 'units':'m'}),
-		('Voltage', {'type': float, 'default': 20, 'units':'V'}),
-		('x Voltage', {'type': float, 'default': 50, 'units':'V'}),
-		('Frequency', {'type': float, 'default': 200, 'units':'Hz'})
-		]
-		w = ParamWidget(params)
-		return w
-	@Element(name='Step Parameters')
-	def step_parameters(self):
-		params = [
-	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
-		('File name', {'type': str, 'default': 'C:\\Users\\Tian Zhong\\Tao\\scan2'}),
-		('x Voltage', {'type': float, 'default': 40, 'units':'V'}),
-		('x Frequency', {'type': float, 'default': 50, 'units':'Hz'}),
-		('y Voltage', {'type': float, 'default': 20, 'units':'V'}),
-		('y Frequency', {'type': float, 'default': 50, 'units':'Hz'}),
-		('z Voltage', {'type': float, 'default': 40, 'units':'V'}),
-		('z Frequency', {'type': float, 'default': 50, 'units':'Hz'})
+		('File name', {'type': str, 'default': 'D:\\Data\\09.16\\scan'}),
+		('X start', {'type': float, 'default': 2480*1e-6, 'units':'m'}),
+		('X steps', {'type': int, 'default': 20}),
+		('Z start', {'type': float, 'default': 1045*1e-6, 'units':'um'}),
+		('Z steps', {'type': int, 'default': 20}),
+		('Step Voltage', {'type': float, 'default': 15, 'units':'V'}),
+		('Move Voltage', {'type': float, 'default': 50, 'units':'V'}),
+		('Step Frequency', {'type': float, 'default': 150, 'units':'Hz'}),
+		('Move Frequency', {'type': float, 'default': 500, 'units':'Hz'})
 		]
 		w = ParamWidget(params)
 		return w
@@ -265,32 +256,27 @@ class ALIGNMENT(Spyrelet):
 	def initialize(self):
 		print('initializing')
 		fieldValues = self.scan_parameters.widget.get()
-		FREQUENCY_x=fieldValues['Frequency'].magnitude
-		FREQUENCY_y=fieldValues['Frequency'].magnitude
-		FREQUENCY_z=fieldValues['Frequency'].magnitude
-		VOLTAGE_x=fieldValues['x Voltage'].magnitude
-		VOLTAGE_y=fieldValues['Voltage'].magnitude
-		VOLTAGE_z=fieldValues['Voltage'].magnitude
-		self.x_end = fieldValues['X end'].magnitude*1e6 
-		z_range = fieldValues['Z range'].magnitude *1e6
-		step = fieldValues['Step'].magnitude*1e6
+		self.movef=fieldValues['Move Frequency'].magnitude
+		self.movev=fieldValues['Move Voltage'].magnitude
+		self.jogv=fieldValues['Step Voltage'].magnitude
+		self.jogf = fieldValues['Step Frequency'].magnitude
 		self.x_start = fieldValues['X start'].magnitude*1e6
-		z_start = fieldValues['Z start'].magnitude*1e6
+		self.z_start = fieldValues['Z start'].magnitude*1e6
 		self.filename = fieldValues['File name']
-		self.zpositions = np.arange(z_start,z_start+z_range+1,step)
-		self.pw = np.zeros((len(self.zpositions),1000),dtype=float)
-		self.eps=0.1
+		self.x_steps = fieldValues['X steps']
+		self.z_steps = fieldValues['Z steps']
 
 		#initialize
-		self.attocube.frequency[self.axis_index_x]=Q_(FREQUENCY_x,'Hz')
-		self.attocube.frequency[self.axis_index_y]=Q_(FREQUENCY_y,'Hz')
-		self.attocube.frequency[self.axis_index_z]=Q_(FREQUENCY_z,'Hz')
-		self.attocube.amplitude[self.axis_index_x]=Q_(VOLTAGE_x,'V')
-		self.attocube.amplitude[self.axis_index_y]=Q_(VOLTAGE_y,'V')
-		self.attocube.amplitude[self.axis_index_z]=Q_(VOLTAGE_z,'V')
-		self.attocube.absolute_move(self.axis_index_x,self.x_start,self.eps)
-		self.attocube.absolute_move(self.axis_index_z,z_start,self.eps)
-		time.sleep(5)
+		self.attocube.frequency[self.axis_index_x]=Q_(self.movef,'Hz')
+		self.attocube.frequency[self.axis_index_y]=Q_(self.movef,'Hz')
+		self.attocube.frequency[self.axis_index_z]=Q_(self.movef,'Hz')
+		self.attocube.amplitude[self.axis_index_x]=Q_(self.movev,'V')
+		self.attocube.amplitude[self.axis_index_y]=Q_(self.movev,'V')
+		self.attocube.amplitude[self.axis_index_z]=Q_(self.movev,'V')
+		self.attocube.absolute_move(self.axis_index_x,self.x_start)
+		time.sleep(1)
+		self.attocube.absolute_move(self.axis_index_z,self.z_start)
+		time.sleep(1)
 		print('initialized')
 		return
 	@ReflectionDistribution.finalizer     

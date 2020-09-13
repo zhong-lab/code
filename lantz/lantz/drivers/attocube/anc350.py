@@ -199,19 +199,19 @@ class ANC350(LibraryDriver):
     # Closed-loop Actions
     # These action are much slower but they ensure the move completed
     @Action(units=(None, 'um', 'um', None, 'seconds', None, None))
-    def cl_move(self, axis, pos, delta_z=Q_(0.1,'um'), iter_n=10, delay=Q_(0.01, 's'), debug=False, max_iter=1000):
+    def cl_move(self, axis, pos, delta_z=Q_(0.1,'um'), iter_n=4, delay=Q_(0.05, 's'), debug=False, max_iter=1000):
         i = 0
         while(not self.at_pos(axis=axis,pos=Q_(pos, 'um'), delta_z=Q_(delta_z, 'um'), iter_n=iter_n, delay=Q_(delay,'s'))):
             self.position[axis] = Q_(pos, 'um')
-            time.sleep(1)
+            time.sleep(0.2)
             i += 1
-            if i>=max_iter:
-                raise Exception("Reached max_iter")
+            #if i>=max_iter:
+            #    raise Exception("Reached max_iter")
         if debug: print("It took {} iterations to move to position".format(i))
         return
 
     @Action(units=(None, 'um', 'um', None, 'seconds'))
-    def at_pos(self, axis, pos, delta_z=Q_(0.1,'um'), iter_n=10, delay=Q_(0.01, 's')):
+    def at_pos(self, axis, pos, delta_z=Q_(0.2,'um'), iter_n=2, delay=Q_(0.1, 's')):
         for i in range(iter_n):
             time.sleep(delay)
             if abs(self.position[axis].to('um').magnitude-pos)>delta_z:
