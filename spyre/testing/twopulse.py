@@ -1,10 +1,8 @@
-##Config file for lifetime_spyrelet.py in spyre/spyre/spyrelet/
-
 # Device List
 devices = {
-    'osc':[
-        'lantz.drivers.tektronix.TDS5104',
-        ['GPIB1::15::INSTR'],
+    'delaygen':[
+        'lantz.drivers.stanford.DG645',
+        ['TCPIP0::169.254.29.167::inst0::INSTR'],
         {}
     ],
     'fungen':[
@@ -13,12 +11,12 @@ devices = {
         {}
     ]
 }
-
 # Experiment List
 spyrelets = {
-    'twopulse':[
-        'spyre.spyrelets.twopulse_spyrelet.TwoPulse',
-        {'fungen': 'fungen'}, 
+    'spin_echo':[
+        'spyre.spyrelets.TwoPulse.Record',
+        {'delaygen': 'delaygen','fungen':'fungen'},
         {}
     ],
+
 }
