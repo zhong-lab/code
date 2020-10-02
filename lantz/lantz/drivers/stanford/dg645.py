@@ -222,6 +222,16 @@ class DG645(MessageBasedDriver):
         self.write('TSRC {:d}'.format(src))
         self.clear_errors()
 
+    @Action()
+    def send_trigger(self):
+        """When the DG645 is configured for single shot triggers, this command
+        initiates a single trigger. When it is configured for externally
+        triggered single shots, this command arms the DG645 to trigger on the
+        next detected external trigger.
+        """
+        self.write('*TRG')
+        self.clear_errors()
+
     @Feat(units = "Hz")
     def trigger_rate(self):
         answ = float(self.query("TRAT?"))
@@ -230,7 +240,7 @@ class DG645(MessageBasedDriver):
 
     @trigger_rate.setter
     def trigger_rate(self,rate):
-        self.write("TRAT {:d}".format(rate))
+        self.write("TRAT {0:f}".format(rate))
         self.clear_errors()
 
     @Feat(units="V", limits=(0,3.5))
@@ -243,6 +253,8 @@ class DG645(MessageBasedDriver):
     def trigger_level(self, lvl):
         self.write("TLVL {:1.2e}".format(lvl))
         self.clear_errors()
+
+
 
     # BURST Commands
 
