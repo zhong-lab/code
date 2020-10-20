@@ -82,6 +82,7 @@ class TwoPulsePhotonEcho(Spyrelet):
 		wholeRange=params['measuring range'].magnitude
 
 		self.configureQutag()
+		# iterating through all of the tau for the T2 measurement
 		for i in range(int((params['stop tau']-params['start tau'])/params['step tau'])+1):
 			xs = np.array([])
 			ys= np.array([])
