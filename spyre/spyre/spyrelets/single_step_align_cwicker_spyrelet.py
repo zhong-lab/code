@@ -36,6 +36,53 @@ class ALIGNMENT(Spyrelet):
     #daq = nidaqmx.Task()
     #daq.ai_channels.add_ai_voltage_chan("Dev1/ai6")
 
+    @Task(name='initialize position')
+    def move2start(self):
+
+        # gets the parameters from the scan parameters widget
+        fieldValues = self.scan_parameters.widget.get()
+
+        # set the frequency and voltage for each axis
+        FREQUENCY_x=fieldValues['X Step Frequency'].magnitude
+        FREQUENCY_y=fieldValues['Y Step Frequency'].magnitude
+        FREQUENCY_z=fieldValues['Z Step Frequency'].magnitude
+
+        VOLTAGE_x=fieldValues['X Step Voltage'].magnitude
+        VOLTAGE_y=fieldValues['Y Step Voltage'].magnitude
+        VOLTAGE_z=fieldValues['Z Step Voltage'].magnitude
+
+        self.x_start = fieldValues['X start'].magnitude*1e6
+        self.z_start = fieldValues['Z start'].magnitude*1e6
+
+        # send the voltage/frequency settings to the controller
+        self.attocube.frequency[self.axis_index_x]=Q_(FREQUENCY_x,'Hz')
+        self.attocube.frequency[self.axis_index_y]=Q_(FREQUENCY_y,'Hz')
+        self.attocube.frequency[self.axis_index_z]=Q_(FREQUENCY_z,'Hz')
+        self.attocube.amplitude[self.axis_index_x]=Q_(VOLTAGE_x,'V')
+        self.attocube.amplitude[self.axis_index_y]=Q_(VOLTAGE_y,'V')
+        self.attocube.amplitude[self.axis_index_z]=Q_(VOLTAGE_z,'V')
+
+        print('here')
+        print('self.zstart:'+str(self.z_start))
+        print('driving to: '+str(self.z_start-200))
+        self.attocube.position[self.axis_index_z]=self.z_start-200
+        time.sleep(1)
+        print('driving to: '+str(self.z_start))
+        self.attocube.position[self.axis_index_z]=self.z_start
+
+        print('move complete')
+        time.sleep(1)
+        print('self.xstart:'+str(self.x_start))
+        print('driving to: '+str(self.x_start-200))
+        self.attocube.position[self.axis_index_x]=self.x_start-200
+        time.sleep(1) # sleep time to get feedback from the closed loop
+        print('driving to: '+str(self.x_start))
+        # The the attocube drives to the starting point.
+        self.attocube.position[self.axis_index_x]=self.x_start
+        return
+
+
+
     # a task that scans the xz axis
     @Task(name='Scan XZ')
     def ReflectionDistribution(self):
@@ -44,47 +91,61 @@ class ALIGNMENT(Spyrelet):
         self.pw=np.zeros((self.z_steps,self.x_steps)) # make an empty array
 
         # set the frequency and voltage for the z axis
-        self.attocube.frequency[self.axis_index_z]=Q_(self.jogf,'Hz')
-        self.attocube.amplitude[self.axis_index_z]=Q_(self.jogv,'V')
-
-        # set the frequency and voltage for the x axis
-        self.attocube.frequency[self.axis_index_x]=Q_(self.jogf,'Hz')
-        self.attocube.amplitude[self.axis_index_x]=Q_(self.jogv,'V')
+        self.attocube.frequency[self.axis_index_z]=Q_(self.movef_z,'Hz')
+        self.attocube.amplitude[self.axis_index_z]=Q_(self.jogv_z,'V')
 
         # attocube moves to the starting z point, initially overshoots by 150um
         # and then drives back to the correct location
-        self.attocube.absolute_move(self.axis_index_z,self.z_start+150)
+        print('self.zstart:'+str(self.z_start))
+        print('driving to: '+str(self.z_start-200))
+        self.attocube.position[self.axis_index_z]=self.z_start-200
         time.sleep(1)
-        self.attocube.absolute_move(self.axis_index_z,self.z_start)
+        print('driving to: '+str(self.z_start))
+        self.attocube.position[self.axis_index_z]=self.z_start
         time.sleep(1)
+
+        set.attocube.amplitude[self.axis_index_z]=Q(self.movev_z,'V')
 
         i = 0
         while i<self.z_steps: # the attocube moves to a set of positions
             # the attocube moves to the starting x position and overshoots by
             # -150um. Attocube says this must be at least 100um to make the
             # movement repeatable.
-            self.attocube.absolute_move(self.axis_index_x,self.x_start-150)
-            time.sleep(1) # sleep time to get feedback from the closed loop
 
+            # set the frequency and voltage for the x axis
+            self.attocube.frequency[self.axis_index_x]=Q_(self.movef_x,'Hz')
+            self.attocube.amplitude[self.axis_index_x]=Q_(self.jogv_x,'V')
+
+            print('self.xstart:'+str(self.x_start))
+            print('driving to: '+str(self.x_start-200))
+
+            self.attocube.position[self.axis_index_x]=self.x_start-200
+            time.sleep(1) # sleep time to get feedback from the closed loop
+            print('driving to: '+str(self.x_start))
             # The the attocube drives to the starting point.
-            self.attocube.absolute_move(self.axis_index_x,self.x_start)
-            time.sleep(1) # sleep time to get feedback from the closed loop
+            self.attocube.position[self.axis_index_x]=self.x_start
+            self.attocube.amplitude[self.axis_index_x]=Q_(self.movev_x,'V')
 
-            self.attocube.single_step(self.axi_index_z,1)
+            self.attocube.single_step(self.axis_index_z,1)
 
             # scan the along the x axis for this row
             j = 0
-            for while j < self.x_steps:
+            while j < self.x_steps:
                 self.attocube.single_step(self.axis_index_x,1)
                 #self.pw[i,j] = self.daq.read() # save the power at this point
-                p=self.pmd.power.magnitude*1000
+                p1=self.pmd.power.magnitude*1000
+                time.sleep(0.1)
+                p2=self.pmd.power.magnitude*1000
+                time.sleep(0.1)
+                p3=self.pmd.power.magnitude*1000
+                p=(p1+p2+p3)/3
                 time.sleep(0.1)
                 self.pw[i,j]=p
                 j=j+1 # increment the array index for the x coordinate
             i = i+1 # increment the array index for the z coordinate
 
             # print some data to the console about scan progress
-            print("%d/%d:%f"%(zpoint,self.z_steps,self.attocube.position[self.axis_index_x].magnitude))
+            #print("%d/%d:%f"%(zpoint,self.z_steps,self.attocube.position[self.axis_index_x].magnitude))
 
             # write the power array to the reflection distribution variable
             self.F.write('\n')
@@ -103,12 +164,12 @@ class ALIGNMENT(Spyrelet):
         fieldValues = self.scan_parameters.widget.get()
 
         # set the frequency and voltage for each axis
-        FREQUENCY_x=fieldValues['Move Frequency'].magnitude
-        FREQUENCY_y=fieldValues['Move Frequency'].magnitude
-        FREQUENCY_z=fieldValues['Move Frequency'].magnitude
-        VOLTAGE_x=fieldValues['Move Voltage'].magnitude
-        VOLTAGE_y=fieldValues['Move Voltage'].magnitude
-        VOLTAGE_z=fieldValues['Move Voltage'].magnitude
+        FREQUENCY_x=fieldValues['Drive Frequency'].magnitude
+        FREQUENCY_y=fieldValues['Drive Frequency'].magnitude
+        FREQUENCY_z=fieldValues['Drive Frequency'].magnitude
+        VOLTAGE_x=fieldValues['X Step Voltage'].magnitude
+        VOLTAGE_y=fieldValues['Y Step Voltage'].magnitude
+        VOLTAGE_z=fieldValues['Z Step Voltage'].magnitude
 
         # send the voltage/frequency settings to the controller
         self.attocube.frequency[self.axis_index_x]=Q_(FREQUENCY_x,'Hz')
@@ -211,10 +272,14 @@ class ALIGNMENT(Spyrelet):
         ('X steps', {'type': float, 'default': 50}),
         ('Z start', {'type': float, 'default': 2500*1e-6, 'units':'m'}),
         ('Z steps', {'type': float, 'default': 50}),
-        ('Step Voltage', {'type': float, 'default': 20, 'units':'V'}),
-        ('Move Voltage', {'type': float, 'default': 20, 'units':'V'}),
-        ('Step Frequency', {'type': float, 'default': 500, 'units':'Hz'}),
-        ('Move Frequency', {'type': float, 'default': 500, 'units':'Hz'})
+        ('X Step Voltage',{'type':float,'default':15,'units':'V'}),
+        ('Y Step Voltage',{'type':float,'default':15,'units':'V'}),
+        ('Z Step Voltage',{'type':float,'default':40,'units':'V'}),
+        ('X Step Frequency',{'type':float,'default':500,'units':'V'}),
+        ('Y Step Frequency',{'type':float,'default':500,'units':'V'}),
+        ('Z Step Frequency',{'type':float,'default':500,'units':'V'}),
+        ('Drive Voltage',{'type':float,'default':40,'units':'V'}),
+        ('Drive Frequency', {'type': float, 'default': 500, 'units':'Hz'})
         ]
         w = ParamWidget(params)
         return w
@@ -325,10 +390,19 @@ class ALIGNMENT(Spyrelet):
     def initialize(self):
         print('initializing')
         fieldValues = self.scan_parameters.widget.get()
-        self.movef=fieldValues['Move Frequency'].magnitude
-        self.movev=fieldValues['Move Voltage'].magnitude
-        self.jogv=fieldValues['Step Voltage'].magnitude
-        self.jogf = fieldValues['Step Frequency'].magnitude
+        self.movef_x=fieldValues['X Step Frequency'].magnitude
+        self.movef_y=fieldValues['Y Step Frequency'].magnitude
+        self.movef_z=fieldValues['Z Step Frequency'].magnitude
+
+        self.jogf = fieldValues['Drive Frequency'].magnitude
+
+        self.movev_x=fieldValues['X Step Voltage'].magnitude
+        self.movev_y=fieldValues['Y Step Voltage'].magnitude
+        self.movev_z=fieldValues['Z Step Voltage'].magnitude
+        self.jogv_x=fieldValues['Drive Voltage'].magnitude
+        self.jogv_y=fieldValues['Drive Voltage'].magnitude
+        self.jogv_z=fieldValues['Drive Voltage'].magnitude
+
         self.x_start = fieldValues['X start'].magnitude*1e6
         self.z_start = fieldValues['Z start'].magnitude*1e6
         self.filename = fieldValues['File name']
@@ -338,12 +412,13 @@ class ALIGNMENT(Spyrelet):
         self.pw = np.zeros((self.x_steps,self.z_steps),dtype=float)
 
         #initialize
-        self.attocube.frequency[self.axis_index_x]=Q_(self.movef,'Hz')
-        self.attocube.frequency[self.axis_index_y]=Q_(self.movef,'Hz')
-        self.attocube.frequency[self.axis_index_z]=Q_(self.movef,'Hz')
-        self.attocube.amplitude[self.axis_index_x]=Q_(self.movev,'V')
-        self.attocube.amplitude[self.axis_index_y]=Q_(self.movev,'V')
-        self.attocube.amplitude[self.axis_index_z]=Q_(self.movev,'V')
+        self.attocube.frequency[self.axis_index_x]=Q_(self.movef_x,'Hz')
+        self.attocube.frequency[self.axis_index_y]=Q_(self.movef_y,'Hz')
+        self.attocube.frequency[self.axis_index_z]=Q_(self.movef_z,'Hz')
+
+        self.attocube.amplitude[self.axis_index_x]=Q_(self.movev_x,'V')
+        self.attocube.amplitude[self.axis_index_y]=Q_(self.movev_y,'V')
+        self.attocube.amplitude[self.axis_index_z]=Q_(self.movev_z,'V')
 
         # initialize by driving to the beginning point of the scan
         self.attocube.absolute_move(self.axis_index_x,self.x_start)
