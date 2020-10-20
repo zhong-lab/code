@@ -1,3 +1,8 @@
+
+"""
+Smart loading of a spyre app
+"""
+
 import time
 import sys
 from importlib import import_module
@@ -47,6 +52,7 @@ def main():
         for sname in unloaded_spyrelets:
             start = time.time()
             try:
+                print('spyrelets[sname]: '+str(spyrelets[sname]))
                 sclass, dlist, slist = spyrelets[sname]
 
                 # Build required spyrelets list and check that all required spyrelets have been successfully loaded
@@ -70,7 +76,7 @@ def main():
 
                     # Instanciate the class
                     class_name = sclass.split('.')[-1]
-                    mod = import_module(sclass.replace('.'+ class_name, ''))
+                    mod = import_module(sclass.replace('.'+class_name, ''))
                     s = getattr(mod, class_name)()
 
 
