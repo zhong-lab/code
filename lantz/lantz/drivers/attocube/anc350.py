@@ -91,7 +91,7 @@ class ANC350(LibraryDriver):
 
     @position.setter
     def position(self, axis, pos):
-        return self.absolute_move(axis, pos)
+        return self.cl_move_2(axis, pos)
 
 
     @DictFeat(units='F')
@@ -155,9 +155,12 @@ class ANC350(LibraryDriver):
         self.lib.startSingleStep(self.device, axis, backward)
         return
 
-    MAX_ABSOLUTE_MOVE = Q_(1000, 'um')
+    MAX_ABSOLUTE_MOVE = Q_(6000, 'um')
     @Action()
     def absolute_move(self, axis, target, eps=0.1, max_move=MAX_ABSOLUTE_MOVE):
+        # max_move is None =0
+        # not max_move is None = 1
+        
         if not max_move is None:
             if abs(self.position[axis]-Q_(target, 'um')) > max_move:
                 raise Exception("Relative move %f-%f um is greater then the %f um"%(self.position[axis].magnitude,Q_(target, 'm').magnitude,max_move.magnitude))
@@ -174,6 +177,7 @@ class ANC350(LibraryDriver):
     @Action()
     def relative_move(self, axis, delta):
         delta = Q_(delta, 'um')
+        print('delta:'+str(delta))
         if abs(delta) > MAX_RELATIVE_MOVE:
             raise Exception("Relative move %f is greater then the MAX_RELATIVE_MOVE"%(delta))
         else:
@@ -198,6 +202,20 @@ class ANC350(LibraryDriver):
     @Action()
     def dc_bias(self, axis, voltage):
         self.check_error(self.lib.setDcVoltage(self.device, axis, voltage))
+        return
+
+    @Action()
+    def cl_move_2(self,axis,pos,delta_z=Q_(0.4,'um'),max_iter=1000):
+        current_pos=Q_(self.position[axis].magnitude,'um')
+        upperbound=Q_(pos,'um')+delta_z
+        lowerbound=Q_(pos,'um')-delta_z
+        i=0
+        if pos<0:
+            pos=0
+        while (not ((current_pos < upperbound) and (current_pos > lowerbound))) and (i<max_iter):
+            self.absolute_move(axis,pos)
+            current_pos=self.position[axis]
+            i+=1
         return
 
     # ----------------------------------------------
