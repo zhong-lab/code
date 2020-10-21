@@ -1,0 +1,3 @@
+[gui_scripts]
+spyre = spyre.__main__:main
+

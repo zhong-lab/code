@@ -1,0 +1,8 @@
+numpy>=1.10.4
+scipy>=0.16.0
+pandas>=0.19.2
+lantz
+pint>=0.7.2
+pyqtgraph>=0.10.0
+pyyaml>=3.11
+qtconsole

@@ -1,7 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<key name="Software" modified="2019-09-12 09:58:54" build="180528">
-	<key name="ConEmu" modified="2019-09-12 09:58:54" build="180528">
-		<key name=".Vanilla" modified="2019-10-19 16:50:54" build="191012">
+<key name="Software" modified="2019-06-26 14:19:54" build="180528">
+	<key name="ConEmu" modified="2019-06-26 14:19:54" build="180528">
+		<key name=".Vanilla" modified="2019-06-26 14:20:09" build="180528">
+			<value name="UseCurrentSizePos" type="hex" data="01"/>
+			<value name="AutoSaveSizePos" type="hex" data="01"/>
+			<value name="Cascaded" type="hex" data="01"/>
+			<value name="IntegralSize" type="hex" data="00"/>
+			<value name="WindowMode" type="dword" data="0000051f"/>
+			<value name="ConWnd X" type="long" data="650"/>
+			<value name="ConWnd Y" type="long" data="0"/>
+			<value name="LastMonitor" type="string" data="0,0,1600,1160"/>
+			<value name="ConWnd Width" type="dword" data="00000066"/>
+			<value name="ConWnd Height" type="dword" data="00000035"/>
+			<value name="16bit Height" type="ulong" data="0"/>
 			<value name="StartType" type="hex" data="02"/>
 			<value name="CmdLine" type="string" data=""/>
 			<value name="StartTasksFile" type="string" data=""/>
@@ -41,20 +52,9 @@
 			<value name="FontSize" type="ulong" data="14"/>
 			<value name="StatusFontHeight" type="long" data="12"/>
 			<value name="TabFontHeight" type="long" data="13"/>
-			<key name="HotKeys" modified="2019-09-12 09:58:54" build="180528">
+			<key name="HotKeys" modified="2019-06-26 14:20:00" build="180528">
 				<value name="MinimizeRestore" type="dword" data="000011c0"/>
 			</key>
-			<value name="UseCurrentSizePos" type="hex" data="01"/>
-			<value name="AutoSaveSizePos" type="hex" data="01"/>
-			<value name="Cascaded" type="hex" data="01"/>
-			<value name="IntegralSize" type="hex" data="00"/>
-			<value name="WindowMode" type="dword" data="00000520"/>
-			<value name="ConWnd X" type="long" data="608"/>
-			<value name="ConWnd Y" type="long" data="87"/>
-			<value name="LastMonitor" type="string" data="0,0,1920,1040"/>
-			<value name="ConWnd Width" type="dword" data="00000077"/>
-			<value name="ConWnd Height" type="dword" data="00000016"/>
-			<value name="16bit Height" type="ulong" data="0"/>
 		</key>
 	</key>
 </key>
