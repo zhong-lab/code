@@ -68,6 +68,8 @@ class Record(Spyrelet):
 		triggerdelay=params['trigger delay'].magnitude
 		Amp_factor_pi2=params['Pi2voltage'].magnitude
 		Amp_factor_pi=params['Pivoltage'].magnitude
+		tau_opt=params['Optpulsewidth'].magnitude
+		tau_wait=params['Waitingtime'].magnitude
 
 		deltaphiiq=98  # Based off calibration
 		predelay=50e-9
@@ -192,12 +194,19 @@ class Record(Spyrelet):
 
 # Set the delay generator for triggering the AWG and scope
 
-		self.delaygen.delay['A']=0
+		self.delaygen.delay['A']=0+tau_opt+tau_wait
 		self.delaygen.delay['B']=10e-9
 		self.delaygen.delay['C']=0
 		self.delaygen.delay['D']=0
 		self.delaygen.delay['E']=0
-		self.delaygen.delay['F']=0
+		self.delaygen.delay['F']=tau_opt
+
+		# self.delaygen.delay['A']=0
+		# self.delaygen.delay['B']=10e-9
+		# self.delaygen.delay['C']=0
+		# self.delaygen.delay['D']=0
+		# self.delaygen.delay['E']=0+tau_opt+tau_wait
+		# self.delaygen.delay['F']=tau_opt
 
 		self.delaygen.Trigger_Source='Internal'
 		self.delaygen.trigger_rate=1/trigperiod
@@ -211,7 +220,8 @@ class Record(Spyrelet):
 
 		self.osc.delaymode_on()
 		self.osc.delay_position(0)
-		self.osc.delay_time(2*tau-800e-9)  # This makes sure that echo is at center of screen
+		self.osc.delay_time(2*tau-800e-9+tau_opt+tau_wait)  # This makes sure that echo is at center of screen
+		# self.osc.delay_time(2*tau-800e-9)  # This makes sure that echo is at center of screen
 
 		time.sleep(5)
 
@@ -297,7 +307,7 @@ class Record(Spyrelet):
 		('dc repeat unit', {'type': float, 'default': 1e-7, 'units':'s'}),
 		('trigger delay', {'type': float, 'default': 32e-9, 'units':'s'}),	
 		('timestep', {'type': float, 'default': 1e-9, 'units':'s'}),
-		('period', {'type': float, 'default': 2, 'units':'s'}),
+		('period', {'type': float, 'default': 5, 'units':'s'}),
 		('nPulses', {'type': int, 'default': 1, 'units':'dimensionless'}),
 		('nAverage', {'type': int, 'default': 200, 'units':'dimensionless'}),
 		('IQFrequency', {'type': float, 'default': 1e8, 'units':'dimensionless'}),
@@ -307,6 +317,8 @@ class Record(Spyrelet):
 		('CavityFreq', {'type': float, 'default': 5.69758e9, 'units':'dimensionless'}),
 		('Pi2voltage', {'type': float, 'default': 0.707, 'units':'dimensionless'}),
 		('Pivoltage', {'type': float, 'default': 1.0, 'units':'dimensionless'}),
+		('Optpulsewidth', {'type': float, 'default': 100.0e-3, 'units':'s'}),
+		('Waitingtime', {'type': float, 'default': 1.0e-3, 'units':'s'}),		
 		]
 		
 		w = ParamWidget(params)

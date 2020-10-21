@@ -222,13 +222,13 @@ if __name__ == '__main__':
         # inst.save_img('HAO/imag01.bmp')
 
         # inst.source_power=-30
-        inst.IF_bandwidth=3000
-        inst.freq_cent=4.9610e9
+        # inst.IF_bandwidth=3000
+        # inst.freq_cent=4.9610e9
         # inst.freq_cent=5.5e9
-        inst.freq_span=1e6
-        inst.set_average(1,'OFF') 
+        # inst.freq_span=1e6
+        # inst.set_average(1,'OFF') 
 
-        inst.autoscale(1,1)
+        # inst.autoscale(1,1)
         tr1=inst.get_trace(1)
         freq1=inst.get_traceX(1)
 
@@ -250,6 +250,7 @@ if __name__ == '__main__':
         # plt.plot(freq2,tr2,label='Trace2')
         plt.legend()
         plt.show()
-        inst.set_s_parameter(1,1,'S21')
+        np.savetxt('D:/MW data/20201018/Pulsed/5.6GHz/DET08_00dbm_7dbm_1khz_50avg.txt', np.c_[freq1,tr1])       
+        # inst.set_s_parameter(1,1,'S21')
         # inst.set_active_trace(1,2)
         # print("  ")

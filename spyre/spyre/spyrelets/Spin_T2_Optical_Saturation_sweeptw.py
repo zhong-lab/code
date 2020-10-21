@@ -45,7 +45,7 @@ class Record(Spyrelet):
 	}
 
 
-	def record(self,tau):
+	def record(self,tau_wait):
 # Set the AWG 
 		self.dataset.clear()
 		self.fungen.clear_mem(1)
@@ -68,6 +68,8 @@ class Record(Spyrelet):
 		triggerdelay=params['trigger delay'].magnitude
 		Amp_factor_pi2=params['Pi2voltage'].magnitude
 		Amp_factor_pi=params['Pivoltage'].magnitude
+		tau_opt=params['Optpulsewidth'].magnitude
+		tau=params['tau'].magnitude
 
 		deltaphiiq=98  # Based off calibration
 		predelay=50e-9
@@ -192,12 +194,12 @@ class Record(Spyrelet):
 
 # Set the delay generator for triggering the AWG and scope
 
-		self.delaygen.delay['A']=0
+		self.delaygen.delay['A']=0+tau_opt+tau_wait
 		self.delaygen.delay['B']=10e-9
 		self.delaygen.delay['C']=0
 		self.delaygen.delay['D']=0
 		self.delaygen.delay['E']=0
-		self.delaygen.delay['F']=0
+		self.delaygen.delay['F']=tau_opt
 
 		self.delaygen.Trigger_Source='Internal'
 		self.delaygen.trigger_rate=1/trigperiod
@@ -211,7 +213,7 @@ class Record(Spyrelet):
 
 		self.osc.delaymode_on()
 		self.osc.delay_position(0)
-		self.osc.delay_time(2*tau-800e-9)  # This makes sure that echo is at center of screen
+		self.osc.delay_time(2*tau-800e-9+tau_opt+tau_wait)  # This makes sure that echo is at center of screen
 
 		time.sleep(5)
 
@@ -231,14 +233,14 @@ class Record(Spyrelet):
 		x = np.array(x)
 		x = x-x.min()
 		y = np.array(y)
-		np.savetxt('D:/MW data/20201002/SpinT2/Scan2/ch3/{}.txt'.format(tau*1e6), np.c_[x,y])   
+		np.savetxt('D:/MW data/20201013/OpticalSaturation/Scan/Scan6/ch3/{}.txt'.format(tau_wait*1e3), np.c_[x,y])   
 
 		self.osc.datasource(4)
 		x,y=self.osc.curv()
 		x = np.array(x)
 		x = x-x.min()
 		y = np.array(y)
-		np.savetxt('D:/MW data/20201002/SpinT2/Scan2/ch4/{}.txt'.format(tau*1e6), np.c_[x,y])
+		np.savetxt('D:/MW data/20201013/OpticalSaturation/Scan/Scan6/ch4/{}.txt'.format(tau_wait*1e3), np.c_[x,y])
 		time.sleep(15)   # Sleeptime for saving data
 
 		self.fungen.output[1] = 'OFF'
@@ -273,7 +275,7 @@ class Record(Spyrelet):
 		# tauarray=[1.5e-6,2e-6,2.5e-6,3e-6,3.5e-6,4e-6,4.5e-6]
 		# tauarray=[1.8e-6,2.2e-6,2.6e-6,3.3e-6,3.8e-6,4.3e-6]
 		# tauarray=[1.5e-6,1.8e-6,2.1e-6,2.4e-6,2.7e-6,3.0e-6,3.3e-6,3.6e-6,3.9e-6,4.2e-6,4.5e-6]
-		tauarray=[5e-6,10e-6,25e-6,50e-6,100e-6,200e-6,300e-6,400e-6,500e-6,600e-6,700e-6,800e-6,900e-6,1e-3]
+		tauarray=[0.5e-3,1e-3,5e-3,10e-3,50e-3,100e-3,250e-3,500e-3,750e-3,1]
 
 		# tauarray=[10e-6]
 
@@ -297,9 +299,9 @@ class Record(Spyrelet):
 		('dc repeat unit', {'type': float, 'default': 1e-7, 'units':'s'}),
 		('trigger delay', {'type': float, 'default': 32e-9, 'units':'s'}),	
 		('timestep', {'type': float, 'default': 1e-9, 'units':'s'}),
-		('period', {'type': float, 'default': 2, 'units':'s'}),
+		('period', {'type': float, 'default': 5, 'units':'s'}),
 		('nPulses', {'type': int, 'default': 1, 'units':'dimensionless'}),
-		('nAverage', {'type': int, 'default': 200, 'units':'dimensionless'}),
+		('nAverage', {'type': int, 'default': 30, 'units':'dimensionless'}),
 		('IQFrequency', {'type': float, 'default': 1e8, 'units':'dimensionless'}),
 		('Phase', {'type': float, 'default': 0, 'units':'dimensionless'}),
 		('DeltaPhase', {'type': float, 'default': 90, 'units':'dimensionless'}),
@@ -307,6 +309,8 @@ class Record(Spyrelet):
 		('CavityFreq', {'type': float, 'default': 5.69758e9, 'units':'dimensionless'}),
 		('Pi2voltage', {'type': float, 'default': 0.707, 'units':'dimensionless'}),
 		('Pivoltage', {'type': float, 'default': 1.0, 'units':'dimensionless'}),
+		('Optpulsewidth', {'type': float, 'default': 100.0e-3, 'units':'s'}),
+		('tau', {'type': float, 'default': 5.0e-6, 'units':'s'}),		
 		]
 		
 		w = ParamWidget(params)

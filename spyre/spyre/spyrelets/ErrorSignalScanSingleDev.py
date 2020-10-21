@@ -52,7 +52,7 @@ class Record(Spyrelet):
         frequency_start = center-span*0.5
         frequency_stop = center+span*0.5
         frequency_step = step 
-        rf_power=-10  #Power in dBm
+        rf_power=0  #Power in dBm
         time_constant=0.1 # Use 0.3, 0.1 , 1 or 3 sec only
         self.lockin.Set_Time_Constant(time_constant)  
 
@@ -70,7 +70,7 @@ class Record(Spyrelet):
 
         time.sleep(5)
 
-        file = open('D:/MW data/20200614/ESR/slope/1/{}_{}_{}.txt'.format(freq,dev,x),'w') 
+        file = open('D:/MW data/20200930/Lockin/slope/4/{}_{}_{}.txt'.format(freq,dev,x),'w') 
 
 
         frequency=frequency_start
@@ -106,11 +106,11 @@ class Record(Spyrelet):
         # freqStart=1e3
         # freqStop=3e6
         # freqStep=1e3
-        dev=655e3
-        freq=61e3   
-        center=4.960501e9
+        dev=650e3
+        freq=65e3   
+        center=5.6975813e9
         span=2e6
-        step=0.05e6
+        step=0.025e6
         nrepeats=10
         for x in range(0,nrepeats):            
             self.slope(freq,dev,center,span,step,x)

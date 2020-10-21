@@ -69,10 +69,12 @@ class Record(Spyrelet):
 		cavityfreq=params['CavityFreq'].magnitude
 		trigperiod=params['period'].magnitude
 		triggerdelay=params['trigger delay'].magnitude
-		Amp_factor_pi2=params['Pi2factor'].magnitude
-		deltaphiiq=93  # Based off calibration
+		Amp_factor_pi2=params['Pi2voltage'].magnitude
+		Amp_factor_pi=params['Pivoltage'].magnitude
+
+		deltaphiiq=98  # Based off calibration
 		predelay=50e-9
-		postdelay=150e-9
+		postdelay=550e-9
 
 		time0 = self.lockin.System_Time_Day*24*3600+self.lockin.System_Time_Hours*3600+self.lockin.System_Time_Min*60+self.lockin.System_Time_Seconds
 		t = 0
@@ -121,14 +123,14 @@ class Record(Spyrelet):
 
 # Pi Pulse
 
-		piPulseI = Arbseq_Class_MW('piPulseI', timestep,Wavepipulse,0.08,pulsewidth,freq,phase+deltaphase)
+		piPulseI = Arbseq_Class_MW('piPulseI', timestep,Wavepipulse,Amp_factor_pi,pulsewidth,freq,phase+deltaphase)
 		piPulseI.delays=predelay
 		piPulseI.postdelay=postdelay
 		piPulseI.sendTrigger()
 		piPulseI.create_envelope()
 
 
-		piPulseQ = Arbseq_Class_MW('piPulseQ', timestep,Wavepipulse,0.08,pulsewidth,freq,phase+deltaphase+deltaphiiq)
+		piPulseQ = Arbseq_Class_MW('piPulseQ', timestep,Wavepipulse,Amp_factor_pi,pulsewidth,freq,phase+deltaphase+deltaphiiq)
 		piPulseQ.delays=predelay
 		piPulseQ.postdelay=postdelay		
 		piPulseQ.create_envelope()
@@ -174,11 +176,11 @@ class Record(Spyrelet):
 		self.fungen.create_arbseq('twoPulseQ',seq1,2)
 
 		self.fungen.wait()
-		self.fungen.voltage[1] = 0.500*0.5
+		self.fungen.voltage[1] = 0.500
 		self.fungen.offset[1] = 0.000
 		print("Voltage is {} , don't remove this line else the AWG will set the voltage to 50 mV".format(self.fungen.voltage[1]))
 
-		self.fungen.voltage[2] = 0.480*0.5
+		self.fungen.voltage[2] = 0.480
 		self.fungen.offset[2] = -0.001
 
 		print("Voltage is {} , don't remove this line else the AWG will set the voltage to 50 mV".format(self.fungen.voltage[2]))
@@ -197,6 +199,9 @@ class Record(Spyrelet):
 		self.delaygen.delay['B']=10e-9
 		self.delaygen.delay['C']=0
 		self.delaygen.delay['D']=0
+		self.delaygen.delay['E']=0
+		self.delaygen.delay['F']=0
+				
 		self.delaygen.Trigger_Source='Internal'
 		self.delaygen.trigger_rate=1/trigperiod
 
@@ -209,7 +214,7 @@ class Record(Spyrelet):
 
 		self.osc.delaymode_on()
 		self.osc.delay_position(0)
-		self.osc.delay_time(2*tau-400e-9)  # This makes sure that echo is at center of screen
+		self.osc.delay_time(2*tau-800e-9)  # This makes sure that echo is at center of screen
 
 		time.sleep(5)
 
@@ -231,14 +236,14 @@ class Record(Spyrelet):
 			x = np.array(x)
 			x = x-x.min()
 			y = np.array(y)
-			np.savetxt('D:/MW data/20200814/EDFS/Scan1/ch3/{}.txt'.format(t), np.c_[x,y])   
+			np.savetxt('D:/MW data/20201009/EDFS/Scan1/ch3/{}.txt'.format(t), np.c_[x,y])   
 
 			self.osc.datasource(4)
 			x,y=self.osc.curv()
 			x = np.array(x)
 			x = x-x.min()
 			y = np.array(y)
-			np.savetxt('D:/MW data/20200814/EDFS/Scan1/ch4/{}.txt'.format(t), np.c_[x,y])
+			np.savetxt('D:/MW data/20201009/EDFS/Scan1/ch4/{}.txt'.format(t), np.c_[x,y])
 			time.sleep(5)   # Sleeptime for saving data
 
 
@@ -257,13 +262,13 @@ class Record(Spyrelet):
 		self.osc.delaymode_off()
 		self.osc.data_start(1)
 		self.osc.data_stop(2000000)  # max resolution ius 4e6, the resolution for 200 ns scale is 5e5
-		self.osc.time_scale(200.0e-9)
+		self.osc.time_scale(400e-9)
 		self.osc.setmode('sample')
 		self.source.RF_OFF()
 		self.source.Mod_OFF()
-		self.source.set_RF_Power(15) 
+		self.source.set_RF_Power(-3) 
 
-		tauarray=[1.5e-6]
+		tauarray=[5e-6]
 
 		for tau in tauarray:
 			self.record(tau)
@@ -282,7 +287,7 @@ class Record(Spyrelet):
 	def pulse_parameters(self):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
-		('dc repeat unit', {'type': float, 'default': 50e-9, 'units':'s'}),
+		('dc repeat unit', {'type': float, 'default': 1e-7, 'units':'s'}),
 		('trigger delay', {'type': float, 'default': 32e-9, 'units':'s'}),	
 		('timestep', {'type': float, 'default': 1e-9, 'units':'s'}),
 		('period', {'type': float, 'default': 1, 'units':'s'}),
@@ -291,10 +296,11 @@ class Record(Spyrelet):
 		('IQFrequency', {'type': float, 'default': 1e8, 'units':'dimensionless'}),
 		('Phase', {'type': float, 'default': 0, 'units':'dimensionless'}),
 		('DeltaPhase', {'type': float, 'default': 90, 'units':'dimensionless'}),
-		('pulse width', {'type': float, 'default': 200e-9, 'units':'s'}),
-		('CavityFreq', {'type': float, 'default': 4.9849e9, 'units':'dimensionless'}),
-		('Pi2factor', {'type': float, 'default': 0.06, 'units':'dimensionless'}),
-		('scantime', {'type': int, 'default': 1800, 'units':'dimensionless'})	
+		('pulse width', {'type': float, 'default': 1e-6, 'units':'s'}),
+		('CavityFreq', {'type': float, 'default': 5.69758e9, 'units':'dimensionless'}),
+		('Pi2voltage', {'type': float, 'default': 0.707, 'units':'dimensionless'}),
+		('Pivoltage', {'type': float, 'default': 1.0, 'units':'dimensionless'}),
+		('scantime', {'type': int, 'default': 10800, 'units':'dimensionless'})	
 		]
 		
 		w = ParamWidget(params)

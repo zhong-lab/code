@@ -52,7 +52,7 @@ class Record(Spyrelet):
         frequency_start = center-span*0.5
         frequency_stop = center+span*0.5
         frequency_step = step 
-        rf_power=-20  #Power in dBm
+        rf_power=0  #Power in dBm
         time_constant=0.1 # Use 0.3, 0.1 , 1 or 3 sec only
         self.lockin.Set_Time_Constant(time_constant)  
 
@@ -70,7 +70,7 @@ class Record(Spyrelet):
 
         time.sleep(5)
 
-        file = open('D:/MW data/20200127/slope/2/{}_{}.txt'.format(freq,dev),'w') 
+        file = open('D:/MW data/20200930/Lockin/slope/3/{}_{}.txt'.format(freq,dev),'w') 
 
 
         frequency=frequency_start
@@ -106,21 +106,21 @@ class Record(Spyrelet):
         # freqStart=1e3
         # freqStop=3e6
         # freqStep=1e3
-        devStart=250e3
-        devStop=260e3
-        devStep=100e3
-        freqStart=1e3
-        freqStop=2e3
-        freqStep=1e3        
-        center=4.9605e9
+        devStart=600e3
+        devStop=900e3
+        devSteps=10
+        freqStart=65e3
+        freqStop=65e3
+        freqSteps=1        
+        center=5.6975813e9
         span=2e6
         step=0.025e6
-        # for dev in np.logspace(5,6.47,10):            
-        #     for freq in np.logspace(3,5.3,10):
-        #         self.slope(freq,dev,center,span,step)
+        for freq in np.linspace(freqStart,freqStop,freqSteps):            
+            for dev in np.linspace(devStart,devStop,devSteps):
+                self.slope(freq,dev,center,span,step)
 
-        self.slope(61e3,655e3,center,span,step)       
-        return
+        # self.slope(61e3,655e3,center,span,step)       
+        # return
 
     @Scan_Dev_Freq.initializer
     def initialize(self):

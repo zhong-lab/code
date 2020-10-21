@@ -311,39 +311,45 @@ if __name__ == '__main__':
 
 
 # This part is normally not commented out for dumping data on screen with average
+        
+        # wavelength=1952444
+        for i in range(1,2):
+            
 
-        osc.datasource(3)
-
-
-        osc.data_start(1)
-        osc.data_stop(4000000)   
-        # osc.setmode('sample')
-
-        # osc.setmode('average')
-        # osc.average(100)
-
-        # time.sleep(101)     
-
-        x,y=osc.curv()
-        x = np.array(x)
-        x = x-x.min()
-        y = np.array(y)
-        # np.savetxt('D:/MW data/20200216/FinalDataSet/Transition2/CPMG/Tau50/N128nopi2/1/ch2.txt', np.c_[x,y])
-
-        np.savetxt('D:/MW data/20200814/Test/ch3/1.txt', np.c_[x,y])
-
-        osc.datasource(4)
+            osc.datasource(3)
 
 
-        x1,y1=osc.curv()
-        x1 = np.array(x1)
-        x1 = x1-x1.min()
-        y1 = np.array(y1)
-        # np.savetxt('D:/MW data/20200216/FinalDataSet/Transition2/CPMG/Tau50/N128nopi2/1/ch3.txt', np.c_[x1,y1])
-        np.savetxt('D:/MW data/20200814/Test/ch4/1.txt', np.c_[x1,y1])
+            osc.data_start(1)
+            osc.data_stop(2000000)   
+            osc.setmode('sample')
 
-        # osc.setmode('sample')
+            osc.setmode('average')
+            osc.average(50)
 
+            time.sleep(50*2)     
+
+            x,y=osc.curv()
+            x = np.array(x)
+            x = x-x.min()
+            y = np.array(y)
+            np.savetxt('D:/MW data/20201013/OpticalSaturation/Scan/Scan8/ch3/piezooff_{}.txt'.format(i), np.c_[x,y])
+
+            osc.datasource(4)
+
+
+            x1,y1=osc.curv()
+
+            x1 = np.array(x1)
+            x1 = x1-x1.min()
+            y1 = np.array(y1)
+            np.savetxt('D:/MW data/20201013/OpticalSaturation/Scan/Scan8/ch4/piezooff_{}.txt'.format(i), np.c_[x1,y1])
+
+            osc.setmode('sample')
+
+            time.sleep(5)
+
+#  1570   ,  1561,   1551,  1535.5 ,1535.48,1535.455,1535.438,1535.407, 1521,  
+# 190936.8, 192000, 193500, *195220, 195223, 195226, 195228 ,195230*, 197000 , 199000 
 # End of the part that is normally not commented out for dumping data on screen with average
 
 

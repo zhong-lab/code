@@ -274,7 +274,7 @@ class Record(Spyrelet):
 		self.osc.setmode('sample')
 		self.source.RF_OFF()
 		self.source.Mod_OFF()
-		self.source.set_RF_Power(15) 
+		self.source.set_RF_Power(-3) 
 
 		# tau1=params['tau1'].magnitude
 		# taustep=params['taustep'].magnitude

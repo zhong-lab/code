@@ -214,6 +214,7 @@ class Arbseq_Class_MW(object):
             values.append(0)
 
         print('Lenght of sequence is {}'.format(len(values)))
+        # print('Seq is {}'.format(values))
         self.ydata=values
                 
 

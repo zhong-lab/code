@@ -251,7 +251,7 @@ class Record(Spyrelet):
 		self.osc.data_stop(2000000) 
 		self.osc.time_scale(400e-9)
 		self.osc.setmode('sample')
-		self.source.set_RF_Power(15) 		
+		self.source.set_RF_Power(-3) 		
 		self.source.RF_OFF()
 		xarray=[0.1,0.2,0.4,0.6,0.8,1.0]
 		for x in xarray:
