@@ -4,6 +4,11 @@ from lantz import Feat, DictFeat, Action, Q_
 import time
 from ctypes import c_uint, c_void_p, c_double, pointer, POINTER
 
+# test message
+#  test message 2
+# test message 3
+# test message 4
+
 class ANC350(LibraryDriver):
 
     LIBRARY_NAME = 'anc350v3.dll'
