@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QPushButton, QTextEdit, QVBoxLayout
 import time
 import random
 import os
-import nidaqmx
+#import nidaqmx
 
 from spyre import Spyrelet, Task, Element
 from spyre.widgets.task import TaskWidget
@@ -29,10 +29,9 @@ from toptica.lasersdk.client import NetworkConnection, Client
 from lantz.drivers.thorlabs.pm100d import PM100D
 class LaserScan(Spyrelet):
     requires = {
-        'wm': Bristol_771,
         'pmd': PM100D
     }
-    conn1 = NetworkConnection('1.1.1.1')
+    conn1 = NetworkConnection('1.1.1.2')
 
     dlc = Client(conn1)
 
@@ -55,15 +54,15 @@ class LaserScan(Spyrelet):
                 xx=[]            
                 dlc.set("laser1:ctl:wavelength-set",start_wavelength)
                 time.sleep(10)
-                act_start = self.wm.measure_wavelength()
+                #act_start = self.wm.measure_wavelength()
                 time.sleep(2)
                 for item in self.wv:
                     dlc.set("laser1:ctl:wavelength-set",item)
                     time.sleep(0.0001)
                     xx.append(self.pmd.power.magnitude * 1000)
-                act_stop = self.wm.measure_wavelength()
-                print('%f,%f'%(act_start,act_stop))
-                wl = np.linspace(act_wavelength,act_wavelength,len(xx))
+                #act_stop = self.wm.measure_wavelength()
+                #print('%f,%f'%(act_start,act_stop))
+                wl = np.linspace(start_wavelength,stop_wavelength,len(xx))
                 for item in xx:
                     F.write("%f,"%item)
                 for item in wl:
