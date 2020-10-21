@@ -8,6 +8,8 @@ from ctypes import c_uint, c_void_p, c_double, pointer, POINTER
 #  test message 2
 # test message 3
 # test message 4
+# test message 5
+# test message 6
 
 class ANC350(LibraryDriver):
 
