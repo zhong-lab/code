@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QPushButton, QTextEdit, QVBoxLayout
 import time
 import random
 import os
-import nidaqmx
+#import nidaqmx
 
 from spyre import Spyrelet, Task, Element
 from spyre.widgets.task import TaskWidget
@@ -19,7 +19,7 @@ from spyre.widgets.repository_widget import RepositoryWidget
 
 from lantz.drivers.keysight import Arbseq_Class
 from lantz.drivers.keysight.seqbuild import SeqBuild
-
+from toptica.lasersdk.client import SerialConnection
 from lantz import Q_
 from lantz.drivers.keysight import Keysight_33622A
 from lantz.drivers.tektronix import TDS2024C
@@ -34,12 +34,13 @@ class LaserScan(Spyrelet):
         'pmd':PM100D
 
     }
-    conn1 = NetworkConnection('1.1.1.2')
+    #conn1 = NetworkConnection('1.1.1.2')
+    conn1 = SerialConnection('COM5')
 
     dlc = Client(conn1)
     
-    daq = nidaqmx.Task()
-    daq.ai_channels.add_ai_voltage_chan("Dev1/ai3")
+    #daq = nidaqmx.Task()
+    #daq.ai_channels.add_ai_voltage_chan("Dev1/ai3")
     
     @Task()
     def scan(self):
@@ -53,7 +54,7 @@ class LaserScan(Spyrelet):
         step = param['Step'].magnitude*1e9
         n = param['Num Scan']
         self.wv = np.arange(start_wavelength,stop_wavelength,step)
-        self.daq.start()
+        #self.daq.start()
         print('here')
         with Client(self.conn1) as dlc:
             print('here')
@@ -64,9 +65,9 @@ class LaserScan(Spyrelet):
                 for item in self.wv:
                     dlc.set("laser1:ctl:wavelength-set",item)
                     time.sleep(0.01)
-                    xx.append(self.daq.read()) #daq    
+                    #xx.append(self.daq.read()) #daq    
                     
-                    #xx.append(self.pmd.power.magnitude)# powermeter
+                    xx.append(self.pmd.power.magnitude)# powermeter
                 time.sleep(1)
 
                 wl = np.linspace(start_wavelength,stop_wavelength,len(xx))
@@ -76,7 +77,7 @@ class LaserScan(Spyrelet):
                     F2.write("%f,"%item)
                 F.write("\n")
                 F2.write("\n")
-        self.daq.stop()
+        #self.daq.stop()
         return
 
     @Element(name='Params')
