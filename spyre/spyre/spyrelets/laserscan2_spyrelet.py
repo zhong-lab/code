@@ -67,7 +67,7 @@ class LaserScan(Spyrelet):
                     time.sleep(0.01)
                     #xx.append(self.daq.read()) #daq    
                     
-                    xx.append(self.pmd.power.magnitude)# powermeter
+                    xx.append(self.pmd.power.magnitude*1000000)# powermeter
                 time.sleep(1)
 
                 wl = np.linspace(start_wavelength,stop_wavelength,len(xx))
