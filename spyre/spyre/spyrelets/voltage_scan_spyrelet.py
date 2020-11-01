@@ -111,166 +111,6 @@ class PLThinFilm(Spyrelet):
         wl=self.wm.measure_wavelength()
         return voltageTargets,totalShift,wl
 
-    """
-    def record(self,channel):
-        # Set the AWG 
-        self.dataset.clear()
-        self.fungen.clear_mem(1)
-
-        self.fungen.wait()
-
-        params = self.pulse_parameters.widget.get()
-        repeatmag=params['dc repeat unit'].magnitude
-        timestep=params['timestep'].magnitude
-        pulsewidth1=params['pulse width1'].magnitude                                
-        pulsewidth1=params['pulse width2'].magnitude
-        freq=params['IFFrequency'].magnitude
-        phase=params['Phase'].magnitude
-        trigperiod = params['period'].magnitude
-        triggerdelay=params['trigger delay'].magnitude
-        awgvoltage=params['Voltage'].magnitude
-        runtime=params['Runtime'].magnitude
-        tau = params['tau'].magnitude
-
-        shutter_offset = params['shutter offset'].magnitude
-
-        # Waves for Spin Echo
-        Wavepi2pulse='Square'   # 'Gaussian' or 'Square'
-        Wavepipulse='Square'
-
-        self.configureQutag()
-        xs=np.array([])
-        ys=np.array([])
-        hist=[]
-        self.dataset.clear()
-        self.fungen.output[1]='OFF'
-        self.fungen.clear_mem(1)
-        self.fungen.wait()
-
-        # Triggering delay
-
-        delay0I = Arbseq_Class_MW('delay0I', timestep,'DC',0,triggerdelay,0,0)
-        repeatwidthdelay0I=(triggerdelay)
-        delay0I.setRepeats(repeatwidthdelay0I)
-        delay0I.create_envelope()
-        delay0I.repeatstring = 'onceWaitTrig'
-
-        # Pi/2 pulse
-
-        pi2PulseI = Arbseq_Class_MW('pi2PulseI', timestep,Wavepi2pulse,Amp_factor_pi2,pulsewidth/2,freq,0)
-        pi2PulseI.delays=predelay
-        pi2PulseI.postdelay=postdelay
-        pi2PulseI.sendTrigger()
-        pi2PulseI.create_envelope()
-
-        # Delay of Tau
-
-        delay1 = Arbseq_Class_MW('delay1', timestep,'DC',0,repeatmag,0,0)
-        repeatwidthdelay1=(tau-1.0*pulsewidth-predelay-postdelay)
-        delay1.setRepeats(repeatwidthdelay1)
-        delay1.create_envelope()
-
-        # Pi Pulse
-
-        piPulseI = Arbseq_Class_MW('piPulseI', timestep,Wavepipulse,0.08,pulsewidth,freq)
-        piPulseI.delays=predelay
-        piPulseI.postdelay=postdelay
-        piPulseI.sendTrigger()
-        piPulseI.create_envelope()
-
-        # Delay of 2 tau
-
-        delay2 = Arbseq_Class_MW('delay2', timestep,'DC',0,repeatmag,0,0) #Block for 2 tau
-        repeatwidthdelay2=(2*tau-pulsewidth-predelay-postdelay)
-        delay2.setRepeats(repeatwidthdelay2)
-        delay2.create_envelope()
-
-        # Send all the Arbs
-
-        self.fungen.send_arb(delay0I, 1)
-        self.fungen.send_arb(pi2PulseI, 1)
-        self.fungen.send_arb(delay1, 1)
-        self.fungen.send_arb(piPulseI, 1)
-        self.fungen.send_arb(delay2, 1)
-
-        # Make sequence
-
-        seq = [delay0I,pi2PulseI, delay1, piPulseI]
-
-        for i in range(0,npulses-1):
-            seq.append(delay2)
-            seq.append(piPulseI)
-
-        self.fungen.create_arbseq('twoPulseI', seq, 1)
-
-        self.fungen.wait()
-        self.fungen.voltage[1] = params['pulse height'].magnitude+0.000000000001*i
-        self.fungen.offset[1] = 0.000
-        print("Voltage is {} , don't remove this line else the AWG will set the voltage to 50 mV".format(self.fungen.voltage[1]))
-
-        time.sleep(1)
-
-        # AWG Output On
-        self.fungen.output[1] = 'ON'
-
-        time.sleep(1)
-
-        # Set the delay generator for triggering the AWG and scope
-
-        self.delaygen.delay['A']=0
-        self.delaygen.delay['B']=10e-9
-        self.delaygen.delay['C']=0
-        self.delaygen.delay['D']=0
-        self.delaygen.Trigger_Source='Internal'
-        self.delaygen.trigger_rate=1/trigperiod
-
-        time.sleep(10)
-
-        # Start collecting data
-        
-        self.fungen.output[1] = 'ON'
-
-        ##Qutag Part
-        self.configureQutag()
-        qutagparams = self.qutag_params.widget.get()
-        lost = self.qutag.getLastTimestamps(True) # clear Timestamp buffer
-        stoptimestamp = 0
-        bincount=qutagparams['Bin Count']
-        timebase = self.qutag.getTimebase()
-        start = qutagparams['Start Channel']
-        stop = qutagparams['Stop Channel']
-        stoparray = []
-        self.initHist(bincount)
-
-        startTime = time.time()
-        wls=[]
-        lost = self.qutag.getLastTimestamps(True)
-        looptime=startTime
-        while looptime-startTime < expparams['Measurement Time'].magnitude:
-            loopstart=time.time()
-            # get the lost timestamps
-            lost = self.qutag.getLastTimestamps(True)
-            # wait half a milisecond
-            time.sleep(5*0.1)
-            # get thte timestamps in the last half milisecond
-            timestamps = self.qutag.getLastTimestamps(True)
-
-            tstamp = timestamps[0] # array of timestamps
-            tchannel = timestamps[1] # array of channels
-            values = timestamps[2] # number of recorded timestamps
-
-            for k in range(values):
-                # output all stop events together with the latest start event
-                if tchannel[k] == start:
-                    synctimestamp = tstamp[k]
-                else:
-                    stoptimestamp = tstamp[k]
-                    stoparray.append(stoptimestamp)
-            wl=self.wm.measure_wavelength()
-            wls.append(str(wl))
-            looptime+=time.time()-loopstart
-    """
-    
     @Task()
     def piezo_scan(self,timestep=100e-9):
         
@@ -306,12 +146,12 @@ class PLThinFilm(Spyrelet):
             #self.fungen.offset[channel]=voltageTargets[i]
             time.sleep(1)
             # measure the wavelength
-            wl_meas=self.wm.measure_wavelength()
+            #wl_meas=self.wm.measure_wavelength()
             # write this to a .CSV file
             with open(filename+'.csv', 'w') as csvfile:
                 CSVwriter= csv.writer(csvfile, delimiter=' ',quotechar='|',quoting=csv.QUOTE_MINIMAL)
-                CSVwriter.writerow(wl_meas,voltageTargets[i])
-        self.fungen.output[channel]='OFF'
+                CSVwriter.writerow(voltageTargets[i])
+        #self.fungen.output[channel]='OFF'
 
 
 
@@ -550,15 +390,15 @@ class PLThinFilm(Spyrelet):
     def qutagInit(self):
         print('qutag successfully initialized')
 
-    @Element(name='Wavelength parameters')
-    def wl_parameters(self):
-        params = [
-    #    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
-        ('start', {'type': float, 'default': 1535}),
-        ('stop', {'type': float, 'default': 1536})
-        ]
-        w = ParamWidget(params)
-        return w
+    # @Element(name='Wavelength parameters')
+    # def wl_parameters(self):
+    #     params = [
+    # #    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
+    #     ('start', {'type': float, 'default': 1535}),
+    #     ('stop', {'type': float, 'default': 1536})
+    #     ]
+    #     w = ParamWidget(params)
+    #     return w
 
     @Element(name='Piezo scan parameters')
     def piezo_parameters(self):
@@ -572,18 +412,18 @@ class PLThinFilm(Spyrelet):
         w=ParamWidget(params)
         return w
 
-    @Element(name='Experiment Parameters')
-    def exp_parameters(self):
-        params = [
-    #    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
-        ('# of points', {'type': int, 'default': 100}),
-        ('Measurement Time', {'type': int, 'default': 300, 'units':'s'}),
-        ('File Name', {'type': str}),
-        ('AWG Pulse Repetition Period',{'type': float,'default': 0.01,'units':'s'}),
-        ('# of Passes', {'type': int, 'default': 100})
-        ]
-        w = ParamWidget(params)
-        return w
+    # @Element(name='Experiment Parameters')
+    # def exp_parameters(self):
+    #     params = [
+    # #    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
+    #     ('# of points', {'type': int, 'default': 100}),
+    #     ('Measurement Time', {'type': int, 'default': 300, 'units':'s'}),
+    #     ('File Name', {'type': str}),
+    #     ('AWG Pulse Repetition Period',{'type': float,'default': 0.01,'units':'s'}),
+    #     ('# of Passes', {'type': int, 'default': 100})
+    #     ]
+    #     w = ParamWidget(params)
+    #     return w
 
     @Element(name='QuTAG Parameters')
     def qutag_params(self):

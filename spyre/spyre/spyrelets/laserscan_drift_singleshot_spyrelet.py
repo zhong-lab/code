@@ -80,7 +80,7 @@ class LaserScan(Spyrelet):
         ('Step', {'type': float, 'default': 0.005*1e-9, 'units':'m'}),
         ('Stop', {'type': float, 'default': 1536.3*1e-9, 'units':'m'}),
         ('Num Scan', {'type': int, 'default': 1}),
-        ('Filename', {'type': str, 'default':'D:\\Data\\10.17.2020_ffpc_sand_bags_loaded\\singleshot_5pm_offresonance'})
+        ('Filename', {'type': str, 'default':'D:\\Data\\11.01.2020_Hehose_lifted_ffpc\\singleshot_5pm_onresonance'})
 
         # ('Amplitude', {'type': float, 'default': 1, 'units':'V'})
         ]
