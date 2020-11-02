@@ -8,7 +8,6 @@ from PyQt5.QtWidgets import QPushButton, QTextEdit, QVBoxLayout
 import time
 import random
 import os
-import nidaqmx
 
 from spyre import Spyrelet, Task, Element
 from spyre.widgets.task import TaskWidget
@@ -87,12 +86,12 @@ class LaserScan(Spyrelet):
 	def parameters(self):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
-		('Start', {'type': float, 'default': 1534.3*1e-9, 'units':'m'}),
+		('Start', {'type': float, 'default': 1534*1e-9, 'units':'m'}),
 		('Step', {'type': float, 'default': 0.005*1e-9, 'units':'m'}),
-		('Stop', {'type': float, 'default': 1536.3*1e-9, 'units':'m'}),
+		('Stop', {'type': float, 'default': 1536*1e-9, 'units':'m'}),
 		('Num Scan', {'type': int, 'default': 1}),
 		('Integrationtime', {'type':float,'default':2,'units':'s'}),   
-		('Filename', {'type': str, 'default':'D:\\Data\\10.17.2020_ffpc_sand_bags_loaded\\integration\\2second_5pm_offresonance_1'})
+		('Filename', {'type': str, 'default':'D:\\Data\\11.01.2020_Hehose_lifted_ffpc\\integration\\2second_5pm_offresonance_1'})
 		
 		# ('Amplitude', {'type': float, 'default': 1, 'units':'V'})
 		]
