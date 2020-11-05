@@ -102,7 +102,7 @@ class DarkCount(Spyrelet):
 			self.getDarkCounts.acquire(values)
 		self.srs.SIM928_voltage[5]=0
 		self.srs.module_reset[5]
-		datadir = 'D:\Data\\09.09.2019\\'
+		datadir = 'D:\\Data\\09.09.2019\\'
 		print(BC)
 		print(DCR_1)
 		np.savetxt(datadir+expParams['File Name']+'.csv', (BC,DCR_1), delimiter=',')

@@ -40,7 +40,7 @@ class QuTAG:
             
     def __init__(self):
         # load DLL -------------------------------------------
-        dll_dp = r'C:\Users\zhong\code\lantz\lantz\drivers\qutools\lib'
+        dll_dp = r'C:\Users\zhong\lab_code\lantz\lantz\drivers\qutools\lib'
         dll_name = 'tdcbase.dll'
         usbdll_name= 'FTD3XX.dll'
         dir_before = os.getcwd()
