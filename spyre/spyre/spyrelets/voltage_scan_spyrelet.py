@@ -148,6 +148,7 @@ class fiberfilter_scan(Spyrelet):
         Vstart=piezo_params['voltage start']
         Vstop=piezo_params['voltage end']
         pts=piezo_params['scan points']
+        t=piezo_params['integration time']
 
         voltageTargets=np.linspace(Vstart,Vstop,pts)
         wavelength=1530.3614+voltageTargets*5.489
@@ -182,7 +183,7 @@ class fiberfilter_scan(Spyrelet):
             lost = self.qutag.getLastTimestamps(True)
             #self.fungen.offset[channel]=voltageTargets[i]
             self.fungen.offset(channel,voltageTargets[i])
-            time.sleep(0.1)
+            time.sleep(t)
             timestamps = self.qutag.getLastTimestamps(True)
             tstamp = timestamps[0] # array of timestamps
             tchannel = timestamps[1] # array of channels
@@ -217,6 +218,7 @@ class fiberfilter_scan(Spyrelet):
             ('voltage end',{'type': float,'default':1,'units':'V'}),
             ('scan points',{'type':int,'default':100}),
             ('AWG channel',{'type':int,'default':1}),
+            ('integration time',{'type':float,'default':1}),
             ('Scale factor',{'type':float,'default':17}),
             ('Filename', {'type': str, 'default':'D:\\Data\\11.04.2020_fiberfilterscan\\test'})
         ]
