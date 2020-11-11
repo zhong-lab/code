@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QPushButton, QTextEdit, QVBoxLayout
 import time
 import random
 import os
-import nidaqmx
+#import nidaqmx
 
 from spyre import Spyrelet, Task, Element
 from spyre.widgets.task import TaskWidget
@@ -31,15 +31,15 @@ from toptica.lasersdk.client import NetworkConnection, Client, SerialConnection
 class LaserScan(Spyrelet):
     # delete if not using power meter
     requires = {
-        #'pmd':PM100D
+        'pmd':PM100D
 
     }
     conn1 = NetworkConnection('1.1.1.2')
 
     dlc = Client(conn1)
     
-    daq = nidaqmx.Task()
-    daq.ai_channels.add_ai_voltage_chan("Dev1/ai3")
+    #daq = nidaqmx.Task()
+    #daq.ai_channels.add_ai_voltage_chan("Dev1/ai3")
     
     @Task()
     def scan(self):
@@ -53,7 +53,7 @@ class LaserScan(Spyrelet):
         step = param['Step'].magnitude*1e9
         n = param['Num Scan']
         self.wv = np.arange(start_wavelength,stop_wavelength,step)
-        self.daq.start()
+        #self.daq.start()
         print('here')
         with Client(self.conn1) as dlc:
             print('here')
@@ -64,9 +64,9 @@ class LaserScan(Spyrelet):
                 for item in self.wv:
                     dlc.set("laser1:ctl:wavelength-set",item)
                     time.sleep(0.005)
-                    xx.append(self.daq.read())
+                    #xx.append(self.daq.read())
                     
-                    #xx.append(self.pmd.power.magnitude)
+                    xx.append(self.pmd.power.magnitude*1000000)
                 time.sleep(1)
 
                 wl = np.linspace(start_wavelength,stop_wavelength,len(xx))
@@ -76,7 +76,7 @@ class LaserScan(Spyrelet):
                     F2.write("%f,"%item)
                 F.write("\n")
                 F2.write("\n")
-        self.daq.stop()
+        #self.daq.stop()
         return
 
     @Element(name='Params')
