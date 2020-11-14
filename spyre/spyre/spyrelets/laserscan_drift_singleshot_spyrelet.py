@@ -75,11 +75,11 @@ class LaserScan(Spyrelet):
     def parameters(self):
         params = [
     #    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
-        ('Start', {'type': float, 'default': 1534*1e-9, 'units':'m'}),
+        ('Start', {'type': float, 'default': 1535*1e-9, 'units':'m'}),
         ('Step', {'type': float, 'default': 0.005*1e-9, 'units':'m'}),
-        ('Stop', {'type': float, 'default': 1536*1e-9, 'units':'m'}),
+        ('Stop', {'type': float, 'default': 1537*1e-9, 'units':'m'}),
         ('Num Scan', {'type': int, 'default': 1}),
-        ('Filename', {'type': str, 'default':'D:\\Data\\11.01.2020_Hehose_lifted_ffpc\\singleshot_5pm_offresonance'})
+        ('Filename', {'type': str, 'default':'D:\\Data\\11.13.2020_ffpc\\singleshot_5pm_offresonance'})
 
         # ('Amplitude', {'type': float, 'default': 1, 'units':'V'})
         ]
