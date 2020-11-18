@@ -64,7 +64,7 @@ class LaserScan(Spyrelet):
                 time.sleep(8)
                 for item in self.wv:
                     dlc.set("laser1:ctl:wavelength-set",item)
-                    time.sleep(0.01)
+                    time.sleep(0.05)
                     #xx.append(self.daq.read()) #daq    
                     
                     xx.append(self.pmd.power.magnitude*1000000)# powermeter
