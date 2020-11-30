@@ -70,11 +70,10 @@ class Record(Spyrelet):
 		PiAmp=1
 	
 
-		deltaphiiq=93  # Based off calibration
+		deltaphiiq=98  # Based off calibration
 		predelay=50e-9
-		postdelay=150e-9
-		timeoffset=150e-9
-		delayoffset=50e-9
+		postdelay=550e-9
+
 
 # Waves for Spin Echo
 		Wavepi2pulse='Square'   # 'Gaussian' or 'Square'
@@ -225,14 +224,14 @@ class Record(Spyrelet):
 		x = np.array(x)
 		x = x-x.min()
 		y = np.array(y)
-		np.savetxt('D:/MW data/20200805/Optimization/sweepPulse2_width/ch3/{}.txt'.format(pulsewidth2*1e9), np.c_[x,y])   
+		np.savetxt('D:/MW data/20201002/Optimization/sweepPulse2_width/Scan2/ch3/{}.txt'.format(pulsewidth2*1e6), np.c_[x,y])   
 
 		self.osc.datasource(4)
 		x,y=self.osc.curv()
 		x = np.array(x)
 		x = x-x.min()
 		y = np.array(y)
-		np.savetxt('D:/MW data/20200805/Optimization/sweepPulse2_width/ch4/{}.txt'.format(pulsewidth2*1e9), np.c_[x,y])
+		np.savetxt('D:/MW data/20201002/Optimization/sweepPulse2_width/Scan2/ch4/{}.txt'.format(pulsewidth2*1e6), np.c_[x,y])
 		time.sleep(15)   # Sleeptime for saving data
 
 		self.fungen.output[1] = 'OFF'
@@ -248,13 +247,13 @@ class Record(Spyrelet):
 
 		self.osc.data_start(1)
 		self.osc.data_stop(2000000) 
-		self.osc.time_scale(400e-9)
+		self.osc.time_scale(2e-6)
 		self.osc.setmode('sample')
 		self.source.RF_OFF()
 		self.source.Mod_OFF()
-		self.source.set_RF_Power(10)        
+		self.source.set_RF_Power(-3)        
 
-		pulse2widths=[50e-9,100e-9,150e-9,200e-9,250e-9,300e-9,350e-9,400e-9]
+		pulse2widths=[0.2e-6,0.5e-6,0.8e-6,1e-6,1.5e-6,2e-6,2.5e-6,3e-6,3.5e-6,4e-6]
 		# pulse2widths=[90e-9]
 
 		for x in pulse2widths:
@@ -274,19 +273,19 @@ class Record(Spyrelet):
 	def pulse_parameters(self):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
-		('dc repeat unit', {'type': float, 'default': 50e-9, 'units':'s'}),
+		('dc repeat unit', {'type': float, 'default': 1e-7, 'units':'s'}),
 		('timestep', {'type': float, 'default': 1e-9, 'units':'s'}),
 		('trigger delay', {'type': float, 'default': 32e-9, 'units':'s'}),			
-		('period', {'type': float, 'default': 2, 'units':'s'}),
-		('tau', {'type': float, 'default': 1e-6, 'units':'s'}),
+		('period', {'type': float, 'default': 1, 'units':'s'}),
+		('tau', {'type': float, 'default': 5e-6, 'units':'s'}),
 		('nPulses', {'type': int, 'default': 1, 'units':'dimensionless'}),
-		('nAverage', {'type': int, 'default': 200, 'units':'dimensionless'}),
+		('nAverage', {'type': int, 'default': 50, 'units':'dimensionless'}),
 		('IQFrequency', {'type': float, 'default': 1e8, 'units':'dimensionless'}),
 		('Phase', {'type': float, 'default': 0, 'units':'dimensionless'}),
 		('DeltaPhase', {'type': float, 'default': 90, 'units':'dimensionless'}),
 		('Pulse1Voltage', {'type': float, 'default': 0.707, 'units':'dimensionless'}),		
-		('pulse1 width', {'type': float, 'default': 200e-9, 'units':'s'}),
-		('CavityFreq', {'type': float, 'default': 4.9849e9, 'units':'dimensionless'}),
+		('pulse1 width', {'type': float, 'default': 1e-6, 'units':'s'}),
+		('CavityFreq', {'type': float, 'default': 5.69758e9, 'units':'dimensionless'}),
 		('VoltageFactor', {'type': float, 'default': 1, 'units':'dimensionless'}),
 		]
 		w = ParamWidget(params)

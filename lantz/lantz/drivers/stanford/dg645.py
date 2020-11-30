@@ -326,14 +326,15 @@ if __name__ == '__main__':
         # print('The identification number of this instrument is :' + str(inst.idn))
         inst.clear_errors()
         # inst.Trigger_Source='Single shot'
-        inst.Trigger_Source='Internal'
 
-        inst.delay['D']=5e-6
 
-        delaya=inst.delay['A']
-        delayb=inst.delay['B']
-        delayc=inst.delay['C']
-        delayd=inst.delay['D']
-        print("Delay for a,b,c,d is {}, {}, {}, {}".format(delaya,delayb,delayc,delayd))
+
+        inst.delay['A']=0
+        inst.delay['B']=0
+        inst.delay['C']=0
+        inst.delay['D']=0
+        inst.delay['E']=0
+        inst.delay['F']=0
+
         # inst.Trigger_Source='External falling edges'
         #inst.Trigger_Source='External rising edges'

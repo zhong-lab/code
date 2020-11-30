@@ -109,7 +109,7 @@ def main():
     failed_spyrelets.extend(unloaded_spyrelets)
     print(failed_spyrelets)
 
-    spyrew.restore_spyrelet_geometries()
+    #spyrew.restore_spyrelet_geometries()
     spyrew.showMaximized()
 
     sys.__excepthook__ = sys.excepthook

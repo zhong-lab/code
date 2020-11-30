@@ -69,9 +69,9 @@ class Record(Spyrelet):
 		PiAmp=params['Pulse2Voltage'].magnitude
 		Pi2Amp=params['Pulse1Voltage'].magnitude
 		InvAmp=params['Pulse0Voltage'].magnitude	
-		deltaphiiq=93  # Based off calibration
+		deltaphiiq=98  # Based off calibration
 		predelay=50e-9
-		postdelay=150e-9
+		postdelay=0.55e-6
 
 
 # Waves for Spin Echo
@@ -189,11 +189,11 @@ class Record(Spyrelet):
 		self.fungen.create_arbseq('twoPulseQ',seq1,2)
 
 		self.fungen.wait()
-		self.fungen.voltage[1] = 0.500*0.5
+		self.fungen.voltage[1] = 0.500
 		self.fungen.offset[1] = 0.000
 		print("Voltage is {} , don't remove this line else the AWG will set the voltage to 50 mV".format(self.fungen.voltage[1]))
 
-		self.fungen.voltage[2] = 0.480*0.5
+		self.fungen.voltage[2] = 0.480
 		self.fungen.offset[2] = -0.001
 
 		print("Voltage is {} , don't remove this line else the AWG will set the voltage to 50 mV".format(self.fungen.voltage[2]))
@@ -225,7 +225,7 @@ class Record(Spyrelet):
 
 		self.osc.delaymode_on()
 		self.osc.delay_position(0)
-		self.osc.delay_time(tau1+2*tau-400e-9)  # This makes sure that echo is at center of screen
+		self.osc.delay_time(tau1+2*tau-800e-9)  # This makes sure that echo is at center of screen
 
 		time.sleep(5)
 
@@ -245,14 +245,14 @@ class Record(Spyrelet):
 		x = np.array(x)
 		x = x-x.min()
 		y = np.array(y)
-		np.savetxt('D:/MW data/20200814/SpinT1/Scan10/ch3/{}.txt'.format(tau1*1e3), np.c_[x,y])   
+		np.savetxt('D:/MW data/20201111/SpinT1/Scan18/ch3/{}.txt'.format(tau1*1e3), np.c_[x,y])   
 
 		self.osc.datasource(4)
 		x,y=self.osc.curv()
 		x = np.array(x)
 		x = x-x.min()
 		y = np.array(y)
-		np.savetxt('D:/MW data/20200814/SpinT1/Scan10/ch4/{}.txt'.format(tau1*1e3), np.c_[x,y])
+		np.savetxt('D:/MW data/20201111/SpinT1/Scan18/ch4/{}.txt'.format(tau1*1e3), np.c_[x,y])
 		time.sleep(15)   # Sleeptime for saving data
 
 		self.fungen.output[1] = 'OFF'
@@ -270,11 +270,15 @@ class Record(Spyrelet):
 		self.osc.delaymode_off()
 		self.osc.data_start(1)
 		self.osc.data_stop(2000000)  # max resolution ius 4e6, the resolution for 200 ns scale is 5e5
-		self.osc.time_scale(200.0e-9)
+		self.osc.time_scale(400.0e-9)
 		self.osc.setmode('sample')
+		self.osc.set_50ohm(3)
+		self.osc.set_50ohm(4)
 		self.source.RF_OFF()
 		self.source.Mod_OFF()
-		self.source.set_RF_Power(15) 
+		self.source.set_RF_Power(-3) 
+		time.sleep(7200)  #sleep for 2 hours for frige to coolsdown
+		# self.osc.set_horizontal_resolution(2e6)
 
 		# tau1=params['tau1'].magnitude
 		# taustep=params['taustep'].magnitude
@@ -284,15 +288,19 @@ class Record(Spyrelet):
 		# 	self.record(tau)
 		# return
 
-		# tau1array=[0.001,0.010,0.025,0.050,0.075,0.1,0.125,0.15,0.175,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]
-		tau1array=[0.050,0.10,0.20,0.30,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.2,1.4,1.6,2.0,3.0,4.0,5.0]
+		tau1array=[0.001,0.010,0.025,0.050,0.075,0.1,0.125,0.15,0.175,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1,1.2,1.4,1.6,1.8,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5,10.0]
+		#tau1array=[0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1,1.4,1.6,1.8,2.0,2.5,3.0,3.5,4.0,4.5,5.0,5.5,6.0,6.5,7.0,7.5,8.0,8.5,9.0,9.5,10.0]
+		#stau1array=[0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1,1.2,1.4,1.6,1.8,2.0,2.5,3.0]  # for longer T1
+		# tau1array=[0.05,0.075,0.1,0.15,0.2,0.25,0.3,0.35,0.4,0.5,0.6,0.7,0.8,0.9,1,1.2,1.4]  # for short  T1
+
+		# tau1array=[2.0,3.0,4.0,5.0]
 
 		# tau1array=[100e-3,1.0,5.0]
 		# tau1array=[0.125,0.15,0.175]
 
 		# tau1array=[0.050]
 
-		tau=1.5e-6
+		tau=5e-6
 		for tau1 in tau1array:
 			self.record(tau,tau1)
 		return
@@ -310,21 +318,21 @@ class Record(Spyrelet):
 	def pulse_parameters(self):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
-		('dc repeat unit', {'type': float, 'default': 50e-9, 'units':'s'}),
+		('dc repeat unit', {'type': float, 'default': 1e-7, 'units':'s'}),
 		('trigger delay', {'type': float, 'default': 32e-9, 'units':'s'}),	
 		('timestep', {'type': float, 'default': 1e-9, 'units':'s'}),
-		('period', {'type': float, 'default': 10, 'units':'s'}),
+		('period', {'type': float, 'default': 20, 'units':'s'}),
 		('nPulses', {'type': int, 'default': 1, 'units':'dimensionless'}),
-		('nAverage', {'type': int, 'default': 50, 'units':'dimensionless'}),
+		('nAverage', {'type': int, 'default': 20, 'units':'dimensionless'}),
 		('IQFrequency', {'type': float, 'default': 1e8, 'units':'dimensionless'}),
 		('Phase', {'type': float, 'default': 0, 'units':'dimensionless'}),
 		('DeltaPhase', {'type': float, 'default': 0, 'units':'dimensionless'}),
-		('pulse width', {'type': float, 'default': 200e-9, 'units':'s'}),
-		('pulse width0', {'type': float, 'default': 1000e-9, 'units':'s'}),
-		('CavityFreq', {'type': float, 'default': 4.9849e9, 'units':'dimensionless'}),
-		('Pulse0Voltage', {'type': float, 'default': 0.20, 'units':'dimensionless'}),		
-		('Pulse1Voltage', {'type': float, 'default': 0.06, 'units':'dimensionless'}),
-		('Pulse2Voltage', {'type': float, 'default':0.08, 'units':'dimensionless'}),
+		('pulse width', {'type': float, 'default': 1e-6, 'units':'s'}),
+		('pulse width0', {'type': float, 'default': 1e-6, 'units':'s'}),
+		('CavityFreq', {'type': float, 'default': 5.69758e9, 'units':'dimensionless'}),
+		('Pulse0Voltage', {'type': float, 'default': 1.0, 'units':'dimensionless'}),		
+		('Pulse1Voltage', {'type': float, 'default': 0.707, 'units':'dimensionless'}),
+		('Pulse2Voltage', {'type': float, 'default':1.0, 'units':'dimensionless'}),
 		]
 		
 		w = ParamWidget(params)

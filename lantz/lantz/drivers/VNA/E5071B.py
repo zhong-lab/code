@@ -222,13 +222,13 @@ if __name__ == '__main__':
         # inst.save_img('HAO/imag01.bmp')
 
         # inst.source_power=-30
-        inst.IF_bandwidth=3000
-        inst.freq_cent=4.9610e9
-        # inst.freq_cent=5.5e9
-        inst.freq_span=1e6
-        inst.set_average(1,'OFF') 
+        # inst.IF_bandwidth=3000
+        # inst.freq_cent=4.9610e9
+        # # inst.freq_cent=5.5e9
+        # inst.freq_span=1e6
+        # inst.set_average(1,'OFF') 
 
-        inst.autoscale(1,1)
+        # inst.autoscale(1,1)
         tr1=inst.get_trace(1)
         freq1=inst.get_traceX(1)
 
@@ -236,6 +236,7 @@ if __name__ == '__main__':
 
         plt.scatter(freq1,tr1,s=1)
         plt.plot(freq1,tr1,label='Trace1')
+
         # plt.show()
 
 
@@ -250,6 +251,9 @@ if __name__ == '__main__':
         # plt.plot(freq2,tr2,label='Trace2')
         plt.legend()
         plt.show()
-        inst.set_s_parameter(1,1,'S21')
+
+        np.savetxt('D:/MW data/20201022/RamanHeterodyne/5.69ghz_1khzspan_400hz_If_7dbm_195228ghz_avg400_laser_on_dither_off_10ms_scan1.txt', np.c_[freq1,tr1])
+
+        # inst.set_s_parameter(1,1,'S21')
         # inst.set_active_trace(1,2)
         # print("  ")

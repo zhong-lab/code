@@ -287,7 +287,7 @@ class Record(Spyrelet):
 		self.osc.setmode('sample')
 		self.source.RF_OFF()
 		self.source.Mod_OFF()
-		self.source.set_RF_Power(10) 
+		self.source.set_RF_Power(-3) 
 
 		# tau1=params['tau1'].magnitude
 		# taustep=params['taustep'].magnitude
@@ -350,10 +350,10 @@ class Record(Spyrelet):
 		# ('nMeasurement', {'type': int, 'default': 1, 'units':'dimensionless'}),
 		('IQFrequency', {'type': float, 'default': 1e8, 'units':'dimensionless'}),
 		('Phase', {'type': float, 'default': 0, 'units':'dimensionless'}),
-		('pulse width', {'type': float, 'default': 50e-9, 'units':'s'}),
-		('CavityFreq', {'type': float, 'default':  4.9849e9, 'units':'dimensionless'}),
-		('Voltage', {'type': float, 'default': 1.0, 'units':'dimensionless'}),
-		('Pi2factor', {'type': float, 'default': 0.707, 'units':'dimensionless'}),
+		('pulse width', {'type': float, 'default': 1e-6, 'units':'s'}),
+		('CavityFreq', {'type': float, 'default': 5.69758e9, 'units':'dimensionless'}),
+		('Pi2voltage', {'type': float, 'default': 0.707, 'units':'dimensionless'}),
+		('Pivoltage', {'type': float, 'default': 1.0, 'units':'dimensionless'}),
 		]
 		
 		w = ParamWidget(params)

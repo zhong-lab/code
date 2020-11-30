@@ -151,11 +151,11 @@ class MS2721B(MessageBasedDriver):
 
     @Action()
     def acquireData(self):
-        return self.query(':TRACe[:DATA]? 1')
+        return self.query(' :TRACe[:DATA]:PREamble? ')
 
     @Action()
     def format(self):
-        self.write(':FORMat:DATA REAL,32')
+        self.write(':FORMat[:DATA] ASCii')
 
 
 if __name__ == '__main__':
@@ -169,8 +169,8 @@ if __name__ == '__main__':
 
     log_to_screen(DEBUG)
     # this is the USB VISA Address:
-    with MS2721B('TCPIP0::169.254.13.29::inst0::INSTR') as inst:
+    with MS2721B('TCPIP0::169.254.51.199::inst0::INSTR') as inst:
         print('The identification of this instrument is :' + inst.idn)
-        # inst.format()
-        # print(inst.acquireData())
+        inst.format()
+        print(inst.acquireData())
 

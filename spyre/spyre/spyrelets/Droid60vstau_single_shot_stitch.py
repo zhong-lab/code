@@ -64,10 +64,12 @@ class Record(Spyrelet):
 		cavityfreq=params['CavityFreq'].magnitude
 		trigperiod=params['period'].magnitude
 		triggerdelay=params['trigger delay'].magnitude
-		Amp_factor_pi2=params['Pi2factor'].magnitude
-		deltaphiiq=93  # Based off calibration
+		Amp_factor_pi2=params['Pi2voltage'].magnitude
+		Amp_factor_pi=params['Pivoltage'].magnitude
+
+		deltaphiiq=98  # Based off calibration
 		predelay=50e-9
-		postdelay=150e-9
+		postdelay=0.55e-6
 
 		deltaphase1=0  #X
 		deltaphase2=90 #Y
@@ -158,28 +160,28 @@ class Record(Spyrelet):
 
 # Pix Pulse
 
-		pixPulseI = Arbseq_Class_MW('pixPulseI', timestep,Wavepipulse,0.08,pulsewidth,freq,phase+deltaphase1)
+		pixPulseI = Arbseq_Class_MW('pixPulseI', timestep,Wavepipulse,Amp_factor_pi,pulsewidth,freq,phase+deltaphase1)
 		pixPulseI.delays=predelay
 		pixPulseI.postdelay=postdelay
 		pixPulseI.sendTrigger()
 		pixPulseI.create_envelope()
 
 
-		pixPulseQ = Arbseq_Class_MW('pixPulseQ', timestep,Wavepipulse,0.08,pulsewidth,freq,phase+deltaphase1+deltaphiiq)
+		pixPulseQ = Arbseq_Class_MW('pixPulseQ', timestep,Wavepipulse,Amp_factor_pi,pulsewidth,freq,phase+deltaphase1+deltaphiiq)
 		pixPulseQ.delays=predelay
 		pixPulseQ.postdelay=postdelay		
 		pixPulseQ.create_envelope()
 
 # Piy Pulse
 
-		piyPulseI = Arbseq_Class_MW('piyPulseI', timestep,Wavepipulse,0.08,pulsewidth,freq,phase+deltaphase2)
+		piyPulseI = Arbseq_Class_MW('piyPulseI', timestep,Wavepipulse,Amp_factor_pi,pulsewidth,freq,phase+deltaphase2)
 		piyPulseI.delays=predelay
 		piyPulseI.postdelay=postdelay
 		piyPulseI.sendTrigger()
 		piyPulseI.create_envelope()
 
 
-		piyPulseQ = Arbseq_Class_MW('piyPulseQ', timestep,Wavepipulse,0.08,pulsewidth,freq,phase+deltaphase2+deltaphiiq)
+		piyPulseQ = Arbseq_Class_MW('piyPulseQ', timestep,Wavepipulse,Amp_factor_pi,pulsewidth,freq,phase+deltaphase2+deltaphiiq)
 		piyPulseQ.delays=predelay
 		piyPulseQ.postdelay=postdelay		
 		piyPulseQ.create_envelope()
@@ -187,28 +189,28 @@ class Record(Spyrelet):
 
 # Pimx Pulse
 
-		pimxPulseI = Arbseq_Class_MW('pimxPulseI', timestep,Wavepipulse,0.08,pulsewidth,freq,phase+deltaphase3)
+		pimxPulseI = Arbseq_Class_MW('pimxPulseI', timestep,Wavepipulse,Amp_factor_pi,pulsewidth,freq,phase+deltaphase3)
 		pimxPulseI.delays=predelay
 		pimxPulseI.postdelay=postdelay
 		pimxPulseI.sendTrigger()
 		pimxPulseI.create_envelope()
 
 
-		pimxPulseQ = Arbseq_Class_MW('pimxPulseQ', timestep,Wavepipulse,0.08,pulsewidth,freq,phase+deltaphase3+deltaphiiq)
+		pimxPulseQ = Arbseq_Class_MW('pimxPulseQ', timestep,Wavepipulse,Amp_factor_pi,pulsewidth,freq,phase+deltaphase3+deltaphiiq)
 		pimxPulseQ.delays=predelay
 		pimxPulseQ.postdelay=postdelay		
 		pimxPulseQ.create_envelope()
 
 # Pimy Pulse
 
-		pimyPulseI = Arbseq_Class_MW('pimyPulseI', timestep,Wavepipulse,0.08,pulsewidth,freq,phase+deltaphase4)
+		pimyPulseI = Arbseq_Class_MW('pimyPulseI', timestep,Wavepipulse,Amp_factor_pi,pulsewidth,freq,phase+deltaphase4)
 		pimyPulseI.delays=predelay
 		pimyPulseI.postdelay=postdelay
 		pimyPulseI.sendTrigger()
 		pimyPulseI.create_envelope()
 
 
-		pimyPulseQ = Arbseq_Class_MW('pimyPulseQ', timestep,Wavepipulse,0.08,pulsewidth,freq,phase+deltaphase4+deltaphiiq)
+		pimyPulseQ = Arbseq_Class_MW('pimyPulseQ', timestep,Wavepipulse,Amp_factor_pi,pulsewidth,freq,phase+deltaphase4+deltaphiiq)
 		pimyPulseQ.delays=predelay
 		pimyPulseQ.postdelay=postdelay		
 		pimyPulseQ.create_envelope()
@@ -216,14 +218,14 @@ class Record(Spyrelet):
 
 # COMP1 Pulse (pi/2x pi/2my)
 
-		COMP1PulseI = Arbseq_Class_MW('COMP1PulseI', timestep,'COMP1',0.08,pulsewidth,freq,phase)
+		COMP1PulseI = Arbseq_Class_MW('COMP1PulseI', timestep,'COMP1',Amp_factor_pi,pulsewidth,freq,phase)
 		COMP1PulseI.delays=predelay
 		COMP1PulseI.postdelay=postdelay
 		COMP1PulseI.sendTrigger()
 		COMP1PulseI.create_envelope()
 
 
-		COMP1PulseQ = Arbseq_Class_MW('COMP1PulseQ', timestep,'COMP1',0.08,pulsewidth,freq,phase+deltaphiiq)
+		COMP1PulseQ = Arbseq_Class_MW('COMP1PulseQ', timestep,'COMP1',Amp_factor_pi,pulsewidth,freq,phase+deltaphiiq)
 		COMP1PulseQ.delays=predelay
 		COMP1PulseQ.postdelay=postdelay		
 		COMP1PulseQ.create_envelope()
@@ -231,14 +233,14 @@ class Record(Spyrelet):
 
 # COMP2 Pulse (pi/2my pi/2x)
 
-		COMP2PulseI = Arbseq_Class_MW('COMP2PulseI', timestep,'COMP2',0.08,pulsewidth,freq,phase)
+		COMP2PulseI = Arbseq_Class_MW('COMP2PulseI', timestep,'COMP2',Amp_factor_pi,pulsewidth,freq,phase)
 		COMP2PulseI.delays=predelay
 		COMP2PulseI.postdelay=postdelay
 		COMP2PulseI.sendTrigger()
 		COMP2PulseI.create_envelope()
 
 
-		COMP2PulseQ = Arbseq_Class_MW('COMP2PulseQ', timestep,'COMP2',0.08,pulsewidth,freq,phase+deltaphiiq)
+		COMP2PulseQ = Arbseq_Class_MW('COMP2PulseQ', timestep,'COMP2',Amp_factor_pi,pulsewidth,freq,phase+deltaphiiq)
 		COMP2PulseQ.delays=predelay
 		COMP2PulseQ.postdelay=postdelay		
 		COMP2PulseQ.create_envelope()
@@ -246,14 +248,14 @@ class Record(Spyrelet):
 
 # COMP3 Pulse (pi/2x pi/2y)
 
-		COMP3PulseI = Arbseq_Class_MW('COMP3PulseI', timestep,'COMP3',0.08,pulsewidth,freq,phase)
+		COMP3PulseI = Arbseq_Class_MW('COMP3PulseI', timestep,'COMP3',Amp_factor_pi,pulsewidth,freq,phase)
 		COMP3PulseI.delays=predelay
 		COMP3PulseI.postdelay=postdelay
 		COMP3PulseI.sendTrigger()
 		COMP3PulseI.create_envelope()
 
 
-		COMP3PulseQ = Arbseq_Class_MW('COMP3PulseQ', timestep,'COMP3',0.08,pulsewidth,freq,phase+deltaphiiq)
+		COMP3PulseQ = Arbseq_Class_MW('COMP3PulseQ', timestep,'COMP3',Amp_factor_pi,pulsewidth,freq,phase+deltaphiiq)
 		COMP3PulseQ.delays=predelay
 		COMP3PulseQ.postdelay=postdelay		
 		COMP3PulseQ.create_envelope()
@@ -261,14 +263,14 @@ class Record(Spyrelet):
 
 # COMP4 Pulse (pi/2x pi/2y)
 
-		COMP4PulseI = Arbseq_Class_MW('COMP4PulseI', timestep,'COMP4',0.08,pulsewidth,freq,phase)
+		COMP4PulseI = Arbseq_Class_MW('COMP4PulseI', timestep,'COMP4',Amp_factor_pi,pulsewidth,freq,phase)
 		COMP4PulseI.delays=predelay
 		COMP4PulseI.postdelay=postdelay
 		COMP4PulseI.sendTrigger()
 		COMP4PulseI.create_envelope()
 
 
-		COMP4PulseQ = Arbseq_Class_MW('COMP4PulseQ', timestep,'COMP4',0.08,pulsewidth,freq,phase+deltaphiiq)
+		COMP4PulseQ = Arbseq_Class_MW('COMP4PulseQ', timestep,'COMP4',Amp_factor_pi,pulsewidth,freq,phase+deltaphiiq)
 		COMP4PulseQ.delays=predelay
 		COMP4PulseQ.postdelay=postdelay		
 		COMP4PulseQ.create_envelope()
@@ -658,11 +660,11 @@ class Record(Spyrelet):
 		self.fungen.create_arbseq('twoPulseQ',seq1,2)
 
 		self.fungen.wait()
-		self.fungen.voltage[1] = 0.500*0.5
-		self.fungen.offset[1] = 2*milivolt
+		self.fungen.voltage[1] = 0.500
+		self.fungen.offset[1] = 0*milivolt
 		print("Voltage is {} , don't remove this line else the AWG will set the voltage to 50 mV".format(self.fungen.voltage[1]))
 
-		self.fungen.voltage[2] = 0.480*0.5
+		self.fungen.voltage[2] = 0.480
 		self.fungen.offset[2] = -1*milivolt
 
 		print("Voltage is {} , don't remove this line else the AWG will set the voltage to 50 mV".format(self.fungen.voltage[2]))
@@ -750,8 +752,8 @@ class Record(Spyrelet):
 		ydata=np.array(ydata)
 		ydata1=np.array(ydata1)
 
-		np.savetxt('D:/MW data/20200811/DROID60/Scan2/ch3/{}_{}.txt'.format(tau*1e6,npulses), np.c_[xdata,ydata])   
-		np.savetxt('D:/MW data/20200811/DROID60/Scan2/ch4/{}_{}.txt'.format(tau*1e6,npulses), np.c_[xdata1,ydata1])
+		np.savetxt('D:/MW data/20201102/DROID60/Scan1/ch3/{}_{}.txt'.format(tau*1e6,npulses), np.c_[xdata,ydata])   
+		np.savetxt('D:/MW data/20201102/DROID60/Scan1/ch4/{}_{}.txt'.format(tau*1e6,npulses), np.c_[xdata1,ydata1])
 		time.sleep(10)   # Sleeptime for saving data
 
 		self.osc.delaymode_off()
@@ -769,7 +771,8 @@ class Record(Spyrelet):
 		self.osc.setmode('sample')
 		self.source.RF_OFF()
 		self.source.Mod_OFF()
-		self.source.set_RF_Power(15) 
+		self.source.set_RF_Power(-3) 
+		self.osc.set_horizontal_resolution(2e6)
 
 		# tau1=params['tau1'].magnitude
 		# taustep=params['taustep'].magnitude
@@ -779,7 +782,8 @@ class Record(Spyrelet):
 		# 	self.record(tau)
 		# return
 
-		tauarray=[6e-6,7e-6,8e-6,9e-6,10e-6,11e-6,12e-6,13e-6,14e-6,15e-6,16e-6,17e-6]
+		# tauarray=[5e-6,5.5e-6,6e-6,6.5e-6,7e-6,7.5e-6,8e-6,9e-6]
+		tauarray=[13e-6]
 
 		minreadpulses=8			# Minimum number of pulses that have to be read for having enough datapoints
 		oscscale=200e-6         # These two values were chose since I was measuring at 100 MHz so with these settings the sampling resolution is 0.8 ns which is ~ 12 sample per waveform
@@ -793,7 +797,7 @@ class Record(Spyrelet):
 		for tau in tauarray:
 
 			if(tau>=sc1):
-				ndelay=round(tau/3.0e-6)
+				ndelay=round(tau/sc1)
 		
 				print(ndelay)
 			self.osc.time_scale(oscscale)
@@ -816,7 +820,7 @@ class Record(Spyrelet):
 	def pulse_parameters(self):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
-		('dc repeat unit', {'type': float, 'default': 50e-9, 'units':'s'}),
+		('dc repeat unit', {'type': float, 'default': 1e-7, 'units':'s'}),
 		('trigger delay', {'type': float, 'default': 32e-9, 'units':'s'}),	
 		('timestep', {'type': float, 'default': 1e-9, 'units':'s'}),
 		('period', {'type': float, 'default': 2, 'units':'s'}),
@@ -828,9 +832,10 @@ class Record(Spyrelet):
 		# ('nMeasurement', {'type': int, 'default': 1, 'units':'dimensionless'}),
 		('IQFrequency', {'type': float, 'default': 1e8, 'units':'dimensionless'}),
 		('Phase', {'type': float, 'default': 0, 'units':'dimensionless'}),
-		('pulse width', {'type': float, 'default':200e-9, 'units':'s'}),
-		('CavityFreq', {'type': float, 'default': 4.9849e9, 'units':'dimensionless'}),
-		('Pi2factor', {'type': float, 'default': 0.06, 'units':'dimensionless'}),
+		('pulse width', {'type': float, 'default':1e-6, 'units':'s'}),
+		('CavityFreq', {'type': float, 'default': 5.69758e9, 'units':'dimensionless'}),
+		('Pi2voltage', {'type': float, 'default': 0.707, 'units':'dimensionless'}),
+		('Pivoltage', {'type': float, 'default': 1.0, 'units':'dimensionless'}),
 		]
 		
 		w = ParamWidget(params)
