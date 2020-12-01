@@ -161,6 +161,82 @@ class Arbseq_Class_MW(object):
                         values.append(height*np.sin(omega*timestep*time+0+phi))
 
 
+        if (self.type== 'COMP5'):   # Composite pulse pi/2mx  pi/2my
+            
+            if omega == 0:
+                for y in range(round(width/timestep)):
+                    values.append(height)
+
+            else:
+                for y in range(round(width/timestep)):
+
+                    if(y<(round(0.5*width/timestep))):
+
+                        values.append(-height*np.sin(omega*timestep*y+0+phi )) 
+
+                    else:
+
+                        time=(y-round(0.5*width/timestep))
+                        values.append(-height*np.sin(omega*timestep*time+(np.pi/2)+phi))
+
+
+        if (self.type== 'COMP6'):   # Composite pulse pi/2my  pi/2mx
+            
+            if omega == 0:
+                for y in range(round(width/timestep)):
+                    values.append(height)
+
+            else:
+                for y in range(round(width/timestep)):
+
+                    if(y<(round(0.5*width/timestep))):
+
+                        values.append(-height*np.sin(omega*timestep*y+(np.pi/2)+phi )) 
+
+                    else:
+
+                        time=(y-round(0.5*width/timestep))
+                        values.append(-height*np.sin(omega*timestep*time+0+phi))
+
+
+        if (self.type== 'COMP7'):   # Composite pulse pi/m2x  pi/2y
+            
+            if omega == 0:
+                for y in range(round(width/timestep)):
+                    values.append(height)
+
+            else:
+                for y in range(round(width/timestep)):
+
+                    if(y<(round(0.5*width/timestep))):
+
+                        values.append(-height*np.sin(omega*timestep*y+0+phi )) 
+
+                    else:
+
+                        time=(y-round(0.5*width/timestep))
+                        values.append(height*np.sin(omega*timestep*time+(np.pi/2)+phi))
+
+
+        if (self.type== 'COMP8'):   # Composite pulse pi/2y  pi/2mx
+            
+            if omega == 0:
+                for y in range(round(width/timestep)):
+                    values.append(height)
+
+            else:
+                for y in range(round(width/timestep)):
+
+                    if(y<(round(0.5*width/timestep))):
+
+                        values.append(height*np.sin(omega*timestep*y+(np.pi/2)+phi )) 
+
+                    else:
+
+                        time=(y-round(0.5*width/timestep))
+                        values.append(-height*np.sin(omega*timestep*time+0+phi))
+
+
         elif (self.type == 'Gaussian'):
             mu=width/2
             sigma=width/4     # Assuming pulse width is 4 sigma = point where the amplitude goes down to 0.1% of peak value
@@ -214,6 +290,7 @@ class Arbseq_Class_MW(object):
             values.append(0)
 
         print('Lenght of sequence is {}'.format(len(values)))
+        # print('Seq is {}'.format(values))
         self.ydata=values
                 
 
@@ -228,3 +305,8 @@ class Arbseq_Class_MW(object):
         + ',' + self.markerstring + ',' + str(self.markerloc))
         print('Created seqstring: ' + seqstring)
         return seqstring
+
+    
+
+
+

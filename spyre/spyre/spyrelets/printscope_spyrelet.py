@@ -46,7 +46,7 @@ class PrintScope(Spyrelet):
 				if msvcrt.getwche() == '\r':
 					self.osc.datasource(1)
 					self.xs,self.ys=self.osc.curv()
-					self.osc.datasource(4)
+					self.osc.datasource(2)
 					self.x1s,self.y1s=self.osc.curv()
 					values = {
 							'x': self.xs,
