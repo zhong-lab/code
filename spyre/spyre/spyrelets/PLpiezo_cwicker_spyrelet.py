@@ -331,22 +331,44 @@ class PLThinFilm(Spyrelet):
 
 				setting=client.get('laser1:ctl:wavelength-set', float)
 				client.set('laser1:ctl:wavelength-set', wlTargets[i])
-				print('current target wavelength: '+str(wlTargets[i]))
-				print('actual wavelength: '+str(self.wm.measure_wavelength()))
-				time.sleep(1)
+				wl=self.wm.measure_wavelength()
+				
+
+			while ((wl<wlTargets[i]-0.001) or (wl>wlTargets[i]+0.001)):
+					print('correcting for laser drift')
+					self.homelaser(wlTargets[i])
+					wl=self.wm.measure_wavelength()
+					print('current target wavelength: '+str(wlTargets[i]))
+					print('actual wavelength: '+str(self.wm.measure_wavelength()))
+					time.sleep(1)
+
+
+			print('taking data')
+			print('current target wavelength: '+str(wlTargets[i]))
+			print('actual wavelength: '+str(self.wm.measure_wavelength()))
+			
+			time.sleep(1)
 			##Wavemeter measurements
 			stoparray = []
 			startTime = time.time()
 			wls=[]
 			lost = self.qutag.getLastTimestamps(True)
-			while time.time()-startTime < expparams['Measurement Time'].magnitude:
+			counter2=0
+
+			looptime=startTime
+			while looptime-startTime < expparams['Measurement Time'].magnitude:
+				loopstart=time.time()
+				# get the lost timestamps
 				lost = self.qutag.getLastTimestamps(True)
+				# wait half a milisecond
 				time.sleep(5*0.1)
+				# get thte timestamps in the last half milisecond
 				timestamps = self.qutag.getLastTimestamps(True)
 
 				tstamp = timestamps[0] # array of timestamps
 				tchannel = timestamps[1] # array of channels
 				values = timestamps[2] # number of recorded timestamps
+
 				for k in range(values):
 					# output all stop events together with the latest start event
 					if tchannel[k] == start:
@@ -354,7 +376,17 @@ class PLThinFilm(Spyrelet):
 					else:
 						stoptimestamp = tstamp[k]
 						stoparray.append(stoptimestamp)
-				wls.append(str(self.wm.measure_wavelength()))
+				wl=self.wm.measure_wavelength()
+				wls.append(str(wl))
+				looptime+=time.time()-loopstart
+				#print('i: '+str(i)+', looptime-startTime: '+str(looptime-startTime))
+
+				
+				while ((wl<wlTargets[i]-0.001) or (wl>wlTargets[i]+0.001)) and (time.time()-startTime < expparams['Measurement Time'].magnitude):
+					print('correcting for laser drift')
+					self.homelaser(wlTargets[i])
+					wl=self.wm.measure_wavelength()
+			print('actual  wavelength: '+str(wl))
 
 			self.createHistogram(stoparray, timebase, bincount,expparams['AWG Pulse Repetition Period'].magnitude,i, wls)
 			
