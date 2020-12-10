@@ -388,7 +388,154 @@ class PLThinFilm(Spyrelet):
 					wl=self.wm.measure_wavelength()
 			print('actual  wavelength: '+str(wl))
 
-			self.createHistogram(stoparray, timebase, bincount,expparams['AWG Pulse Repetition Period'].magnitude,i, wls)
+			self.createHistogram(stoparray, timebase, bincount,expparams['AWG Pulse Repetition Period'].magnitude,i, wls)	
+
+	@Task()
+	def spectralDiffusion(self):
+		""" Task to measure spectral diffusion on timescales < T1. Assumes that
+		1 channel of the keysight AWG is sending a sine wave to an EOM. The
+		amplitude of the RF drive for the EOM is set such that the sidebands
+		have an equal amplitude to the pump beam. This tasks sweeps the
+		frequency of the sine wave (separation of the EOM sidebands) while
+		collecting PL, which can be used to determine the spectral diffusion
+		linewidth since the saturation of the ions will be determined by how
+		much the sidebands overlap with the spectral  diffusion lineshape.
+		"""
+
+		# some initialization of the function generator
+		self.fungen.clear_mem(1)
+		self.fungen.wait()
+
+		# get the parameters for the experiment from the widget
+		SD_params=self.SD_params.widget.get()
+		triggerdelay=SD_params['Trigger delay'].magnitude
+		startFreq=SD_params['Start frequency'].magnitude
+		stopFreq=SD_params['Stop frequency'].magnitude
+		trigperiod=SD_params['Period'].magnitude
+		pulseWidth=SD_params['Pulse width'].magnitude
+		pulseVoltage=SD_params['Pulse voltage'].magnitude
+		EOMvoltage=SD_params['EOM voltage'].magnitude
+		runtime=SD_params['Runtime'].magnitude
+		pulseChannel=SD_params['Pulse channel'].magnitude
+		EOMchannel=SD_params['EOM channel'].magnitude
+		shutterWidth=SD_params['Shutter width'].magnitude
+		shutterAmplitude=SD_params['Shutter amplitude'].magnitude
+		wl=SD_params['Wavelength'].magnitude
+		timestep=SD_params['Timestep'].magnitude
+		points=SD_params['# of points'].magnitude
+
+
+		# waveform type for the excitation pulse
+		Wavepipulse='Square'
+
+		# set the triggering delay0
+		delay0=Arbseq_Class_MW('delay0',timestep,'DC',0,triggerdelay,0,0)
+		repeatwidthdelay0=(triggerdelay)
+		delay0.setRepeats(repeatwidthdelay0)
+		delay0.create_envelope()
+		delay0.repeatstring='onceWaitTrig'
+
+		# pi pulse
+		piPulse=Arbseq_Class_MW('piPulse',timestep,Wavepipulse,1,pulsewidth2,
+		0,0)
+		piPulse.create_envelope()
+
+		# send all the Arbs
+		self.fungen.send_arb(delay0,1)
+		self.fungen.send_arb(piPulse,1)
+
+		# Make sequence
+		seq=[delay0,piPulse]
+		self.fungen.create_arbseq('Pulse',seq,1)
+		self.fungen.wait()
+		self.fungen.voltage[pulseChannel]=awgvolttage
+		self.fungen.offset[pulseChannel]=0
+		print("Voltage is {} , don't remove this line else the AWG will set the voltage to 50 mV".format(self.fungen.voltage[pulseChannel]))
+
+		# AWG Output on for the pulse channel
+		self.fungen.output[pulseChannel]='ON'
+
+		# set the delay generator for triggering the AWG and scope
+		# want to set the start of the trigger for the pulse sequence such that
+		# the pulse is centered within the shutter window
+		totalSeqLen=pulseWidth
+		startTime=(shutterWidth-totalSeqLen)/2
+		self.delaygen.delay['A']=startTime
+		self.delaygen.delay['B']=startTime+0.1e-3 # plus 100us
+		self.delaygen.delay['C']=0
+		self.delaygen.delay['D']=shutterWidth
+		self.delaygen.delay['E']=shutterWidth
+		self.delaygen.delay['F']=trigperiod-0.5e-3 # minus 500us for the delay
+		self.delaygen.amplitude['CD']=Q_(shutterAmplitude,'V')
+		self.delaygen.amplitude['EF']=Q_(shutterAmplitude,'V')
+		self.delaygen.Trigger_Source='Internal'
+		self.delaygen.trigger_rate=1/trigperiod
+		time.sleep(10)
+
+		# set the sine wave driving the EOM on the other channel
+		self.fungen.voltage[EOMchannel]=EOMvoltage
+		self.fungen.offset[EOMchannel]=0
+		self.fungen.phase[EOMchannel]=0
+		self.fungen.waveform[EOMchannel]='SIN'
+
+		# home the laser
+		self.configureQutag()
+		self.homelaser(wl)
+		print('Laser Homed!')
+
+		##Qutag Part
+		qutagparams = self.qutag_params.widget.get()
+		lost = self.qutag.getLastTimestamps(True) # clear Timestamp buffer
+		stoptimestamp = 0
+		synctimestamp = 0
+		bincount = qutagparams['Bin Count']
+		timebase = self.qutag.getTimebase()
+		start = qutagparams['Start Channel']
+		stop = qutagparams['Stop Channel']
+
+		PATH="D:\\Data\\"+self.SD_params.widget.get()['File name']
+		if (os.path.exists(PATH)):
+			print('deleting old directory with same name')
+			os.system('rm -rf '+str(PATH))
+		print('making new directory')
+		Path(PATH).mkdir(parents=True, exist_ok=True)
+
+		# make a vector containing all the frequency setpoints for the EOM
+		freqs=np.linspace(startFreq,stopFreq,points)
+
+		# now loop through all the set frequencies of the EOM modulation
+		# and record the PL on the qutag
+		self.fungen.output[EOMchannel]='ON'
+		for i in range points:
+			self.fungen.frequency[EOMchannel]=freq[i]
+
+
+			stoparray = []
+			startTime = time.time()
+			wls=[]
+			lost = self.qutag.getLastTimestamps(True)
+
+			while time.time()-startTime < runtime:
+				lost = self.qutag.getLastTimestamps(True)
+				time.sleep(5*0.1)
+				timestamps = self.qutag.getLastTimestamps(True)
+
+				tstamp = timestamps[0] # array of timestamps
+				tchannel = timestamps[1] # array of channels
+				values = timestamps[2] # number of recorded timestamps
+				for k in range(values):
+					# output all stop events together with the latest start
+					# event
+					if tchannel[k] == start:
+						synctimestamp = tstamp[k]
+					else:
+						stoptimestamp = tstamp[k]
+						stoparray.append(stoptimestamp)
+				wls.append(str(self.wm.measure_wavelength()))
+				self.createHistogram(stoparray, timebase, bincount,period,
+				str(i), wls)
+			self.fungen.output[EOMchannel]='OFF'
+			self.fungen.output[pulseChannel]='OFF'
 
 	@Task()
 	def qutagInit(self):
@@ -437,6 +584,32 @@ class PLThinFilm(Spyrelet):
 		('Bin Count', {'type': int, 'default': 1000})
 		]
 		w = ParamWidget(params)
+		return w
+
+	@Element(name='Spectral diffusion experiment parameters')
+	def SD_params(self):
+		""" Widget containing the parameters used in the spectral diffusion
+		experiment.
+		"""
+		params=[
+		('Trigger delay',{'type':float,'default':32e-6,'units':'s'}),
+		('Start frequency',{'type':float,'default':5e6,'units':'Hz'}),
+		('Stop frequency',{'type':float,'default':200e6,'units':'Hz'}),
+		('Pulse width',{'type':float,'default':1e-3,'units','s'}),
+		('Pulse voltage',{'type':float,'default':4,'units':'V'}),
+		('EOM voltage',{'type':float,'default':4,'units':'V'}),
+		('Runtime',{'type':float,'default':10,'units':'s'}),
+		('Pulse channel',{'type':int,'default':1}),
+		('EOM channel',{'type':int,'default':2}),
+		('Shutter width',{'type':float,'default':4e-3,'units':'s'}),
+		('Shutter amplitude',{'type':float,'default':5,'units':'V'}),
+		('Wavelength',{'type':float,'default':1536.480,'units':'nm'}),
+		('Timestep',{'type':float,'default':1e-6,'units':'s'}),
+		('Period',{'type':float,'default':100e-3,'units':'s'}),
+		('File name',{'type':str,'default':'spectral_diffusion'}),
+		('# of points',{'type':int,'default':40})
+		]
+		w=ParamWidget(params)
 		return w
 
 	@startpulse.initializer

@@ -87,10 +87,8 @@ class N51xx(MessageBasedDriver):
         """
         Sets RF output power, in dBm.
         """
-        print('Will not set power - IQ modulator in use!')
-        return
         #value = 5.5 # set for using IQ modulator
-        #return self.write('SOUR:POW {}DBM'.format(value))
+        return self.write('SOUR:POW {}DBM'.format(value))
 
     @Feat(units='radians',limits=(-3.14,3.14))
     def phase(self):

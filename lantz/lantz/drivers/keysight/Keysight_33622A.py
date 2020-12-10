@@ -155,7 +155,7 @@ class Keysight_33622A(MessageBasedDriver):
 		"""
 		self.write('SOURCE{}:VOLT:OFFS {}'.format(key, value))
 
-	@DictFeat(units='Hz', limits=(1, 120e+6), keys=(1, 2))
+	@DictFeat(units='Hz', limits=(1e-6, 200e+6), keys=(1, 2))
 	def frequency(self, key):
 		"""returns current frequency
 		"""

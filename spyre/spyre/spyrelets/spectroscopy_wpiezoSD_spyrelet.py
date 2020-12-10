@@ -21,6 +21,7 @@ import time
 from lantz.drivers.bristol import Bristol_771
 from toptica.lasersdk.client import NetworkConnection, Client
 from lantz.drivers.keysight import Keysight_33622A
+from lantz.drivers.agilent import N51xx
 
 #from lantz.drivers.keysight import Arbseq_Class_MW
 from lantz.drivers.keysight import Keysight_33622A
@@ -69,7 +70,7 @@ class PLThinFilm(Spyrelet):
 				current=self.wm.measure_wavelength()
 				print(current, start)
 
-	def createHistogram(self,stoparray, timebase, bincount, period, index, wls):
+	def createHistogram(self,stoparray, timebase, bincount, period, index, wls,out_name,extra_data=False):
 		print('creating histogram')
 
 		hist = [0]*bincount
@@ -84,10 +85,12 @@ class PLThinFilm(Spyrelet):
 				print('error')
 			else:
 				hist[binNumber]+=1
-		out_name = "D:\\Data\\"+self.exp_parameters.widget.get()['File Name']
-		np.savez(os.path.join(out_name,str(index)),hist,wls)
+		if extra_data==False:
+			np.savez(os.path.join(out_name,str(index)),hist,wls)
+		if extra_data!=False:
+			np.savez(os.path.join(out_name,str(index)),hist,wls,extra_data)
 		#np.savez(os.path.join(out_name,str(index+40)),hist,wls)
-		print('Data stored under File Name: ' + self.exp_parameters.widget.get()['File Name'] + str(index))
+		print('Data stored under File Name: ' + self.exp_parameters.widget.get()['File Name'] +'\\'+str(index)+'.npz')
 
 	def resetTargets(self,targets,totalShift,i,channel):
 		print('AWG limit exceeded, resetting voltage targets')
@@ -292,7 +295,9 @@ class PLThinFilm(Spyrelet):
 			print('targets shift during measurement:  '+str(counter2)+'V')
 				
 
-			self.createHistogram(stoparray, timebase, bincount,expparams['AWG Pulse Repetition Period'].magnitude,i, wls)
+			self.createHistogram(stoparray, timebase, bincount,
+				expparams['AWG Pulse Repetition Period'].magnitude,i, wls,
+				"D:\\Data\\"+self.exp_parameters.widget.get()['File Name'])
 		# turn off AWG
 		self.fungen.output[channel]='OFF'
 	@Task()
@@ -388,7 +393,147 @@ class PLThinFilm(Spyrelet):
 					wl=self.wm.measure_wavelength()
 			print('actual  wavelength: '+str(wl))
 
-			self.createHistogram(stoparray, timebase, bincount,expparams['AWG Pulse Repetition Period'].magnitude,i, wls)
+			self.createHistogram(stoparray, timebase, bincount,
+				expparams['AWG Pulse Repetition Period'].magnitude,i, wls,
+				"D:\\Data\\"+self.exp_parameters.widget.get()['File Name'])
+
+	@Task()
+	def spectralDiffusion(self):
+		""" Task to measure spectral diffusion on timescales < T1. Assumes that
+		1 channel of the keysight AWG is sending a sine wave to an EOM. The
+		amplitude of the RF drive for the EOM is set such that the sidebands
+		have an equal amplitude to the pump beam. This tasks sweeps the
+		frequency of the sine wave (separation of the EOM sidebands) while
+		collecting PL, which can be used to determine the spectral diffusion
+		linewidth since the saturation of the ions will be determined by how
+		much the sidebands overlap with the spectral  diffusion lineshape.
+		"""
+
+		# some initialization of the function generator
+		self.fungen.clear_mem(1)
+		self.fungen.wait()
+
+		# get the parameters for the experiment from the widget
+		SD_params=self.SD_params.widget.get()
+		startFreq=SD_params['Start frequency']
+		stopFreq=SD_params['Stop frequency']
+		EOMvoltage=SD_params['EOM voltage']
+		runtime=SD_params['Runtime']
+		EOMchannel=SD_params['EOM channel']
+		wl=SD_params['Wavelength']
+		points=SD_params['# of points']
+		period=SD_params['Period']
+		foldername=self.SD_params.widget.get()['File Name']
+
+		# convert the period & runtime to floats
+		period=period.magnitude
+		runtime=runtime.magnitude
+
+		# set the sine wave driving the EOM on the other channel
+		self.fungen.voltage[EOMchannel]=EOMvoltage
+		self.fungen.offset[EOMchannel]=0
+		self.fungen.phase[EOMchannel]=0
+		self.fungen.waveform[EOMchannel]='SIN'
+
+		# home the laser
+		self.configureQutag()
+		self.homelaser(wl)
+		print('Laser Homed!')
+
+		##Qutag Part
+		qutagparams = self.qutag_params.widget.get()
+		lost = self.qutag.getLastTimestamps(True) # clear Timestamp buffer
+		stoptimestamp = 0
+		synctimestamp = 0
+		bincount = qutagparams['Bin Count']
+		timebase = self.qutag.getTimebase()
+		start = qutagparams['Start Channel']
+		stop = qutagparams['Stop Channel']
+
+		PATH="D:\\Data\\"+foldername
+		if (os.path.exists(PATH)):
+			print('deleting old directory with same name')
+			os.system('rm -rf '+str(PATH))
+		print('making new directory')
+		Path(PATH).mkdir(parents=True, exist_ok=True)
+
+		# make a vector containing all the frequency setpoints for the EOM
+		freqs=np.linspace(startFreq,stopFreq,points)
+
+		# now loop through all the set frequencies of the EOM modulation
+		# and record the PL on the qutag
+
+		self.fungen.output[EOMchannel]='ON'
+		for i in range(points):
+			self.fungen.frequency[EOMchannel]=freqs[i]
+
+			# want to actively stabilize the laser frequency since it can
+			# drift on the MHz scale
+			with Client(self.laser) as client:
+
+				setting=client.get('laser1:ctl:wavelength-set', float)
+				client.set('laser1:ctl:wavelength-set', wl)
+				currentwl=self.wm.measure_wavelength()
+				
+
+			while ((currentwl<wl-0.001) or (currentwl>wl+0.001)):
+					print('correcting for laser drift')
+					self.homelaser(wl)
+					currentwl=self.wm.measure_wavelength()
+					print('current target wavelength: '+str(wl))
+					print('actual wavelength: '+str(currentwl))
+					time.sleep(1)
+
+
+			print('taking data')
+			print('current frequency: '+str(freqs[i]))
+			print('current target wavelength: '+str(wl))
+			print('actual wavelength: '+str(self.wm.measure_wavelength()))
+			
+			time.sleep(1)
+
+
+			stoparray = []
+			startTime = time.time()
+			wls=[]
+			savefreqs=[]
+			lost = self.qutag.getLastTimestamps(True)
+
+			looptime=startTime
+			while looptime-startTime < runtime:
+				loopstart=time.time()
+				# get the lost timestamps
+				lost = self.qutag.getLastTimestamps(True)
+				# wait half a milisecond
+				time.sleep(5*0.1)
+				# get thte timestamps in the last half milisecond
+				timestamps = self.qutag.getLastTimestamps(True)
+
+				tstamp = timestamps[0] # array of timestamps
+				tchannel = timestamps[1] # array of channels
+				values = timestamps[2] # number of recorded timestamps
+
+				for k in range(values):
+					# output all stop events together with the latest start event
+					if tchannel[k] == start:
+						synctimestamp = tstamp[k]
+					else:
+						stoptimestamp = tstamp[k]
+						stoparray.append(stoptimestamp)
+				currentwl=self.wm.measure_wavelength()
+				wls.append(str(currentwl))
+				savefreqs.append(float(freqs[i]))
+				looptime+=time.time()-loopstart
+
+				while ((currentwl<wl-0.001) or (currentwl>wl+0.001)) and (time.time()-startTime < runtime):
+					print('correcting for laser drift')
+					self.homelaser(wl)
+					currentwl=self.wm.measure_wavelength()
+			print('actual  wavelength: '+str(currentwl))
+
+			self.createHistogram(stoparray, timebase, bincount,period,str(i),
+				wls,PATH,savefreqs)
+		self.fungen.output[EOMchannel]='OFF'
 
 	@Task()
 	def qutagInit(self):
@@ -437,6 +582,28 @@ class PLThinFilm(Spyrelet):
 		('Bin Count', {'type': int, 'default': 1000})
 		]
 		w = ParamWidget(params)
+		return w
+
+	@Element(name='Spectral diffusion experiment parameters')
+	def SD_params(self):
+		""" Widget containing the parameters used in the spectral diffusion
+		experiment.
+
+		Default EOM voltage calibrated by Christina and Yizhong on 11/19/20.
+		(rough estimate for equal amplitude sidebands)
+		"""
+		params=[
+		('Start frequency',{'type':float,'default':5e6,'units':'Hz'}),
+		('Stop frequency',{'type':float,'default':200e6,'units':'Hz'}),
+		('EOM voltage',{'type':float,'default':6,'units':'V'}),
+		('Runtime',{'type':float,'default':10,'units':'s'}),
+		('EOM channel',{'type':int,'default':2}),
+		('Wavelength',{'type':float,'default':1536.480}),
+		('Period',{'type':float,'default':100e-3,'units':'s'}),
+		('# of points',{'type':int,'default':40}),
+		('File Name',{'type':str}),
+		]
+		w=ParamWidget(params)
 		return w
 
 	@startpulse.initializer
