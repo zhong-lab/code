@@ -9,11 +9,6 @@ devices = {
         [6535],
         {}
     ],
-    'source':[
-        'lantz.drivers.agilent.N5181A',
-        ['TCPIP0::A-N5181A-41097::inst0::INSTR'],
-        {}
-    ]
 }
 
 # Experiment List
@@ -22,8 +17,7 @@ spyrelets = {
         'spyre.spyrelets.spectroscopy_wpiezoSD_spyrelet.PLThinFilm',
         {
             'fungen': 'fungen',
-            'wm':'wm',
-            'source':'source'
+            'wm':'wm'
         }, 
         {}
     ],
