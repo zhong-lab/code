@@ -702,7 +702,6 @@ class PLThinFilm(Spyrelet):
 
 			self.createHistogram(stoparray, timebase, bincount,period,str(i),
 				wls,PATH,savefreqs)
-		self.fungen.output[EOMchannel]='OFF'
 
 	@Task()
 	def qutagInit(self):
