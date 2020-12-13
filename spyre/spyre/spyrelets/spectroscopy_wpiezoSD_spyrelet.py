@@ -90,7 +90,7 @@ class PLThinFilm(Spyrelet):
 		if extra_data!=False:
 			np.savez(os.path.join(out_name,str(index)),hist,wls,extra_data)
 		#np.savez(os.path.join(out_name,str(index+40)),hist,wls)
-		print('Data stored under File Name: ' + self.exp_parameters.widget.get()['File Name'] +'\\'+str(index)+'.npz')
+		print('Data stored under File Name: ' + out_name +'\\'+str(index)+'.npz')
 
 	def resetTargets(self,targets,totalShift,i,channel):
 		print('AWG limit exceeded, resetting voltage targets')
@@ -702,6 +702,7 @@ class PLThinFilm(Spyrelet):
 
 			self.createHistogram(stoparray, timebase, bincount,period,str(i),
 				wls,PATH,savefreqs)
+		self.fungen.output[EOMchannel]='OFF'
 
 	@Task()
 	def qutagInit(self):
