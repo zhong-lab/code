@@ -165,7 +165,7 @@ class TDS5104(MessageBasedDriver):
 		self.dataencoding()
 		# self.write('DATa:STARt 1')
 		# self.write('DATa:STOP 400000')
-		answer = self.query_ascii('CURV?', delay=0)
+		answer = self.query_ascii('CURV?', delay=3)
 		params = self.acqparams()
 		data = np.array(answer)
 		yoff = params['YOFF?']
