@@ -31,7 +31,7 @@ class PrintScope(Spyrelet):
 	field='2'
 
 	def saveData(self,x,y,x1,y1,index,field):
-		out_name = "D:\\Data\\1.19.2020\\holewidth"
+		out_name = "D:\\Data\\12.16.2020_YSO_absorption"
 		np.savez(os.path.join(out_name,"trace"),x,y)
 		#out_name = "D:\\Data\\1.16.2020\\ch2"
 		np.savez(os.path.join(out_name,"sweep"),x1,y1)
@@ -46,7 +46,7 @@ class PrintScope(Spyrelet):
 				if msvcrt.getwche() == '\r':
 					self.osc.datasource(1)
 					self.xs,self.ys=self.osc.curv()
-					self.osc.datasource(2)
+					self.osc.datasource(3)
 					self.x1s,self.y1s=self.osc.curv()
 					values = {
 							'x': self.xs,
