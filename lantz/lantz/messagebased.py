@@ -400,7 +400,7 @@ class MessageBasedDriver(Driver):
             delay = 0.0
         if delay > 0.0:
             sleep(delay)
-
+        print(converter, separator, container, delay)
         return self.resource.read_ascii_values(converter, separator, container, delay)
 
     def query_binary(self, command, datatype='f', isbigendian=False,

@@ -31,7 +31,7 @@ class HeterodyneEcho(Spyrelet):
 	maxy=0
 
 	def saveData(self,x,y,index,ind):
-		out_name = "D:\\Data\\1.16.2020\\p6"
+		out_name = "D:\\Data\\12.16.2020_YSO_absorption\\echo_testing"
 		index=str(round(index,8))
 		ind='.'+str(ind)
 		np.savez(os.path.join(out_name,str(index+ind)),x,y)
@@ -145,7 +145,7 @@ class HeterodyneEcho(Spyrelet):
 			print(self.fungen.voltage[1])
 			self.fungen.output[1] = 'ON'
 			# self.osc.set_time(tau*2+pulse_width*3-tau/20)
-			time.sleep(100000)
+			time.sleep(1)
 			# if tau>6.0e-6:
 			# 	if tau>60e-6:
 			# 		self.osc.scale(1,0.01)

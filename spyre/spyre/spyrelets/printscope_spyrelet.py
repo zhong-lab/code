@@ -32,9 +32,9 @@ class PrintScope(Spyrelet):
 
 	def saveData(self,x,y,x1,y1,index,field):
 		out_name = "D:\\Data\\12.16.2020_YSO_absorption"
-		np.savez(os.path.join(out_name,"trace"),x,y)
+		np.savez(os.path.join(out_name,"trace"),np.c_[x,y])
 		#out_name = "D:\\Data\\1.16.2020\\ch2"
-		np.savez(os.path.join(out_name,"sweep"),x1,y1)
+		np.savez(os.path.join(out_name,"sweep"),np.c_[x1,y1])
 		print('Data stored')
 
 	@Task()
