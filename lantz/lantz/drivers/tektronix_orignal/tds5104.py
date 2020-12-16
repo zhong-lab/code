@@ -230,7 +230,7 @@ if __name__ == '__main__':
         plt.plot(x,y)
         plt.show()
         '''
-        osc.datasource(2)
+        osc.datasource(1)
         x,y=osc.curv()
         x = np.array(x)
         x = x-x.min()
