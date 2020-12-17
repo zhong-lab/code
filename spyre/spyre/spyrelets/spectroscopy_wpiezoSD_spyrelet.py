@@ -568,7 +568,7 @@ class PLThinFilm(Spyrelet):
 		
 		The Keysight AWG only works up to 80MHz. 
 
-		Could potentially modify code to use Siglent AWG which can go up to 120MHz. 
+		Could potentially modify code to use Siglent AWG which can go up to 120MHz. - Nope, impossibe, no way 
 		"""
 
 		# some initialization of the function generator
