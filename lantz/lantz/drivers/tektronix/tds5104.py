@@ -132,29 +132,6 @@ class TDS5104(MessageBasedDriver):
 		self.write(':DAT:ENC ascii;WID 2;')
 		return "Set data encoding"
 
-    # # @Action()
-    # def curv(self):
-    #     """Get data.
-
-    #         Returns:
-    #         xdata, ydata as list
-    #     """
-    #     self.dataencoding()
-    #     self.write('DATa:STARt 1')
-    #     self.write('DATa:STOP 1500000')
-    #     answer = self.query_ascii('CURV?', delay=0)
-    #     params = self.acqparams()
-    #     data = np.array(answer)
-    #     yoff = params['YOFF?']
-    #     ymu = params['YMU?']
-    #     yze = params['YZE?']
-    #     xin = params['XIN?']
-    #     xze = params['XZE?']
-    #     ydata = (data - yoff) * ymu + yze
-    #     xdata = np.arange(len(data)) * xin + xze
-    #     return list(xdata), list(ydata)
-
-
 	# @Action()
 	def curv(self):
 		"""Get data.
@@ -319,8 +296,8 @@ if __name__ == '__main__':
 	with TDS5104(args.port) as osc:
 		# osc.init()
 		print(osc.idn)
-		osc.scale(3,0.1)
-		osc.scale(4,0.05)
+		#osc.scale(1,0.005)
+		#osc.scale(4,0.05)
 		# #osc.set_time(0)
 		# print(osc.trigger)
 		# print(osc.delaymode_query)
@@ -372,41 +349,73 @@ if __name__ == '__main__':
 		# np.savetxt('D:/MW data/20201109/Optical/c3i_1uw_0field.txt', np.c_[x,y])
 
 # This part is normally not commented out for dumping data on screen with average
-		
+#### SOrry Yizhong commented it out on Dec.15th, 2020
+	########################################################################################################################	
 		# wavelength=1952444
-		for i in range(1,6):
+		# for i in range(1,6):
 			
 
-			osc.datasource(3)
+		# 	osc.datasource(3)
 
-			osc.data_start(1)
-			osc.data_stop(2000000)   
+		# 	osc.data_start(1)
+		# 	osc.data_stop(2000000)   
 
-			osc.setmode('average')
-			osc.average(25)
+		# 	osc.setmode('average')
+		# 	osc.average(25)
 
-			time.sleep(25*2)     
+		# 	time.sleep(25*2)     
 
-			x,y=osc.curv()
-			x = np.array(x)
-			x = x-x.min()
-			y = np.array(y)
-			np.savetxt('D:\\Data\\12.16.2020_YSO_absorption_{}.txt'.format(i), np.c_[x,y])
+		# 	x,y=osc.curv()
+		# 	x = np.array(x)
+		# 	x = x-x.min()
+		# 	y = np.array(y)
+		# 	np.savetxt('D:/MW data/20201111/OpticalSaturation/Scan8/ch3/1952277_{}.txt'.format(i), np.c_[x,y])
 
-			osc.datasource(3)
+		# 	osc.datasource(4)
 
 
-			x1,y1=osc.curv()
+		# 	x1,y1=osc.curv()
 
-			x1 = np.array(x1)
-			x1 = x1-x1.min()
-			y1 = np.array(y1)
-			np.savetxt('D:\\Data\\12.16.2020_YSO_absorption'.format(i), np.c_[x1,y1])
+		# 	x1 = np.array(x1)
+		# 	x1 = x1-x1.min()
+		# 	y1 = np.array(y1)
+		# 	np.savetxt('D:/MW data/20201111/OpticalSaturation/Scan8/ch4/1952277_{}.txt'.format(i), np.c_[x1,y1])
 
-			osc.setmode('sample')
+		# 	osc.setmode('sample')
 
-			time.sleep(5)
+		# 	time.sleep(5)
+		###############################################################################################################
+			
 
+		osc.datasource(1)
+		print("testing")
+
+		osc.data_start(1)
+		osc.data_stop(8000000)   
+		time.sleep(0)     
+		x,y=osc.curv()
+		x = np.array(x)
+		y = np.array(y)
+		np.savetxt('D:\\Data\\12.16.2020_YSO_absorption\\1T_absorption.txt', np.c_[y])
+		np.savetxt('D:\\Data\\12.16.2020_YSO_absorption\\1T_absorption_t.txt', np.c_[x])
+		plt.plot(x,y)
+
+		osc.setmode('sample')
+		time.sleep(1)
+
+		osc.datasource(3)
+
+		osc.data_start(1)
+		osc.data_stop(8000000)   
+		time.sleep(0)     
+		x1,y1=osc.curv()
+		x1 = np.array(x1)
+		y1 = np.array(y1)
+		np.savetxt('D:\\Data\\12.16.2020_YSO_absorption\\1T_absorption_sweep.txt', np.c_[y1])
+		osc.setmode('sample')
+		time.sleep(1)
+		plt.plot(x1,y1)
+		plt.show()
 #  1570   ,  1561,   1551,  1535.5 ,1535.48,1535.455,1535.438,1535.407, 1521,  
 # 190936.8, 192000, 193500, *195220, 195223, 195226, 195228 ,195230*, 197000 , 199000 
 # End of the part that is normally not commented out for dumping data on screen with average
