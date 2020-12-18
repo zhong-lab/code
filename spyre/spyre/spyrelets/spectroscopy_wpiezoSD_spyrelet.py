@@ -712,8 +712,8 @@ class PLThinFilm(Spyrelet):
 	def wl_parameters(self):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
-		('start', {'type': float, 'default': 1535}),
-		('stop', {'type': float, 'default': 1536})
+		('start', {'type': float, 'default': 1535.61}),
+		('stop', {'type': float, 'default': 1535.61})
 		]
 		w = ParamWidget(params)
 		return w
@@ -737,7 +737,7 @@ class PLThinFilm(Spyrelet):
 		('# of points', {'type': int, 'default': 100}),
 		('Measurement Time', {'type': int, 'default': 300, 'units':'s'}),
 		('File Name', {'type': str}),
-		('AWG Pulse Repetition Period',{'type': float,'default': 0.01,'units':'s'})
+		('AWG Pulse Repetition Period',{'type': float,'default': 0.02,'units':'s'})
 		]
 		w = ParamWidget(params)
 		return w
@@ -747,8 +747,8 @@ class PLThinFilm(Spyrelet):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
 		('Start Channel', {'type': int, 'default': 0}),
-		('Stop Channel', {'type': int, 'default': 2}),
-		('Bin Count', {'type': int, 'default': 1000})
+		('Stop Channel', {'type': int, 'default': 4}),
+		('Bin Count', {'type': int, 'default': 10000})
 		]
 		w = ParamWidget(params)
 		return w
