@@ -167,6 +167,18 @@ class Keysight_33622A(MessageBasedDriver):
 		"""
 		self.write('SOURCE{}:FREQ {}'.format(key, value))
 
+	@DictFeat(units='s', limits=(1e-9, 10e-3), keys=(1, 2))
+	def pulse_width(self, key):
+		"""returns current pulse width
+		"""
+		return float(self.query('SOURCE{}:PULSe:WIDT?'.format(key)))
+
+	@pulse_width.setter
+	def pulse_width(self, key, value):
+		"""frequency setter
+		"""
+		self.write('SOURCE{}:PULSe:WIDT {}'.format(key, value))
+
 	@DictFeat(limits=(-360, 360), keys=(1, 2))
 	def phase(self, key):
 		"""returns current frequency
@@ -381,6 +393,11 @@ if __name__ == '__main__':
 	# this is the USB VISA Address:
 	with Keysight_33622A('USB0::0x0957::0x5707::MY53801461::0::INSTR') as inst:
 		print('The identification of this instrument is :' + inst.idn)
+		inst.waveform[2] = 'PULS'
+		inst.frequency[2] = 60 * Hz
+		inst.voltage[2] = 3.5 * V
+		inst.offset[2] = 1.75 * V
+
 		#print(str(inst.read_standard_event_status_register))
 		#inst.output[1] = 'ON'
 		#inst.voltage[1] = 3.0 * volt
@@ -396,5 +413,5 @@ if __name__ == '__main__':
 		#inst.clear_status
 		#inst.test
 		#image = inst.get_image('BMP')
-		inst.sync()
+		#inst.sync()
 		#print(inst.get_image('PNG'))

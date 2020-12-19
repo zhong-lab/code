@@ -36,6 +36,7 @@ kHz=Q_(1,'kHz')
 MHz = Q_(1.0,'MHz')
 dB = Q_(1,'dB')
 dBm = Q_(1,'dB')
+s = Q_(1,'s')
 
 class PLThinFilm(Spyrelet):
 	requires = {
@@ -305,9 +306,12 @@ class PLThinFilm(Spyrelet):
 				"C:\\Data\\"+self.exp_parameters.widget.get()['File Name'])
 		# turn off AWG
 		self.fungen.output[channel]='OFF'
+	
+
 	@Task()
 	def startpulse(self, timestep=100e-9):
 
+		self.fungen.output[2]='OFF'
 		##Qutag Part
 		self.configureQutag()
 		expparams = self.exp_parameters.widget.get()
@@ -323,10 +327,20 @@ class PLThinFilm(Spyrelet):
 		start = qutagparams['Start Channel']
 		stop = qutagparams['Stop Channel']
 
-		PATH="C:\\Data\\"+self.exp_parameters.widget.get()['File Name']+"\\motor_scan"
+		self.fungen.frequency[2]=expparams['AWG Pulse Frequency']
+		self.fungen.voltage[2]=3.5
+		self.fungen.offset[2]=1.75
+		self.fungen.phase[2]=0
+		self.fungen.pulse_width[2]=expparams['AWG Pulse Width']
+		self.fungen.waveform[2]='PULS'
+		self.fungen.output[2]='ON'
+		
+
+		#PATH="C:\\Data\\12.18.2020_ffpc\\"+self.exp_parameters.widget.get()['File Name']+"\\motor_scan"
+		PATH="C:\\Data\\12.19.2020_ffpc\\1mW\\"+self.exp_parameters.widget.get()['File Name']
 		print('here')
 		print('PATH: '+str(PATH))
-		if PATH!="C:\\Data\\":
+		if PATH!="C:\\Data\\12.19.2020_ffpc\\1mW":
 			if (os.path.exists(PATH)):
 				print('deleting old directory with same name')
 				os.system('rm -rf '+str(PATH))
@@ -406,7 +420,9 @@ class PLThinFilm(Spyrelet):
 
 			self.createHistogram(stoparray, timebase, bincount,
 				expparams['AWG Pulse Repetition Period'].magnitude,i, wls,
-				"C:\\Data\\"+self.exp_parameters.widget.get()['File Name'])
+				"C:\\Data\\12.19.2020_ffpc\\1mW\\"+self.exp_parameters.widget.get()['File Name'])
+
+			self.fungen.output[2]='OFF'
 
 	#@Task()
 	#def spectralDiffusion_wRFsource(self):
@@ -613,7 +629,7 @@ class PLThinFilm(Spyrelet):
 		start = qutagparams['Start Channel']
 		stop = qutagparams['Stop Channel']
 
-		PATH="C:\\Data\\"+str(foldername)
+		PATH="C:\\Data\\12.18.2020_ffpc\\"+str(foldername)
 		print('PATH: '+str(PATH))
 		if PATH!="C:\\Data\\":
 			if (os.path.exists(PATH)):
@@ -712,8 +728,8 @@ class PLThinFilm(Spyrelet):
 	def wl_parameters(self):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
-		('start', {'type': float, 'default': 1535.61}),
-		('stop', {'type': float, 'default': 1535.61})
+		('start', {'type': float, 'default': 1535.45}),
+		('stop', {'type': float, 'default': 1535.77})
 		]
 		w = ParamWidget(params)
 		return w
@@ -734,10 +750,12 @@ class PLThinFilm(Spyrelet):
 	def exp_parameters(self):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
-		('# of points', {'type': int, 'default': 100}),
-		('Measurement Time', {'type': int, 'default': 300, 'units':'s'}),
+		('# of points', {'type': int, 'default': 1}),
+		('Measurement Time', {'type': int, 'default': 100, 'units':'s'}),
 		('File Name', {'type': str}),
-		('AWG Pulse Repetition Period',{'type': float,'default': 0.02,'units':'s'})
+		('AWG Pulse Repetition Period',{'type': float,'default': 0.002,'units':'s'}),
+		('AWG Pulse Frequency',{'type': int,'default': 500,'units':'Hz'}),
+		('AWG Pulse Width',{'type': float,'default': 500e-9,'units':'s'}),
 		]
 		w = ParamWidget(params)
 		return w

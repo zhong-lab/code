@@ -351,7 +351,7 @@ if __name__ == '__main__':
         #inst.voltage[1] = 3.0 * volt
         #inst.offset[1] = 0 * milivolt
         #inst.frequency[1] = 20 * Hz
-        #inst.waveform[1] = 'SQUARE'
+        #inst.waveform[2] = 'SQUARE'
         #print('Current waveform: ' + inst.waveform[1])
         #print('Current voltage: ' + str(inst.voltage[1]))
         #print('Current frequency: ' + str(inst.frequency[1]))
