@@ -25,7 +25,7 @@ from lantz.drivers.keysight import Keysight_33622A
 
 #from lantz.drivers.keysight import Arbseq_Class_MW
 from lantz.drivers.keysight import Keysight_33622A
-#from lantz.drivers.stanford import DG645
+from lantz.drivers.stanford.srs900 import SRS900
 
 from lantz.log import log_to_screen, DEBUG
 
@@ -41,8 +41,8 @@ s = Q_(1,'s')
 class PLThinFilm(Spyrelet):
 	requires = {
 		'wm': Bristol_771,
-		'fungen': Keysight_33622A
-		#'source': N5181A
+		'fungen': Keysight_33622A,
+		'SRS': SRS900
 	}
 	qutag = None
 	laser = NetworkConnection('1.1.1.2')
@@ -114,11 +114,67 @@ class PLThinFilm(Spyrelet):
 		self.homelaser(current)
 		wl=self.wm.measure_wavelength()
 		return voltageTargets,totalShift,wl
+
+	def reset_quench(self):
+		"""
+		A typical quench shows the voltage exceeding 2mV.
+		"""
+		qutagparams = self.qutag_params.widget.get()
+		# vm1=qutagparams['Voltmeter Channel 1']
+		vm2=qutagparams['Voltmeter Channel 2']
+		# vs1=qutagparams['Battery Port 1']
+		vs2=qutagparams['Battery Port 2']
+
+		# self.SRS.clear_status()
+		# V1=self.SRS.SIM970_voltage[vm1].magnitude
+		self.SRS.clear_status()
+		V2=self.SRS.SIM970_voltage[vm2].magnitude
+
+		quenchfix='YES'
+
+		# i=0
+		# while (float(V1)>=0.010):
+		# 	i+=1
+		# 	print('Voltage 1 higher than 10mV, resetting')
+		# 	self.SRS.SIM928_on_off[vs1]='OFF'
+		# 	self.SRS.SIM928_on_off[vs2]='OFF'
+		# 	self.SRS.SIM928_on_off[vs1]='ON'
+		# 	self.SRS.SIM928_on_off[vs2]='ON'
+		# 	print('checking Voltage 1 again')
+		# 	self.SRS.clear_status()
+		# 	time.sleep(1)
+		# 	V1=self.SRS.SIM970_voltage[vm1].magnitude
+		# 	print('Voltage 1: '+str(V1)+'V')
+		# 	if i>10:
+		# 		self.fungen.output[1]='OFF'
+		# 		self.fungen.output[2]='OFF'
+		# 		quenchfix='NO'
+		# 		break
+
+		i=0
+		while (float(V2)>=0.010):
+			i+=1
+			print('Voltage 2 higher than 10mV, resetting')
+			self.SRS.SIM928_on_off[vs1]='OFF'
+			self.SRS.SIM928_on_off[vs2]='OFF'
+			self.SRS.SIM928_on_off[vs1]='ON'
+			self.SRS.SIM928_on_off[vs2]='ON'
+			print('checking Voltage 2 again')
+			self.SRS.clear_status()
+			time.sleep(1)
+			V2=self.SRS.SIM970_voltage[vm2].magnitude
+			print('Voltage 2: '+str(V2)+'V')
+			if i>10:
+				self.fungen.output[1]='OFF'
+				self.fungen.output[2]='OFF'
+				quenchfix='NO'
+				break
+		return quenchfix
 	
 	@Task()
 	def piezo_scan(self,timestep=100e-9):
 		
-
+		#self.fungen.output[1]='ON'
 		piezo_params=self.piezo_parameters.widget.get()
 		Vstart=piezo_params['voltage start']
 		Vstop=piezo_params['voltage end']
@@ -269,6 +325,12 @@ class PLThinFilm(Spyrelet):
 				wls.append(str(wl))
 				looptime+=time.time()-loopstart
 				#print('i: '+str(i)+', looptime-startTime: '+str(looptime-startTime))
+				quenchfix=self.reset_quench()
+				if quenchfix!='YES':
+					print('SNSPD quenched and could not be reset')
+					self.fungen.output[1]='OFF'
+					self.fungen.output[2]='OFF'
+					endloop
 
 				
 				while ((wl<wlpts[i]-0.0002) or (wl>wlpts[i]+0.0002)) and (time.time()-startTime < expparams['Measurement Time'].magnitude):
@@ -311,6 +373,7 @@ class PLThinFilm(Spyrelet):
 	@Task()
 	def startpulse(self, timestep=100e-9):
 
+		#self.fungen.output[1]='ON'
 		self.fungen.output[2]='OFF'
 		##Qutag Part
 		self.configureQutag()
@@ -337,10 +400,10 @@ class PLThinFilm(Spyrelet):
 		
 
 		#PATH="C:\\Data\\12.18.2020_ffpc\\"+self.exp_parameters.widget.get()['File Name']+"\\motor_scan"
-		PATH="C:\\Data\\12.19.2020_ffpc\\1mW\\"+self.exp_parameters.widget.get()['File Name']
+		PATH="C:\\Data\\12.19.2020_ffpc\\6mW\\"+self.exp_parameters.widget.get()['File Name']
 		print('here')
 		print('PATH: '+str(PATH))
-		if PATH!="C:\\Data\\":
+		if PATH!="C:\\Data\\12.19.2020_ffpc\\6mW\\":
 			if (os.path.exists(PATH)):
 				print('deleting old directory with same name')
 				os.system('rm -rf '+str(PATH))
@@ -364,7 +427,7 @@ class PLThinFilm(Spyrelet):
 				wl=self.wm.measure_wavelength()
 				
 
-			while ((wl<wlTargets[i]-0.001) or (wl>wlTargets[i]+0.001)):
+			while ((wl<wlTargets[i]-0.002) or (wl>wlTargets[i]+0.002)):
 					print('correcting for laser drift')
 					self.homelaser(wlTargets[i])
 					wl=self.wm.measure_wavelength()
@@ -391,7 +454,7 @@ class PLThinFilm(Spyrelet):
 				# get the lost timestamps
 				lost = self.qutag.getLastTimestamps(True)
 				# wait half a milisecond
-				time.sleep(5*0.1)
+				time.sleep(5*0.1)   #
 				# get thte timestamps in the last half milisecond
 				timestamps = self.qutag.getLastTimestamps(True)
 
@@ -409,18 +472,25 @@ class PLThinFilm(Spyrelet):
 				wl=self.wm.measure_wavelength()
 				wls.append(str(wl))
 				looptime+=time.time()-loopstart
-				#print('i: '+str(i)+', looptime-startTime: '+str(looptime-startTime))
+				print('i: '+str(i)+', looptime-startTime: '+str(looptime-startTime))
+				# quenchfix=self.reset_quench()
+				# if quenchfix!='YES':
+				# 	print('SNSPD quenched and could not be reset')
+				# 	# self.fungen.output[1]='OFF'
+				# 	self.fungen.output[2]='OFF'
+				# 	endloop
 
 				
-				while ((wl<wlTargets[i]-0.001) or (wl>wlTargets[i]+0.001)) and (time.time()-startTime < expparams['Measurement Time'].magnitude):
+				while ((wl<wlTargets[i]-0.002) or (wl>wlTargets[i]+0.002)) and (time.time()-startTime < expparams['Measurement Time'].magnitude):
 					print('correcting for laser drift')
 					self.homelaser(wlTargets[i])
 					wl=self.wm.measure_wavelength()
-				print('actual  wavelength: '+str(wl))
+			print('actual  wavelength: '+str(wl))
+			#print('I am here')
 			self.createHistogram(stoparray, timebase, bincount, expparams['AWG Pulse Repetition Period'].magnitude,str(i), wls,PATH)
 			# self.createHistogram(stoparray, timebase, bincount,period,str(i),
 			# 	wls,PATH,savefreqs)
-			self.fungen.output[2]='OFF'
+		self.fungen.output[2]='OFF'
 
 	#@Task()
 	#def spectralDiffusion_wRFsource(self):
@@ -588,6 +658,7 @@ class PLThinFilm(Spyrelet):
 		# some initialization of the function generator
 		self.fungen.clear_mem(1)
 		self.fungen.wait()
+		#self.fungen.output[1]='ON'
 
 		# get the parameters for the experiment from the widget
 		SD_wAWGparams=self.SD_wAWGparams.widget.get()
@@ -627,7 +698,7 @@ class PLThinFilm(Spyrelet):
 		start = qutagparams['Start Channel']
 		stop = qutagparams['Stop Channel']
 
-		PATH="C:\\Data\\12.18.2020_ffpc\\"+str(foldername)
+		PATH="C:\\Data\\"+str(foldername)
 		print('PATH: '+str(PATH))
 		if PATH!="C:\\Data\\":
 			if (os.path.exists(PATH)):
@@ -708,6 +779,13 @@ class PLThinFilm(Spyrelet):
 				savefreqs.append(float(freqs[i]))
 				looptime+=time.time()-loopstart
 
+				quenchfix=self.reset_quench()
+				if quenchfix!='YES':
+					print('SNSPD quenched and could not be reset')
+					self.fungen.output[1]='OFF'
+					self.fungen.output[2]='OFF'
+					endloop
+
 				while ((currentwl<wl-0.001) or (currentwl>wl+0.001)) and (time.time()-startTime < runtime):
 					print('correcting for laser drift')
 					self.homelaser(wl)
@@ -750,11 +828,11 @@ class PLThinFilm(Spyrelet):
 	def exp_parameters(self):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
-		('# of points', {'type': int, 'default': 40}),
-		('Measurement Time', {'type': int, 'default': 100, 'units':'s'}),
+		('# of points', {'type': int, 'default': 80}),
+		('Measurement Time', {'type': int, 'default': 200, 'units':'s'}),
 		('File Name', {'type': str}),
-		('AWG Pulse Repetition Period',{'type': float,'default': 0.002,'units':'s'}),
-		('AWG Pulse Frequency',{'type': int,'default': 500,'units':'Hz'}),
+		('AWG Pulse Repetition Period',{'type': float,'default': 0.01,'units':'s'}),
+		('AWG Pulse Frequency',{'type': int,'default': 100,'units':'Hz'}),
 		('AWG Pulse Width',{'type': float,'default': 500e-9,'units':'s'}),
 		]
 		w = ParamWidget(params)
@@ -766,7 +844,11 @@ class PLThinFilm(Spyrelet):
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
 		('Start Channel', {'type': int, 'default': 0}),
 		('Stop Channel', {'type': int, 'default': 4}),
-		('Bin Count', {'type': int, 'default': 1000})
+		('Bin Count', {'type': int, 'default': 1000}),
+		# ('Voltmeter Channel 1',{'type':int,'default':1}),
+		('Voltmeter Channel 2',{'type':int,'default':2}),
+		# ('Battery Port 1',{'type':int,'default':5}),
+		('Battery Port 2',{'type':int,'default':6})
 		]
 		w = ParamWidget(params)
 		return w

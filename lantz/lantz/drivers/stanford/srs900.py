@@ -43,7 +43,7 @@ class SRS900(MessageBasedDriver):
     @Action()
     def clear_status(self):
         self.write('*CLS')
-        print('Status cleared')
+        #print('Status cleared')
 
     @Feat()
     def self_test(self):
@@ -65,19 +65,19 @@ class SRS900(MessageBasedDriver):
     @Action()
     def flush(self):
       self.write('FLSH')
-      print('Buffers Flushed')
+      #print('Buffers Flushed')
 
     @Action()
     def flushoutput(self):
       self.write('FLOQ')
-      print('Output Queue Flushed')   
+      #print('Output Queue Flushed')   
 
     @Action()
     def wait(self):
       self.write('*WAI')
       print('Waiting to Continue')	
 
-    @Action(units='ms')
+    @Action()
     def wait_time(self, value):
       self.write('WAIT {}'.format(value))		
 
@@ -98,6 +98,7 @@ class SRS900(MessageBasedDriver):
 
     @SIM928_on_off.setter
     def SIM928_on_off(self,key,value):
+      """key is the port being uused. """
       self.write('SNDT {},"EXON {}"'.format(key,value))
 
     @DictFeat(keys=list(range(1,8)))
@@ -108,7 +109,7 @@ class SRS900(MessageBasedDriver):
     @DictFeat(keys=list(range(1,8)))
     def module_clear_status(self,key):
       self.write('SNDT {},"*CLS"'.format(key))
-      print("Status Cleared")   
+      #print("Status Cleared")   
 
     @DictFeat(keys=list(range(1,8)))
     def module_identify(self,key):
@@ -127,22 +128,49 @@ class SRS900(MessageBasedDriver):
     def SIM928_voltage(self,key,value):
    	  self.write('SNDT {},"VOLT {}"'.format(key, float(round(value,3))))
 
+    """
     @DictFeat(units='V',keys=list(range(1,9)))
     def SIM970_voltage(self,key):
       self.flush
       self.flushoutput
       self.wait_time(1e6)
-      self.write('SNDT {},"VOLT? 1"'.format(key))
+      #self.write('SNDT {},"VOLT? 1"'.format(key))
       return self.query('GETN? {},80'.format(key),delay=2)
+    """
+    def split_msg(self,msg,key):
+      """ gets rid of header and returns term in response of GETN? command.
 
+      converts term into a float"""
 
-'''    @DictFeat(units = 'V',keys = list(range(1,4)))
+      msglist=msg.split(' ')
+      term=msglist[key]
+      nocom=term[:-1]
+      num=float(nocom)
+      return num
+
+    @DictFeat(units='V',keys=list(range(1,5)))
     def SIM970_voltage(self,key):
-      self.reset()
-      self.clear_status()
+      """ port manually set to 7 (8 will work as well since voltmeter occupies both ports). 
+      Key is the channel of the voltmeter being read. 
+      """
+      self.flush()
       self.flushoutput()
-      self.wait_time(1e6)
-      return self.query('SNDT {},"VOLT?"'.format(key))'''
+      self.wait_time(100)
+      msg=''
+      while len(msg.split(' '))<2:
+        self.write('SNDT 7,"VOLT? 0"')
+        msg=self.query('GETN? 7, 80',delay=2)
+
+      num=self.split_msg(msg,key)
+      return num
+    
+    # @DictFeat(units = 'V',keys = list(range(1,4)))
+    # def SIM970_voltage(self,key):
+    #   self.reset()
+    #   self.clear_status()
+    #   self.flushoutput()
+    #   self.wait_time(1e6)
+    #   return self.query('SNDT {},"VOLT?"'.format(key))
 
 if __name__ == '__main__':
     from time import sleep
@@ -158,8 +186,21 @@ if __name__ == '__main__':
     # this is the GPIB Address:
     with SRS900('GPIB0::2::INSTR') as inst:
       inst.clear_status()
-      inst.SIMmodule_on[7]
-      inst.SIM970_voltage[7]
+      # v2=inst.SIM970_voltage[1]
+
+      inst.clear_status()
+      v2=inst.SIM970_voltage[2]
+
+      
+      # inst.SIM928_on_off[5]='OFF'
+      # inst.SIM928_on_off[5]='ON'
+      inst.SIM928_on_off[6]='OFF'
+      inst.SIM928_on_off[6]='ON'
+      
+
+      #inst.SIMmodule_on[6]
+      #inst.SIMmodule_off[6]
+      #inst.SIM970_voltage[5]
       
 
 
