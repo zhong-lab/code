@@ -400,10 +400,10 @@ class PLThinFilm(Spyrelet):
 		
 
 		#PATH="C:\\Data\\12.18.2020_ffpc\\"+self.exp_parameters.widget.get()['File Name']+"\\motor_scan"
-		PATH="C:\\Data\\12.19.2020_ffpc\\6mW\\"+self.exp_parameters.widget.get()['File Name']
+		PATH="C:\\Data\\12.20.2020_ffpc\\wlsdep0.02mW\\"+self.exp_parameters.widget.get()['File Name']
 		print('here')
 		print('PATH: '+str(PATH))
-		if PATH!="C:\\Data\\12.19.2020_ffpc\\6mW\\":
+		if PATH!="C:\\Data\\12.20.2020_ffpc\\wlsdep0.02mW\\":
 			if (os.path.exists(PATH)):
 				print('deleting old directory with same name')
 				os.system('rm -rf '+str(PATH))
@@ -807,7 +807,7 @@ class PLThinFilm(Spyrelet):
 		('start', {'type': float, 'default': 1535.45}),
 		# ('start', {'type': float, 'default': 1535.61}),
 		# ('stop', {'type': float, 'default': 1535.61})
-		('stop', {'type': float, 'default': 1535.77})
+		('stop', {'type': float, 'default': 1535.81})
 		]
 		w = ParamWidget(params)
 		return w
@@ -828,11 +828,11 @@ class PLThinFilm(Spyrelet):
 	def exp_parameters(self):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
-		('# of points', {'type': int, 'default': 80}),
-		('Measurement Time', {'type': int, 'default': 200, 'units':'s'}),
+		('# of points', {'type': int, 'default': 45}),
+		('Measurement Time', {'type': int, 'default': 600, 'units':'s'}),
 		('File Name', {'type': str}),
-		('AWG Pulse Repetition Period',{'type': float,'default': 0.01,'units':'s'}),
-		('AWG Pulse Frequency',{'type': int,'default': 100,'units':'Hz'}),
+		('AWG Pulse Repetition Period',{'type': float,'default': 0.002,'units':'s'}),
+		('AWG Pulse Frequency',{'type': int,'default': 500,'units':'Hz'}),
 		('AWG Pulse Width',{'type': float,'default': 500e-9,'units':'s'}),
 		]
 		w = ParamWidget(params)
