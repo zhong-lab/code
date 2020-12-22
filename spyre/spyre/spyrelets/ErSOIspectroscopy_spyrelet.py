@@ -412,6 +412,13 @@ class PLThinFilm(Spyrelet):
 		0,0)
 		pi2Pulse.create_envelope()
 
+		# Delay of Tau
+
+		delay1 = Arbseq_Class_MW('delay1', timestep,'DC',0,repeatmag,0,0)
+		repeatwidthdelay1=(tau-1.0*pulsewidth1)
+		delay1.setRepeats(repeatwidthdelay1)
+		delay1.create_envelope()
+
 		# pi pulse
 		piPulse=Arbseq_Class_MW('piPulse',timestep,Wavepipulse,1,pulsewidth2,
 		0,0)

@@ -195,7 +195,7 @@ if __name__ == '__main__':
       # inst.SIM928_on_off[5]='OFF'
       # inst.SIM928_on_off[5]='ON'
       inst.SIM928_on_off[6]='OFF'
-      inst.SIM928_on_off[6]='ON'
+      #inst.SIM928_on_off[6]='ON'
       
 
       #inst.SIMmodule_on[6]
