@@ -393,10 +393,11 @@ if __name__ == '__main__':
 	# this is the USB VISA Address:
 	with Keysight_33622A('USB0::0x0957::0x5707::MY53801461::0::INSTR') as inst:
 		print('The identification of this instrument is :' + inst.idn)
-		inst.waveform[2] = 'PULS'
-		inst.frequency[2] = 60 * Hz
-		inst.voltage[2] = 3.5 * V
-		inst.offset[2] = 1.75 * V
+		# inst.waveform[2] = 'PULS'
+		# inst.frequency[2] = 60 * Hz
+		# inst.voltage[2] = 3.5 * V
+		# inst.offset[2] = 1.75 * V
+		inst.output[2] = 'OFF'
 
 		#print(str(inst.read_standard_event_status_register))
 		#inst.output[1] = 'ON'

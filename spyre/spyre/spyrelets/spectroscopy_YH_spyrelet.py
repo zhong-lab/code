@@ -659,6 +659,9 @@ class PLThinFilm(Spyrelet):
 		self.fungen.clear_mem(1)
 		self.fungen.wait()
 		#self.fungen.output[1]='ON'
+		self.SRS.SIMmodule_on[6] ##Turn on the power supply of the SNSPD
+		time.sleep(1)  ##wait 1s to turn on the SNSPD
+
 
 		# get the parameters for the experiment from the widget
 		SD_wAWGparams=self.SD_wAWGparams.widget.get()
@@ -667,9 +670,12 @@ class PLThinFilm(Spyrelet):
 		EOMvoltage=SD_wAWGparams['EOM voltage']
 		runtime=SD_wAWGparams['Runtime']
 		EOMchannel=SD_wAWGparams['EOM channel']
+		Pulsechannel=SD_wAWGparams['Pulse channel']
+		Pulsefreq=SD_wAWGparams['Pulse Frequency']
+		Pulsewidth=SD_wAWGparams['Pulse Width']
+		period=SD_wAWGparams['Pulse Repetition Period']
 		wl=SD_wAWGparams['Wavelength']
 		points=SD_wAWGparams['# of points']
-		period=SD_wAWGparams['Period']
 		foldername=SD_wAWGparams['File Name']
 
 		# convert the period & runtime to floats
@@ -682,6 +688,17 @@ class PLThinFilm(Spyrelet):
 		self.fungen.offset[EOMchannel]=0
 		self.fungen.phase[EOMchannel]=0
 		self.fungen.waveform[EOMchannel]='SIN'
+
+		self.fungen.frequency[Pulsechannel]=Pulsefreq
+		self.fungen.voltage[Pulsechannel]=3.5
+		self.fungen.offset[Pulsechannel]=1.75
+		self.fungen.phase[Pulsechannel]=0
+		self.fungen.pulse_width[Pulsechannel]=Pulsewidth
+		self.fungen.waveform[Pulsechannel]='PULS'
+
+		self.fungen.output[EOMchannel]='ON'
+		self.fungen.output[Pulsechannel]='ON'
+		
 
 		# home the laser
 		self.configureQutag()
@@ -698,9 +715,9 @@ class PLThinFilm(Spyrelet):
 		start = qutagparams['Start Channel']
 		stop = qutagparams['Stop Channel']
 
-		PATH="C:\\Data\\"+str(foldername)
+		PATH="C:\\Data\\12.23.2020_ffpc\\SD1mW195227GHz\\"+str(foldername)
 		print('PATH: '+str(PATH))
-		if PATH!="C:\\Data\\":
+		if PATH!="C:\\Data\\12.23.2020_ffpc\\SD1mW195227GHz\\":
 			if (os.path.exists(PATH)):
 				print('deleting old directory with same name')
 				os.system('rm -rf '+str(PATH))
@@ -717,7 +734,7 @@ class PLThinFilm(Spyrelet):
 		# now loop through all the set frequencies of the EOM modulation
 		# and record the PL on the qutag
 
-		self.fungen.output[EOMchannel]='ON'
+
 		for i in range(points):
 			self.fungen.frequency[EOMchannel]=freqs[i]
 
@@ -779,12 +796,12 @@ class PLThinFilm(Spyrelet):
 				savefreqs.append(float(freqs[i]))
 				looptime+=time.time()-loopstart
 
-				quenchfix=self.reset_quench()
-				if quenchfix!='YES':
-					print('SNSPD quenched and could not be reset')
-					self.fungen.output[1]='OFF'
-					self.fungen.output[2]='OFF'
-					endloop
+				# quenchfix=self.reset_quench()
+				# if quenchfix!='YES':
+				# 	print('SNSPD quenched and could not be reset')
+				# 	self.fungen.output[1]='OFF'
+				# 	self.fungen.output[2]='OFF'
+				# 	endloop
 
 				while ((currentwl<wl-0.001) or (currentwl>wl+0.001)) and (time.time()-startTime < runtime):
 					print('correcting for laser drift')
@@ -794,7 +811,10 @@ class PLThinFilm(Spyrelet):
 
 			self.createHistogram(stoparray, timebase, bincount,period,str(i),wls,PATH,savefreqs)
 
-		self.fungen.output[EOMchannel]='OFF'
+		self.fungen.output[EOMchannel]='OFF'  ##turn off the AWG for both channels
+		self.fungen.output[Pulsechannel]='OFF'
+		self.SRS.SIMmodule_off[6] ##turn off the SNSPD power suppy after the measurement
+
 
 	@Task()
 	def qutagInit(self):
@@ -829,10 +849,10 @@ class PLThinFilm(Spyrelet):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
 		('# of points', {'type': int, 'default': 60}),
-		('Measurement Time', {'type': int, 'default': 400, 'units':'s'}),
+		('Measurement Time', {'type': int, 'default': 100, 'units':'s'}),
 		('File Name', {'type': str}),
-		('AWG Pulse Repetition Period',{'type': float,'default': 0.002,'units':'s'}),
-		('AWG Pulse Frequency',{'type': int,'default': 500,'units':'Hz'}),
+		('AWG Pulse Repetition Period',{'type': float,'default': 0.01,'units':'s'}),
+		('AWG Pulse Frequency',{'type': int,'default': 100,'units':'Hz'}),
 		('AWG Pulse Width',{'type': float,'default': 500e-9,'units':'s'}),
 		]
 		w = ParamWidget(params)
@@ -862,14 +882,17 @@ class PLThinFilm(Spyrelet):
 		(rough estimate for equal amplitude sidebands)
 		"""
 		params=[
-		('Start frequency',{'type':float,'default':5e6,'units':'Hz'}),
-		('Stop frequency',{'type':float,'default':200e6,'units':'Hz'}),
+		('Start frequency',{'type':float,'default':10e6,'units':'Hz'}),
+		('Stop frequency',{'type':float,'default':100e6,'units':'Hz'}),
 		('EOM voltage',{'type':float,'default':6,'units':'V'}),
 		('Runtime',{'type':float,'default':10,'units':'s'}),
-		('EOM channel',{'type':int,'default':2}),
-		('Wavelength',{'type':float,'default':1536.480}),
-		('Period',{'type':float,'default':100e-3,'units':'s'}),
-		('# of points',{'type':int,'default':40}),
+		('EOM channel',{'type':int,'default':1}),
+		('Pulse channel',{'type':int,'default':2}),
+		('Pulse Repetition Period',{'type': float,'default': 0.01,'units':'s'}),
+		('Pulse Frequency',{'type': int,'default': 100,'units':'Hz'}),
+		('Pulse Width',{'type': float,'default': 500e-9,'units':'s'}),
+		('Wavelength',{'type':float,'default':1535.61}),
+		('# of points',{'type':int,'default':20}),
 		('File Name',{'type':str}),
 		]
 		w=ParamWidget(params)
