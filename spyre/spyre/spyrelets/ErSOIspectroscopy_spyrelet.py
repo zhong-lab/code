@@ -919,7 +919,7 @@ class PLThinFilm(Spyrelet):
 		""" Widget containing the parameters used in the photon echo experiment.
 
 		DC repeat unit: for creating long DC delay a trick is to create small
-		delay and thenrepeat it n number of times to create the whole long
+		delay and then repeat it n number of times to create the whole long
 		delay. This saves waveform memory of AWG since you can imagine the case
 		when you have a really long delay.
 		Dc repeat unit is the smallest dc unit so that the whole dc delay is
