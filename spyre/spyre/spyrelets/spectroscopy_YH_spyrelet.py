@@ -715,9 +715,9 @@ class PLThinFilm(Spyrelet):
 		start = qutagparams['Start Channel']
 		stop = qutagparams['Stop Channel']
 
-		PATH="C:\\Data\\12.24.2020_ffpc\\SD0.1mW195207GHz\\"+str(foldername)
+		PATH="C:\\Data\\12.26.2020_ffpc\\SD1mW195227GHz\\"+str(foldername)
 		print('PATH: '+str(PATH))
-		if PATH!="C:\\Data\\12.24.2020_ffpc\\SD0.1mW195207GHz\\":
+		if PATH!="C:\\Data\\12.26.2020_ffpc\\SD1mW195227GHz\\":
 			if (os.path.exists(PATH)):
 				print('deleting old directory with same name')
 				os.system('rm -rf '+str(PATH))
@@ -882,16 +882,16 @@ class PLThinFilm(Spyrelet):
 		(rough estimate for equal amplitude sidebands)
 		"""
 		params=[
-		('Start frequency',{'type':float,'default':10e6,'units':'Hz'}),
-		('Stop frequency',{'type':float,'default':100e6,'units':'Hz'}),
+		('Start frequency',{'type':float,'default':10e3,'units':'Hz'}),
+		('Stop frequency',{'type':float,'default':4e6,'units':'Hz'}),
 		('EOM voltage',{'type':float,'default':6,'units':'V'}),
-		('Runtime',{'type':float,'default':600,'units':'s'}),
+		('Runtime',{'type':float,'default':60,'units':'s'}),
 		('EOM channel',{'type':int,'default':1}),
 		('Pulse channel',{'type':int,'default':2}),
-		('Pulse Repetition Period',{'type': float,'default': 0.002,'units':'s'}),
-		('Pulse Frequency',{'type': int,'default': 500,'units':'Hz'}),
+		('Pulse Repetition Period',{'type': float,'default': 0.01,'units':'s'}),
+		('Pulse Frequency',{'type': int,'default': 100,'units':'Hz'}),
 		('Pulse Width',{'type': float,'default': 2000e-9,'units':'s'}),
-		('Wavelength',{'type':float,'default':1535.766}),
+		('Wavelength',{'type':float,'default':1535.61}),
 		('# of points',{'type':int,'default':20}),
 		('File Name',{'type':str}),
 		]
