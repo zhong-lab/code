@@ -42,8 +42,8 @@ class TwoPulsePhotonEcho(Spyrelet):
 		self.qutag.enableChannels((start,stop))
 
 	def createHistogram(self,stoparray, timebase, bincount, totalWidth, tau):
-		lowBound=1.9*tau
-		highBound=2.1*tau
+		# lowBound=1.9*tau
+		# highBound=2.1*tau
 		hist = [0]*bincount
 		for stoptime in stoparray:
 			binNumber = int(stoptime*timebase*bincount/(totalWidth))
@@ -52,7 +52,7 @@ class TwoPulsePhotonEcho(Spyrelet):
 				print('error')
 			else:
 				hist[binNumber]+=1
-		out_name = "D:\\Data\\12.18.2019\\230_20dB"
+		out_name = "C:\\Data\\12.26.2020_ffpc\\Echotest\\"
 		x=[]
 		for i in range(bincount):
 			x.append(i*totalWidth/bincount)
@@ -80,6 +80,8 @@ class TwoPulsePhotonEcho(Spyrelet):
 		buffer_time = params['buffer time'].magnitude
 		shutter_offset = params['shutter offset'].magnitude
 		wholeRange=params['measuring range'].magnitude
+		Pulsechannel=params['Pulse channel']
+		Shutterchannel=params['Shutter channel']
 
 		self.configureQutag()
 		for i in range(int((params['stop tau']-params['start tau'])/params['step tau'])+1):
@@ -87,10 +89,10 @@ class TwoPulsePhotonEcho(Spyrelet):
 			ys= np.array([])
 			hist=[]
 			self.dataset.clear()
-			self.fungen.output[1] = 'OFF'
-			self.fungen.output[2] = 'OFF'
-			self.fungen.clear_mem(1)
-			self.fungen.clear_mem(2)
+			self.fungen.output[Pulsechannel] = 'OFF'
+			self.fungen.output[Shutterchannel] = 'OFF'
+			self.fungen.clear_mem(Pulsechannel)
+			self.fungen.clear_mem(Shutterchannel)
 			self.fungen.wait()
 			# self.srs.module_reset[5]
 			# self.srs.SIM928_voltage[5]=params['srs bias'].magnitude+0.000000001*i
@@ -137,7 +139,7 @@ class TwoPulsePhotonEcho(Spyrelet):
 		
 			chn1pulse2 = Arbseq_Class('chn1pulse2', timestep)
 			chn1pulse2.delays = [0]
-			chn1pulse2.heights = [0]
+			chn1pulse2.heights = [1]
 			chn1pulse2.widths = [pulse_width*2]
 			chn1pulse2.totaltime = pulse_width*2 
 			chn1pulse2width = pulse_width*2
@@ -248,34 +250,36 @@ class TwoPulsePhotonEcho(Spyrelet):
 			print(repeat_unit*chn2dc2.nrepeats)
 			chn2dc2.create_sequence()
 
-			self.fungen.send_arb(chn1buffer, 1)
-			self.fungen.send_arb(chn1pulse, 1)
-			self.fungen.send_arb(chn1dc, 1)
-			self.fungen.send_arb(chn1pulse2, 1)
-			self.fungen.send_arb(chn1pulse3, 1)
-			self.fungen.send_arb(chn1dc2, 1)
-			self.fungen.send_arb(chn2buffer, 2)
-			self.fungen.send_arb(chn2pulse1, 2)
-			self.fungen.send_arb(chn2dc1, 2)
-			self.fungen.send_arb(chn2pulse2, 2)
-			self.fungen.send_arb(chn2pulse3, 2)
-			self.fungen.send_arb(chn2dc2, 2)
+			self.fungen.send_arb(chn1buffer, Pulsechannel)
+			self.fungen.send_arb(chn1pulse, Pulsechannel)
+			self.fungen.send_arb(chn1dc, Pulsechannel)
+			self.fungen.send_arb(chn1pulse2, Pulsechannel)
+			self.fungen.send_arb(chn1pulse3, Pulsechannel)
+			self.fungen.send_arb(chn1dc2, Pulsechannel)
+			self.fungen.send_arb(chn2buffer, Shutterchannel)
+			self.fungen.send_arb(chn2pulse1, Shutterchannel)
+			self.fungen.send_arb(chn2dc1, Shutterchannel)
+			self.fungen.send_arb(chn2pulse2, Shutterchannel)
+			self.fungen.send_arb(chn2pulse3, Shutterchannel)
+			self.fungen.send_arb(chn2dc2, Shutterchannel)
 
 			seq = [chn1buffer, chn1pulse, chn1dc, chn1pulse2, chn1pulse3, chn1dc2]
 			seq2 = [chn2buffer, chn2pulse1, chn2dc1, chn2pulse2, chn2pulse3, chn2dc2]
 			
-			self.fungen.create_arbseq('twoPulse', seq, 1)
-			self.fungen.create_arbseq('shutter', seq2, 2)
+			self.fungen.create_arbseq('twoPulse', seq, Pulsechannel)
+			self.fungen.create_arbseq('shutter', seq2, Shutterchannel)
 			self.fungen.wait()
-			self.fungen.voltage[1] = params['pulse height'].magnitude+0.000000000001*i
-			self.fungen.voltage[2] = 7.1+0.0000000000001*i
+			self.fungen.voltage[Pulsechannel] = params['pulse height'].magnitude+0.000000000001*i
+			# self.fungen.voltage[2] = 7.1+0.0000000000001*i
+			self.fungen.voltage[Shutterchannel] = 1.75+0.0000000000001*i
+
 			
-			print(self.fungen.voltage[1], self.fungen.voltage[2])
-			self.fungen.output[2] = 'OFF'
-			self.fungen.trigger_delay(1,shutter_offset)
+			print(self.fungen.voltage[Pulsechannel], self.fungen.voltage[Shutterchannel])
+			self.fungen.output[Shutterchannel] = 'OFF'
+			self.fungen.trigger_delay(Pulsechannel,shutter_offset)
 			self.fungen.sync()
 			time.sleep(1)
-			self.fungen.output[1] = 'ON'
+			self.fungen.output[Pulsechannel] = 'ON'
 			#self.fungen.output[2] = 'OFF'
 			time.sleep(1)
 			
@@ -341,7 +345,8 @@ class TwoPulsePhotonEcho(Spyrelet):
 
 
 			tau+=params['step tau']
-			#self.fungen.output[1] = 'OFF'
+			self.fungen.output[Pulsechannel] = 'OFF'
+			self.fungen.output[Shutterchannel] = 'OFF'
 
 	@Task()
 	def qutagInit(self):
@@ -352,7 +357,7 @@ class TwoPulsePhotonEcho(Spyrelet):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
 		('Start Channel', {'type': int, 'default': 0}),
-		('Stop Channel', {'type': int, 'default': 2}),
+		('Stop Channel', {'type': int, 'default': 4}),
 		('Total Hist Width Multiplier', {'type': int, 'default': 5}),
 		('Bin Count', {'type': int, 'default': 1000})
 		]
@@ -363,41 +368,43 @@ class TwoPulsePhotonEcho(Spyrelet):
 	def exp_parameters(self):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
-		('# of Passes', {'type': int, 'default': 100}),
+		('# of Passes', {'type': int, 'default': 1000}),
 		# ('File Name', {'type': str})
 		]
 		w = ParamWidget(params)
 		return w
 
-	@Element(name='Histogram')
-	def averaged(self):
-		p = LinePlotWidget()
-		p.plot('Channel 1')
-		return p
+	# @Element(name='Histogram')
+	# def averaged(self):
+	# 	p = LinePlotWidget()
+	# 	p.plot('Channel 1')
+	# 	return p
 
-	@averaged.on(startpulse.acquired)
-	def averaged_update(self, ev):
-		w = ev.widget
-		xs = self.xs
-		ys = self.ys
-		w.set('Channel 1', xs=xs, ys=ys)
-		return
+	# @averaged.on(startpulse.acquired)
+	# def averaged_update(self, ev):
+	# 	w = ev.widget
+	# 	xs = self.xs
+	# 	ys = self.ys
+	# 	w.set('Channel 1', xs=xs, ys=ys)
+	# 	return
 
 	@Element(name='Pulse parameters')
 	def pulse_parameters(self):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
-		('pulse height', {'type': float, 'default': 3, 'units':'V'}),
-		('pulse width', {'type': float, 'default': 300e-9, 'units':'s'}),
-		('period', {'type': float, 'default': 0.1, 'units':'s'}),
+		('pulse height', {'type': float, 'default': 1.75, 'units':'V'}),
+		('pulse width', {'type': float, 'default': 200e-9, 'units':'s'}),
+		('period', {'type': float, 'default': 0.01, 'units':'s'}),
 		('repeat unit', {'type': float, 'default': 50e-9, 'units':'s'}),
-		('start tau', {'type': float, 'default': 3e-6, 'units':'s'}),
-		('stop tau', {'type': float, 'default': 10e-6, 'units':'s'}),
+		('start tau', {'type': float, 'default': 10e-6, 'units':'s'}),
+		('stop tau', {'type': float, 'default': 20e-6, 'units':'s'}),
 		('step tau', {'type': float, 'default': 1e-6, 'units':'s'}),
 		# ('srs bias', {'type': float, 'default': 1.2, 'units':'V'}),
 		('shutter offset', {'type': float, 'default': 500e-9, 'units':'s'}),
-		('measuring range', {'type': float, 'default': 70e-6, 'units':'s'}),
-		('buffer time', {'type': float, 'default': 100e-6, 'units':'s'}),
+		('measuring range', {'type': float, 'default': 50e-6, 'units':'s'}),
+		('buffer time', {'type': float, 'default': 0e-6, 'units':'s'}),
+		('Shutter channel',{'type':int,'default':1}),
+		('Pulse channel',{'type':int,'default':2}),
 		]
 		w = ParamWidget(params)
 		return w
@@ -420,15 +427,15 @@ class TwoPulsePhotonEcho(Spyrelet):
 
 	@startpulse.initializer
 	def initialize(self):
-		self.fungen.output[1] = 'OFF'
 		self.fungen.output[2] = 'OFF'
-		self.fungen.clear_mem(1)
+		self.fungen.output[1] = 'OFF'
 		self.fungen.clear_mem(2)
+		self.fungen.clear_mem(1)
 		self.fungen.wait()
 
 	@startpulse.finalizer
 	def finalize(self):
-		self.fungen.output[1] = 'OFF'
 		self.fungen.output[2] = 'OFF'
+		self.fungen.output[1] = 'OFF'
 		print('Two Pulse measurements complete.')
 		return

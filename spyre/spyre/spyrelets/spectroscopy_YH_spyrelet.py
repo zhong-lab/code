@@ -652,11 +652,13 @@ class PLThinFilm(Spyrelet):
 		
 		The Keysight AWG only works up to 80MHz. 
 
-		Could potentially modify code to use Siglent AWG which can go up to 120MHz. - Nope, impossibe, no way 
+		Could potentially modify code to use Siglent AWG which can go up to 120MHz
 		"""
-
+		self.fungen.output[1]='OFF'
+		self.fungen.output[2]='OFF'
 		# some initialization of the function generator
 		self.fungen.clear_mem(1)
+		self.fungen.clear_mem(2)
 		self.fungen.wait()
 		#self.fungen.output[1]='ON'
 		self.SRS.SIMmodule_on[6] ##Turn on the power supply of the SNSPD
@@ -681,20 +683,26 @@ class PLThinFilm(Spyrelet):
 		# convert the period & runtime to floats
 		period=period.magnitude
 		runtime=runtime.magnitude
+		self.fungen.clear_mem(EOMchannel)
+		self.fungen.clear_mem(Pulsechannel)
+		self.fungen.waveform[Pulsechannel]='PULS'
+		self.fungen.waveform[EOMchannel]='SIN'
+
 
 		# set the sine wave driving the EOM on the other channel
-
+		self.fungen.waveform[EOMchannel]='SIN'
 		self.fungen.voltage[EOMchannel]=EOMvoltage
 		self.fungen.offset[EOMchannel]=0
 		self.fungen.phase[EOMchannel]=0
-		self.fungen.waveform[EOMchannel]='SIN'
 
+
+		self.fungen.waveform[Pulsechannel]='PULS'
 		self.fungen.frequency[Pulsechannel]=Pulsefreq
 		self.fungen.voltage[Pulsechannel]=3.5
 		self.fungen.offset[Pulsechannel]=1.75
 		self.fungen.phase[Pulsechannel]=0
 		self.fungen.pulse_width[Pulsechannel]=Pulsewidth
-		self.fungen.waveform[Pulsechannel]='PULS'
+
 
 		self.fungen.output[EOMchannel]='ON'
 		self.fungen.output[Pulsechannel]='ON'
@@ -715,9 +723,9 @@ class PLThinFilm(Spyrelet):
 		start = qutagparams['Start Channel']
 		stop = qutagparams['Stop Channel']
 
-		PATH="C:\\Data\\12.26.2020_ffpc\\SD1mW195227GHz\\"+str(foldername)
+		PATH="C:\\Data\\12.24.2020_ffpc\\SD0.1mW195225GHz\\"+str(foldername)
 		print('PATH: '+str(PATH))
-		if PATH!="C:\\Data\\12.26.2020_ffpc\\SD1mW195227GHz\\":
+		if PATH!="C:\\Data\\12.24.2020_ffpc\\SD0.1mW195225GHz":
 			if (os.path.exists(PATH)):
 				print('deleting old directory with same name')
 				os.system('rm -rf '+str(PATH))
@@ -882,16 +890,16 @@ class PLThinFilm(Spyrelet):
 		(rough estimate for equal amplitude sidebands)
 		"""
 		params=[
-		('Start frequency',{'type':float,'default':10e3,'units':'Hz'}),
-		('Stop frequency',{'type':float,'default':4e6,'units':'Hz'}),
+		('Start frequency',{'type':float,'default':30e6,'units':'Hz'}),
+		('Stop frequency',{'type':float,'default':100e6,'units':'Hz'}),
 		('EOM voltage',{'type':float,'default':6,'units':'V'}),
 		('Runtime',{'type':float,'default':60,'units':'s'}),
 		('EOM channel',{'type':int,'default':1}),
 		('Pulse channel',{'type':int,'default':2}),
-		('Pulse Repetition Period',{'type': float,'default': 0.01,'units':'s'}),
-		('Pulse Frequency',{'type': int,'default': 100,'units':'Hz'}),
+		('Pulse Repetition Period',{'type': float,'default': 0.002,'units':'s'}),
+		('Pulse Frequency',{'type': int,'default': 500,'units':'Hz'}),
 		('Pulse Width',{'type': float,'default': 2000e-9,'units':'s'}),
-		('Wavelength',{'type':float,'default':1535.61}),
+		('Wavelength',{'type':float,'default':1535.625}),
 		('# of points',{'type':int,'default':20}),
 		('File Name',{'type':str}),
 		]
