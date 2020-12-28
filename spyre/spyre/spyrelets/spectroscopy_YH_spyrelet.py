@@ -373,8 +373,11 @@ class PLThinFilm(Spyrelet):
 	@Task()
 	def startpulse(self, timestep=100e-9):
 
-		self.fungen.output[1]='ON'
+		self.fungen.output[1]='OFF'
 		self.fungen.output[2]='OFF'
+		self.SRS.SIMmodule_on[6] ##Turn on the power supply of the SNSPD
+		time.sleep(1)  ##wait 1s to turn on the SNSPD
+
 		##Qutag Part
 		self.configureQutag()
 		expparams = self.exp_parameters.widget.get()
@@ -400,10 +403,10 @@ class PLThinFilm(Spyrelet):
 		
 
 		#PATH="C:\\Data\\12.18.2020_ffpc\\"+self.exp_parameters.widget.get()['File Name']+"\\motor_scan"
-		PATH="C:\\Data\\12.23.2020_ffpc\\"+self.exp_parameters.widget.get()['File Name']
+		PATH="C:\\Data\\12.28.2020_ffpc\\wEOM0.1mW20dBatt500ns1kHz300s\\"+self.exp_parameters.widget.get()['File Name']
 		print('here')
 		print('PATH: '+str(PATH))
-		if PATH!="C:\\Data\\12.23.2020_ffpc\\":
+		if PATH!="C:\\Data\\12.28.2020_ffpc\\wEOM0.1mW20dBatt500ns1kHz300s\\":
 			if (os.path.exists(PATH)):
 				print('deleting old directory with same name')
 				os.system('rm -rf '+str(PATH))
@@ -491,6 +494,7 @@ class PLThinFilm(Spyrelet):
 			# self.createHistogram(stoparray, timebase, bincount,period,str(i),
 			# 	wls,PATH,savefreqs)
 		self.fungen.output[2]='OFF'
+		self.SRS.SIMmodule_off[6] ##turn off the SNSPD power suppy after the measurement
 
 	#@Task()
 	#def spectralDiffusion_wRFsource(self):
@@ -723,9 +727,9 @@ class PLThinFilm(Spyrelet):
 		start = qutagparams['Start Channel']
 		stop = qutagparams['Stop Channel']
 
-		PATH="C:\\Data\\12.24.2020_ffpc\\SD0.1mW195225GHz\\"+str(foldername)
+		PATH="C:\\Data\\12.27.2020_ffpc\\SD0.02mW195227GHz\\"+str(foldername)
 		print('PATH: '+str(PATH))
-		if PATH!="C:\\Data\\12.24.2020_ffpc\\SD0.1mW195225GHz":
+		if PATH!="C:\\Data\\12.27.2020_ffpc\\SD0.02mW195227GHz":
 			if (os.path.exists(PATH)):
 				print('deleting old directory with same name')
 				os.system('rm -rf '+str(PATH))
@@ -832,10 +836,10 @@ class PLThinFilm(Spyrelet):
 	def wl_parameters(self):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
-		('start', {'type': float, 'default': 1560.1}),
+		('start', {'type': float, 'default': 1535.602}),
 		# ('start', {'type': float, 'default': 1535.80}),
 		# ('stop', {'type': float, 'default': 1535.80})
-		('stop', {'type': float, 'default': 1560.12})
+		('stop', {'type': float, 'default': 1535.618})
 		]
 		w = ParamWidget(params)
 		return w
@@ -856,12 +860,12 @@ class PLThinFilm(Spyrelet):
 	def exp_parameters(self):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
-		('# of points', {'type': int, 'default': 10}),
-		('Measurement Time', {'type': int, 'default': 100, 'units':'s'}),
+		('# of points', {'type': int, 'default': 3}),
+		('Measurement Time', {'type': int, 'default': 300, 'units':'s'}),
 		('File Name', {'type': str}),
-		('AWG Pulse Repetition Period',{'type': float,'default': 0.01,'units':'s'}),
-		('AWG Pulse Frequency',{'type': int,'default': 100,'units':'Hz'}),
-		('AWG Pulse Width',{'type': float,'default': 2000e-9,'units':'s'}),
+		('AWG Pulse Repetition Period',{'type': float,'default': 0.001,'units':'s'}),
+		('AWG Pulse Frequency',{'type': int,'default': 1000,'units':'Hz'}),
+		('AWG Pulse Width',{'type': float,'default': 500e-9,'units':'s'}),
 		]
 		w = ParamWidget(params)
 		return w
@@ -890,16 +894,16 @@ class PLThinFilm(Spyrelet):
 		(rough estimate for equal amplitude sidebands)
 		"""
 		params=[
-		('Start frequency',{'type':float,'default':30e6,'units':'Hz'}),
+		('Start frequency',{'type':float,'default':20e6,'units':'Hz'}),
 		('Stop frequency',{'type':float,'default':100e6,'units':'Hz'}),
 		('EOM voltage',{'type':float,'default':6,'units':'V'}),
-		('Runtime',{'type':float,'default':60,'units':'s'}),
+		('Runtime',{'type':float,'default':200,'units':'s'}),
 		('EOM channel',{'type':int,'default':1}),
 		('Pulse channel',{'type':int,'default':2}),
-		('Pulse Repetition Period',{'type': float,'default': 0.002,'units':'s'}),
-		('Pulse Frequency',{'type': int,'default': 500,'units':'Hz'}),
-		('Pulse Width',{'type': float,'default': 2000e-9,'units':'s'}),
-		('Wavelength',{'type':float,'default':1535.625}),
+		('Pulse Repetition Period',{'type': float,'default': 0.001,'units':'s'}),
+		('Pulse Frequency',{'type': int,'default': 1000,'units':'Hz'}),
+		('Pulse Width',{'type': float,'default': 500e-9,'units':'s'}),
+		('Wavelength',{'type':float,'default':1535.61}),
 		('# of points',{'type':int,'default':20}),
 		('File Name',{'type':str}),
 		]
