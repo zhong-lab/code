@@ -985,7 +985,7 @@ class PLThinFilm(Spyrelet):
 		# ('Battery Port 1',{'type':int,'default':5}),
 		('Battery Port 2',{'type':int,'default':6}),
 		('EOM shutter?',{'type':bool}),
-		('EOM shutter channel',{'type':int,'default':1}),
+		('EOM shutter channel',{'type':str,'default':'CD'}),
 		('EOM shutter width',{'type':float,'default':1.1,'units':'ms'})
 		]
 		w = ParamWidget(params)
