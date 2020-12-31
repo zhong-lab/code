@@ -26,6 +26,7 @@ from lantz.drivers.keysight import Keysight_33622A
 #from lantz.drivers.keysight import Arbseq_Class_MW
 from lantz.drivers.keysight import Keysight_33622A
 from lantz.drivers.stanford.srs900 import SRS900
+from lantz.drivers.stanford import DG645
 
 from lantz.log import log_to_screen, DEBUG
 
@@ -42,8 +43,10 @@ class PLThinFilm(Spyrelet):
 	requires = {
 		'wm': Bristol_771,
 		'fungen': Keysight_33622A,
-		'SRS': SRS900
+		'SRS': SRS900,
+		'delaygen':DG645
 	}
+
 	qutag = None
 	laser = NetworkConnection('1.1.1.2')
 	xs=np.array([])
@@ -108,7 +111,7 @@ class PLThinFilm(Spyrelet):
 		totalShift=0
 
 		# bring voltage back to ideal
-		
+
 		self.fungen.offset[channel]=Q_(voltageTargets[i-1],'V')
 		# drive to last wavelength again
 		self.homelaser(current)
@@ -132,32 +135,28 @@ class PLThinFilm(Spyrelet):
 
 		quenchfix='YES'
 
-		# i=0
-		# while (float(V1)>=0.010):
-		# 	i+=1
-		# 	print('Voltage 1 higher than 10mV, resetting')
-		# 	self.SRS.SIM928_on_off[vs1]='OFF'
-		# 	self.SRS.SIM928_on_off[vs2]='OFF'
-		# 	self.SRS.SIM928_on_off[vs1]='ON'
-		# 	self.SRS.SIM928_on_off[vs2]='ON'
-		# 	print('checking Voltage 1 again')
-		# 	self.SRS.clear_status()
-		# 	time.sleep(1)
-		# 	V1=self.SRS.SIM970_voltage[vm1].magnitude
-		# 	print('Voltage 1: '+str(V1)+'V')
-		# 	if i>10:
-		# 		self.fungen.output[1]='OFF'
-		# 		self.fungen.output[2]='OFF'
-		# 		quenchfix='NO'
-		# 		break
+		 i=0
+		 while (float(V1)>=0.010):
+		 	i+=1
+		 	print('Voltage 1 higher than 10mV, resetting')
+		 	self.SRS.SIM928_on_off[vs1]='OFF'
+		 	self.SRS.SIM928_on_off[vs1]='ON'
+		 	print('checking Voltage 1 again')
+		 	self.SRS.clear_status()
+		 	time.sleep(1)
+		 	V1=self.SRS.SIM970_voltage[vm1].magnitude
+		 	print('Voltage 1: '+str(V1)+'V')
+		 	if i>10:
+		 		self.fungen.output[1]='OFF'
+		 		self.fungen.output[2]='OFF'
+		 		quenchfix='NO'
+		 		break
 
 		i=0
 		while (float(V2)>=0.010):
 			i+=1
 			print('Voltage 2 higher than 10mV, resetting')
-			self.SRS.SIM928_on_off[vs1]='OFF'
 			self.SRS.SIM928_on_off[vs2]='OFF'
-			self.SRS.SIM928_on_off[vs1]='ON'
 			self.SRS.SIM928_on_off[vs2]='ON'
 			print('checking Voltage 2 again')
 			self.SRS.clear_status()
@@ -170,10 +169,109 @@ class PLThinFilm(Spyrelet):
 				quenchfix='NO'
 				break
 		return quenchfix
-	
+
+	def stabilize_EOM(self,timebase,stoparray_i):
+		""" Code to stabilize the X-cut EOM when used as a shutter. If the
+		counts during the pulse go up it adjusts the RF voltage."""
+
+		def pulseCounts(self):
+			""" sums up the counts in the shutter pulse during the last two
+			periods.
+			"""
+			stoparray = []
+			lost = self.qutag.getLastTimestamps(True)
+			# wait half a milisecond
+			time.sleep(0.5)
+			# get thte timestamps in the last half milisecond
+			timestamps = self.qutag.getLastTimestamps(True)
+
+			tstamp = timestamps[0] # array of timestamps
+			tchannel = timestamps[1] # array of channels
+			values = timestamps[2] # number of recorded timestamps
+
+			for k in range(values):
+				# output all stop events together with the latest start event
+				if tchannel[k] == start:
+					synctimestamp = tstamp[k]
+					else:
+						stoptimestamp = tstamp[k]
+						stoparray.append(stoptimestamp)
+			stoptimes=[i*timebase for i in stoparray if i*timebase<shutterWidth]
+			pulseSum=sum(stoptimes)
+			return pulseSum
+
+		def compareDelta(self,delta1,delta2):
+			""" Returns true if the change improved the extinction ratio or kept
+			it the same, and false if it did not.
+			"""
+			 if delta1>=delta2:
+				 return True
+			 else:
+				 return False
+
+		def checkMinMax(self,RFamp):
+			""" Returns False if the amplitude exceeds the limits that can be
+			set on the delay generator (0V-5V).
+			"""
+			if ((RFamp>5) or (RFamp<0)):
+				return True
+			else:
+				return False
+
+		# get the params from the params widget
+		qutagparams = self.qutag_params.widget.get()
+		shutterCheck=qutagparams['EOM shutter?']
+		shutterChannel=qutagparams['EOM shutter channel']
+		shutterWidth=qutagparams['EOM shutter width']
+
+		RFamp=self.delaygen.amplitude[shutterChannel]
+
+		sign=1 # the first attempt to adjust the RF will be positive
+
+		# if the EOM shutter is used
+		if shutterCheck==True:
+			print('compensating EOM temperature drift')
+
+			# get the initial sum of counts during the pulse
+			stoptimes_i=[i*timebase for i in stoparray_i if i*timebase<shutterWidth]
+			pulseSum_st=sum(stoptimes_i)
+
+			pulseSum_end=pulseCounts() # check shuttered pulse counts again
+			d1=pulseSum_end-pulseSum_st # get the difference between the two
+
+			d2=d1 # while the current difference is more than 1000 counts
+			i=0 # the number of sign flips
+
+			while (d2>1000):
+
+				# change the RF amplitude
+				newAmp=RFamp+sign*0.01 # the smallest adjustment for the delaygen
+				print('newRF amplitude: '+str(newAmp))
+
+				# check if at at the max RF voltage or the sign flipped 10x
+				if ((self.checkMinMax(RFamp)==True) or (i>10)):
+					print('EOM temperature drift could not be compensated')
+					endloop
+
+				# set the new amplitude on the delay generator
+				self.delaygen.amplitude[shutterChannel]=newAmp
+
+				# check the difference in the counts now
+				pulseSum_end=pulseCounts()
+				d2=pulseSum_end-pulseSum_st
+
+				# if the difference in the counts has not improved flip sign
+				if not self.compareDelta(d1,d2):
+					i+=1
+					sign*=-1
+			print('EOM RF OK')
+			return
+		else:
+			return
+
 	@Task()
 	def piezo_scan(self,timestep=100e-9):
-		
+
 		#self.fungen.output[1]='ON'
 		piezo_params=self.piezo_parameters.widget.get()
 		Vstart=piezo_params['voltage start']
@@ -252,7 +350,7 @@ class PLThinFilm(Spyrelet):
 			counter=0
 			if len(wls)!=0:
 				last_wl=np.mean(np.array(wls).astype(np.float))
-			
+
 			print('i: '+str(i)+', initializing')
 
 			while ((wl<wlpts[i]-0.0002) or (wl>wlpts[i]+0.0002)):
@@ -291,7 +389,7 @@ class PLThinFilm(Spyrelet):
 			print('current target wavelength: '+str(wlpts[i]))
 			print('current set voltage: '+str(voltageTargets[i]))
 			print('actual wavelength: '+str(self.wm.measure_wavelength()))
-			
+
 			time.sleep(1)
 			##Wavemeter measurements
 			stoparray = []
@@ -299,6 +397,7 @@ class PLThinFilm(Spyrelet):
 			wls=[]
 			lost = self.qutag.getLastTimestamps(True)
 			counter2=0
+			stoparray_i=[]
 
 			looptime=startTime
 			while looptime-startTime < expparams['Measurement Time'].magnitude:
@@ -325,6 +424,12 @@ class PLThinFilm(Spyrelet):
 				wls.append(str(wl))
 				looptime+=time.time()-loopstart
 				#print('i: '+str(i)+', looptime-startTime: '+str(looptime-startTime))
+
+				# stabilize the EOM shutter
+				if len(stoparray_i)==0:
+					stoparray_i=stoparray
+				self.stabilize_EOM(self,timebase,stoparray_i)
+
 				quenchfix=self.reset_quench()
 				if quenchfix!='YES':
 					print('SNSPD quenched and could not be reset')
@@ -332,7 +437,7 @@ class PLThinFilm(Spyrelet):
 					self.fungen.output[2]='OFF'
 					endloop
 
-				
+
 				while ((wl<wlpts[i]-0.0002) or (wl>wlpts[i]+0.0002)) and (time.time()-startTime < expparams['Measurement Time'].magnitude):
 					offset=wl-wlpts[i]
 					Voff=offset/0.315*140/(piezo_params['Scale factor']*2)
@@ -358,17 +463,17 @@ class PLThinFilm(Spyrelet):
 							wl=self.wm.measure_wavelength()
 							counter2+=Voff
 							totalShift+=Voff
-				
+
 			print('actual  wavelength: '+str(wl))
 			print('targets shift during measurement:  '+str(counter2)+'V')
-				
+
 
 			self.createHistogram(stoparray, timebase, bincount,
 				expparams['AWG Pulse Repetition Period'].magnitude,i, wls,
 				"C:\\Data\\"+self.exp_parameters.widget.get()['File Name'])
 		# turn off AWG
 		self.fungen.output[channel]='OFF'
-	
+
 
 	@Task()
 	def startpulse(self, timestep=100e-9):
@@ -400,13 +505,13 @@ class PLThinFilm(Spyrelet):
 		self.fungen.pulse_width[2]=expparams['AWG Pulse Width']
 		self.fungen.waveform[2]='PULS'
 		self.fungen.output[2]='ON'
-		
+
 
 		#PATH="C:\\Data\\12.18.2020_ffpc\\"+self.exp_parameters.widget.get()['File Name']+"\\motor_scan"
-		PATH="C:\\Data\\12.29.2020_ffpc\\wEOM1mW20dBatt1kHzwlssweep\\supplementary_1\\"+self.exp_parameters.widget.get()['File Name']
+		PATH="C:\\Data\\12.28.2020_ffpc\\wEOM0.1mW20dBatt1kHzwlssweep\\supplementary\\"+self.exp_parameters.widget.get()['File Name']
 		print('here')
 		print('PATH: '+str(PATH))
-		if PATH!="C:\\Data\\12.29.2020_ffpc\\wEOM1mW20dBatt1kHzwlssweep\\supplementary_1\\":
+		if PATH!="C:\\Data\\12.28.2020_ffpc\\wEOM0.1mW20dBatt1kHzwlssweep\\supplementary\\":
 			if (os.path.exists(PATH)):
 				print('deleting old directory with same name')
 				os.system('rm -rf '+str(PATH))
@@ -418,7 +523,7 @@ class PLThinFilm(Spyrelet):
 			print("Task will error trying to saving data.")
 
 		wlTargets=np.linspace(wlparams['start'],wlparams['stop'],expparams['# of points'])
-		
+
 
 		print('wlTargets: '+str(wlTargets))
 		for i in range(expparams['# of points']):
@@ -428,7 +533,7 @@ class PLThinFilm(Spyrelet):
 				setting=client.get('laser1:ctl:wavelength-set', float)
 				client.set('laser1:ctl:wavelength-set', wlTargets[i])
 				wl=self.wm.measure_wavelength()
-				
+
 
 			while ((wl<wlTargets[i]-0.001) or (wl>wlTargets[i]+0.001)):
 					print('correcting for laser drift')
@@ -442,7 +547,7 @@ class PLThinFilm(Spyrelet):
 			print('taking data')
 			print('current target wavelength: '+str(wlTargets[i]))
 			print('actual wavelength: '+str(self.wm.measure_wavelength()))
-			
+
 			time.sleep(1)
 			##Wavemeter measurements
 			stoparray = []
@@ -457,8 +562,8 @@ class PLThinFilm(Spyrelet):
 				# get the lost timestamps
 				lost = self.qutag.getLastTimestamps(True)
 				# wait half a milisecond
-				time.sleep(5*0.1)   #
-				# get thte timestamps in the last half milisecond
+				time.sleep(5*0.1)
+				# get the timestamps in the last half milisecond
 				timestamps = self.qutag.getLastTimestamps(True)
 
 				tstamp = timestamps[0] # array of timestamps
@@ -476,14 +581,20 @@ class PLThinFilm(Spyrelet):
 				wls.append(str(wl))
 				looptime+=time.time()-loopstart
 				print('i: '+str(i)+', looptime-startTime: '+str(looptime-startTime))
-				# quenchfix=self.reset_quench()
-				# if quenchfix!='YES':
-				# 	print('SNSPD quenched and could not be reset')
-				# 	# self.fungen.output[1]='OFF'
-				# 	self.fungen.output[2]='OFF'
-				# 	endloop
+				quenchfix=self.reset_quench()
 
-				
+				# stabilize the EOM shutter
+				if len(stoparray_i)==0:
+					stoparray_i=stoparray
+				self.stabilize_EOM(self,timebase,stoparray_i)
+
+			 	if quenchfix!='YES':
+					print('SNSPD quenched and could not be reset')
+				    self.fungen.output[1]='OFF'
+				 	self.fungen.output[2]='OFF'
+				 	endloop
+
+
 				while ((wl<wlTargets[i]-0.001) or (wl>wlTargets[i]+0.001)) and (time.time()-startTime < expparams['Measurement Time'].magnitude):
 					print('correcting for laser drift')
 					self.homelaser(wlTargets[i])
@@ -506,8 +617,8 @@ class PLThinFilm(Spyrelet):
 		collecting PL, which can be used to determine the spectral diffusion
 		linewidth since the saturation of the ions will be determined by how
 		much the sidebands overlap with the spectral  diffusion lineshape.
-		
-		This task is good for modulating between 1MHz and 200MHz. 
+
+		This task is good for modulating between 1MHz and 200MHz.
 		JDSU EOM amplifier has nonlinear performance below 1MHz (amplification
 		increases), but the N5181A works down to 100kHz if desired.
 		"""
@@ -517,27 +628,21 @@ class PLThinFilm(Spyrelet):
 		SD_wRFparams=self.SD_wRFparams.widget.get()
 		startFreq=SD_wRFparams['Start frequency']
 		stopFreq=SD_wRFparams['Stop frequency']
-
 		power=SD_wRFparams['RF Power']
-
 		runtime=SD_wRFparams['Runtime']
 		wl=SD_wRFparams['Wavelength']
 		points=SD_wRFparams['# of points']
 		period=SD_wRFparams['Period']
 		foldername=self.SD_wRFparams.widget.get()['File Name']
-
 		# convert the period & runtime to floats
 		period=period.magnitude
 		runtime=runtime.magnitude
-
 		# set the amplitude of the RF signal
 		self.source.set_RF_Power(power)
-
 		# home the laser
 		self.configureQutag()
 		self.homelaser(wl)
 		print('Laser Homed!')
-
 		##Qutag Part
 		qutagparams = self.qutag_params.widget.get()
 		lost = self.qutag.getLastTimestamps(True) # clear Timestamp buffer
@@ -547,7 +652,6 @@ class PLThinFilm(Spyrelet):
 		timebase = self.qutag.getTimebase()
 		start = qutagparams['Start Channel']
 		stop = qutagparams['Stop Channel']
-
 		PATH="D:\\Data\\"+foldername
 		if PATH!="D:\\Data\\":
 			if (os.path.exists(PATH)):
@@ -555,31 +659,23 @@ class PLThinFilm(Spyrelet):
 				os.system('rm -rf '+str(PATH))
 			print('making new directory')
 			Path(PATH).mkdir(parents=True, exist_ok=True)
-
 		# make a vector containing all the frequency setpoints for the EOM
 		freqs=np.linspace(startFreq,stopFreq,points)
-
 		# now loop through all the set frequencies of the EOM modulation
 		# and record the PL on the qutag
-
 		# turn on the RF source & set it in CW mode
 		self.source.FM_ON()
 		self.source.set_CW_mode()
-
 		for i in range(points):
-
 			#set the frequency on the RF source
 			self.source.set_CW_Freq(freqs[i])
-			
 
 			# want to actively stabilize the laser frequency since it can
 			# drift on the MHz scale
 			with Client(self.laser) as client:
-
 				setting=client.get('laser1:ctl:wavelength-set', float)
 				client.set('laser1:ctl:wavelength-set', wl)
 				currentwl=self.wm.measure_wavelength()
-				
 
 			while ((currentwl<wl-0.001) or (currentwl>wl+0.001)):
 					print('correcting for laser drift')
@@ -588,22 +684,17 @@ class PLThinFilm(Spyrelet):
 					print('current target wavelength: '+str(wl))
 					print('actual wavelength: '+str(currentwl))
 					time.sleep(1)
-
-
 			print('taking data')
 			print('current frequency: '+str(freqs[i]))
 			print('current target wavelength: '+str(wl))
 			print('actual wavelength: '+str(self.wm.measure_wavelength()))
-			
+
 			time.sleep(1)
-
-
 			stoparray = []
 			startTime = time.time()
 			wls=[]
 			savefreqs=[]
 			lost = self.qutag.getLastTimestamps(True)
-
 			looptime=startTime
 			while looptime-startTime < runtime:
 				loopstart=time.time()
@@ -613,11 +704,9 @@ class PLThinFilm(Spyrelet):
 				time.sleep(5*0.1)
 				# get thte timestamps in the last half milisecond
 				timestamps = self.qutag.getLastTimestamps(True)
-
 				tstamp = timestamps[0] # array of timestamps
 				tchannel = timestamps[1] # array of channels
 				values = timestamps[2] # number of recorded timestamps
-
 				for k in range(values):
 					# output all stop events together with the latest start event
 					if tchannel[k] == start:
@@ -629,33 +718,29 @@ class PLThinFilm(Spyrelet):
 				wls.append(str(currentwl))
 				savefreqs.append(float(freqs[i]))
 				looptime+=time.time()-loopstart
-
 				while ((currentwl<wl-0.001) or (currentwl>wl+0.001)) and (time.time()-startTime < runtime):
 					print('correcting for laser drift')
 					self.homelaser(wl)
 					currentwl=self.wm.measure_wavelength()
 			print('actual  wavelength: '+str(currentwl))
-
 			self.createHistogram(stoparray, timebase, bincount,period,str(i),
 				wls,PATH,savefreqs)
-
 		# turnn off the RF output of the N5181A whenn done
 		self.source.RF_OFF()
 		"""
 	@Task()
 	def spectralDiffusion_wAWG(self):
-		""" Task to measure spectral diffusion on timescales < T1. Uses the 
+		""" Task to measure spectral diffusion on timescales < T1. Uses the
 		Agilent N5181A RF source to send a sine wave to the phase EOM. The
 		amplitude of the RF drive for the EOM is set such that the sidebands
-		have an equal amplitude to the pump beam (Calibrated on 11/19/20 to 
+		have an equal amplitude to the pump beam (Calibrated on 11/19/20 to
 		be 6Vpp for the JDSU phase EOM). This tasks sweeps the
 		frequency of the sine wave (separation of the EOM sidebands) while
 		collecting PL, which can be used to determine the spectral diffusion
 		linewidth since the saturation of the ions will be determined by how
 		much the sidebands overlap with the spectral  diffusion lineshape.
-		
-		The Keysight AWG only works up to 80MHz. 
 
+		The Keysight AWG only works up to 80MHz.
 		Could potentially modify code to use Siglent AWG which can go up to 120MHz
 		"""
 		self.fungen.output[1]='OFF'
@@ -710,7 +795,7 @@ class PLThinFilm(Spyrelet):
 
 		self.fungen.output[EOMchannel]='ON'
 		self.fungen.output[Pulsechannel]='ON'
-		
+
 
 		# home the laser
 		self.configureQutag()
@@ -727,9 +812,9 @@ class PLThinFilm(Spyrelet):
 		start = qutagparams['Start Channel']
 		stop = qutagparams['Stop Channel']
 
-		PATH="C:\\Data\\12.29.2020_ffpc\\SD0.1mW20dBatt195227GHz\\"+str(foldername)
+		PATH="C:\\Data\\12.28.2020_ffpc\\SD0.02mW20dBatt195227GHz\\"+str(foldername)
 		print('PATH: '+str(PATH))
-		if PATH!="C:\\Data\\12.29.2020_ffpc\\SD0.1mW20dBatt195227GHz\\":
+		if PATH!="C:\\Data\\12.28.2020_ffpc\\SD0.02mW20dBatt195227GHz\\":
 			if (os.path.exists(PATH)):
 				print('deleting old directory with same name')
 				os.system('rm -rf '+str(PATH))
@@ -757,7 +842,7 @@ class PLThinFilm(Spyrelet):
 				setting=client.get('laser1:ctl:wavelength-set', float)
 				client.set('laser1:ctl:wavelength-set', wl)
 				currentwl=self.wm.measure_wavelength()
-				
+
 
 			while ((currentwl<wl-0.001) or (currentwl>wl+0.001)):
 					print('correcting for laser drift')
@@ -772,7 +857,7 @@ class PLThinFilm(Spyrelet):
 			print('current frequency: '+str(freqs[i]))
 			print('current target wavelength: '+str(wl))
 			print('actual wavelength: '+str(self.wm.measure_wavelength()))
-			
+
 			time.sleep(1)
 
 
@@ -808,12 +893,17 @@ class PLThinFilm(Spyrelet):
 				savefreqs.append(float(freqs[i]))
 				looptime+=time.time()-loopstart
 
-				# quenchfix=self.reset_quench()
-				# if quenchfix!='YES':
-				# 	print('SNSPD quenched and could not be reset')
-				# 	self.fungen.output[1]='OFF'
-				# 	self.fungen.output[2]='OFF'
-				# 	endloop
+				# stabilize the EOM shutter
+				if len(stoparray_i)==0:
+					stoparray_i=stoparray
+				self.stabilize_EOM(self,timebase,stoparray_i)
+
+				quenchfix=self.reset_quench()
+				if quenchfix!='YES':
+					print('SNSPD quenched and could not be reset')
+				 	self.fungen.output[1]='OFF'
+				 	self.fungen.output[2]='OFF'
+				 	endloop
 
 				while ((currentwl<wl-0.001) or (currentwl>wl+0.001)) and (time.time()-startTime < runtime):
 					print('correcting for laser drift')
@@ -836,10 +926,10 @@ class PLThinFilm(Spyrelet):
 	def wl_parameters(self):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
-		# ('start', {'type': float, 'default': 1535.665}),
-		('start', {'type': float, 'default': 1535.61}),
-		('stop', {'type': float, 'default': 1535.61})
-		# ('stop', {'type': float, 'default': 1535.61})
+		('start', {'type': float, 'default': 1535.574}),
+		# ('start', {'type': float, 'default': 1535.80}),
+		# ('stop', {'type': float, 'default': 1535.80})
+		('stop', {'type': float, 'default': 1535.637})
 		]
 		w = ParamWidget(params)
 		return w
@@ -860,8 +950,8 @@ class PLThinFilm(Spyrelet):
 	def exp_parameters(self):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
-		('# of points', {'type': int, 'default': 6}),
-		('Measurement Time', {'type': int, 'default': 200, 'units':'s'}),
+		('# of points', {'type': int, 'default': 8}),
+		('Measurement Time', {'type': int, 'default': 600, 'units':'s'}),
 		('File Name', {'type': str}),
 		('AWG Pulse Repetition Period',{'type': float,'default': 0.001,'units':'s'}),
 		('AWG Pulse Frequency',{'type': int,'default': 1000,'units':'Hz'}),
@@ -872,6 +962,19 @@ class PLThinFilm(Spyrelet):
 
 	@Element(name='QuTAG Parameters')
 	def qutag_params(self):
+		"""
+		if the EOM shutter check box is checked then the EOM RF voltage will be
+		stabilized during the experiment.
+
+		Care needs to be taken when setting the shutter amplitude, since the
+		delay generator expects a 50ohm load. A 50Ohm termination may be needed
+		depending on the EOM used.
+
+		The JDSU X-cut EOM resistances
+		are:
+		RF port: 40Ohm
+		Bias port: 1MOhm
+		"""
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
 		('Start Channel', {'type': int, 'default': 0}),
@@ -880,7 +983,10 @@ class PLThinFilm(Spyrelet):
 		# ('Voltmeter Channel 1',{'type':int,'default':1}),
 		('Voltmeter Channel 2',{'type':int,'default':2}),
 		# ('Battery Port 1',{'type':int,'default':5}),
-		('Battery Port 2',{'type':int,'default':6})
+		('Battery Port 2',{'type':int,'default':6}),
+		('EOM shutter?',{'type':bool}),
+		('EOM shutter channel',{'type':str,'default':'CD'}),
+		('EOM shutter width',{'type':float,'default':1.1,'units':'ms'})
 		]
 		w = ParamWidget(params)
 		return w
@@ -889,13 +995,12 @@ class PLThinFilm(Spyrelet):
 	def SD_wAWGparams(self):
 		""" Widget containing the parameters used in the spectral diffusion
 		experiment.
-
 		Default EOM voltage calibrated by Christina and Yizhong on 11/19/20.
 		(rough estimate for equal amplitude sidebands)
 		"""
 		params=[
-		('Start frequency',{'type':float,'default':3.1e6,'units':'Hz'}),
-		('Stop frequency',{'type':float,'default':3.3e6,'units':'Hz'}),
+		('Start frequency',{'type':float,'default':10e3,'units':'Hz'}),
+		('Stop frequency',{'type':float,'default':20e6,'units':'Hz'}),
 		('EOM voltage',{'type':float,'default':6,'units':'V'}),
 		('Runtime',{'type':float,'default':300,'units':'s'}),
 		('EOM channel',{'type':int,'default':1}),
@@ -904,7 +1009,7 @@ class PLThinFilm(Spyrelet):
 		('Pulse Frequency',{'type': int,'default': 1000,'units':'Hz'}),
 		('Pulse Width',{'type': float,'default': 500e-9,'units':'s'}),
 		('Wavelength',{'type':float,'default':1535.61}),
-		('# of points',{'type':int,'default':2}),
+		('# of points',{'type':int,'default':10}),
 		('File Name',{'type':str}),
 		]
 		w=ParamWidget(params)
@@ -914,7 +1019,6 @@ class PLThinFilm(Spyrelet):
 	#def SD_wRFparams(self):
 		""" Widget containing the parameters used in the spectral diffusion
 		experiment.
-
 		Default EOM voltage calibrated by Christina and Yizhong on 11/19/20.
 		(rough estimate for equal amplitude sidebands)
 		"""
