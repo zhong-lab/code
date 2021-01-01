@@ -271,14 +271,14 @@ class TwoPulsePhotonEcho(Spyrelet):
 			self.fungen.wait()
 			self.fungen.voltage[Pulsechannel] = params['pulse height'].magnitude+0.000000000001*i
 			# self.fungen.voltage[2] = 7.1+0.0000000000001*i
-			self.fungen.voltage[Shutterchannel] = 1.75+0.0000000000001*i
+			self.fungen.voltage[Shutterchannel] = params['shutter height'].magnitude+0.0000000000001*i
 
 			
 			print(self.fungen.voltage[Pulsechannel], self.fungen.voltage[Shutterchannel])
-			self.fungen.output[Shutterchannel] = 'OFF'
+			self.fungen.output[Shutterchannel] = 'ON'
 			self.fungen.trigger_delay(Pulsechannel,shutter_offset)
 			self.fungen.sync()
-			time.sleep(1)
+			time.sleep(2)
 			self.fungen.output[Pulsechannel] = 'ON'
 			#self.fungen.output[2] = 'OFF'
 			time.sleep(1)
@@ -393,16 +393,17 @@ class TwoPulsePhotonEcho(Spyrelet):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
 		('pulse height', {'type': float, 'default': 1.75, 'units':'V'}),
+		('shutter height', {'type': float, 'default': 2.20, 'units':'V'}),
 		('pulse width', {'type': float, 'default': 200e-9, 'units':'s'}),
-		('period', {'type': float, 'default': 0.01, 'units':'s'}),
+		('period', {'type': float, 'default': 0.001, 'units':'s'}),
 		('repeat unit', {'type': float, 'default': 50e-9, 'units':'s'}),
-		('start tau', {'type': float, 'default': 100e-6, 'units':'s'}),
-		('stop tau', {'type': float, 'default': 200e-6, 'units':'s'}),
+		('start tau', {'type': float, 'default': 5e-6, 'units':'s'}),
+		('stop tau', {'type': float, 'default': 20e-6, 'units':'s'}),
 		('step tau', {'type': float, 'default': 1e-6, 'units':'s'}),
 		# ('srs bias', {'type': float, 'default': 1.2, 'units':'V'}),
 		('shutter offset', {'type': float, 'default': 500e-9, 'units':'s'}),
 		('measuring range', {'type': float, 'default': 50e-6, 'units':'s'}),
-		('buffer time', {'type': float, 'default': 20e-6, 'units':'s'}),
+		('buffer time', {'type': float, 'default': 10e-6, 'units':'s'}),
 		('Shutter channel',{'type':int,'default':1}),
 		('Pulse channel',{'type':int,'default':2}),
 		]
