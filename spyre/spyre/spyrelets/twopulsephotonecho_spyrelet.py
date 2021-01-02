@@ -395,7 +395,7 @@ class TwoPulsePhotonEcho(Spyrelet):
 		('pulse height', {'type': float, 'default': 1.75, 'units':'V'}),
 		('shutter height', {'type': float, 'default': 2.20, 'units':'V'}),
 		('pulse width', {'type': float, 'default': 200e-9, 'units':'s'}),
-		('period', {'type': float, 'default': 0.001, 'units':'s'}),
+		('period', {'type': float, 'default': 0.004, 'units':'s'}),
 		('repeat unit', {'type': float, 'default': 50e-9, 'units':'s'}),
 		('start tau', {'type': float, 'default': 5e-6, 'units':'s'}),
 		('stop tau', {'type': float, 'default': 20e-6, 'units':'s'}),

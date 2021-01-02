@@ -394,14 +394,15 @@ class MessageBasedDriver(Driver):
 
     def query_ascii(self, command, converter='f', separator=',',
                            container=list, termination=None, encoding=None, delay=None):
-        
+        #print("4 varibles:",converter, separator, container, delay)
         self.resource.write(command, termination, encoding)
         if delay is None:
             delay = 0.0
         if delay > 0.0:
             sleep(delay)
-        print(converter, separator, container, delay)
-        return self.resource.read_ascii_values(converter, separator, container, delay)
+        #simport pdb; pdb.set_trace()
+        #print("4 varibles:",converter, separator, container, delay)
+        return self.resource.read_ascii_values()
 
     def query_binary(self, command, datatype='f', isbigendian=False,
                            container=list, delay=None, header='ieee'):
