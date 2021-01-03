@@ -31,16 +31,31 @@ class SpinEcho(Spyrelet):
 
 	@Task()
 	def startpulse(self,timestep=1e-9):
+		params = self.pulse_parameters.widget.get()
+		tau = params['start tau'].magnitude
+		#period = params['period'].magnitude
+		#repeat_unit = params['repeat unit'].magnitude
+		pi_width = params['pulse width'].magnitude
+		buffer_time = params['buffer time'].magnitude
+		#shutter_offset = params['shutter offset'].magnitude
+		#wholeRange=params['measuring range'].magnitude
+		#Pulsechannel=params['Pulse channel']
+		#Shutterchannel=params['Shutter channel']
 		self.fungen.output[1] = 'OFF'
 		self.fungen.output[2] = 'OFF'
 		self.fungen.clear_mem(1)
 		self.fungen.clear_mem(2)
 		self.fungen.wait()
 
-		burn_width = 100e-3
-		wait_time = 10e-6
-		pi_width = 300e-9
-		tau = 10e-6
+		burn_width = params['burn_width'].magnitude
+		wait_time = params['wait_time'].magnitude
+		burn_rep=int(burn_width/1e-5)
+		buffer_rep=int(buffer_time/1e-5)
+
+		#import pdb; pdb. set_trace()
+		# wait_time = 10e-6
+		# pi_width = 300e-9
+		# tau = 10e-6
 
 		## build pulse sequence for AWG channel 1
 		chn1pulse = Arbseq_Class('chn1pulse', timestep)
@@ -48,7 +63,7 @@ class SpinEcho(Spyrelet):
 		chn1pulse.heights = [1]
 		chn1pulse.widths = [1e-5]
 		chn1pulse.totaltime = 1e-5
-		chn1pulse.nrepeats = 500
+		chn1pulse.nrepeats = burn_rep
 		chn1pulse.repeatstring = 'repeat'
 		chn1pulse.markerstring = 'lowAtStart'
 		chn1pulse.markerloc = 0
@@ -123,9 +138,9 @@ class SpinEcho(Spyrelet):
 		chn1dc4 = Arbseq_Class('chn1dc4', timestep)
 		chn1dc4.delays = [0]
 		chn1dc4.heights = [0]
-		chn1dc4.widths = [pi_width]
-		chn1dc4.totaltime = pi_width
-		chn1dc4.nrepeats = 500
+		chn1dc4.widths = [1e-5]
+		chn1dc4.totaltime = 1e-5
+		chn1dc4.nrepeats = buffer_rep
 		chn1dc4.repeatstring = 'repeat'
 		chn1dc4.markerstring = 'lowAtStart'
 		chn1dc4.markerloc = 0
@@ -136,7 +151,7 @@ class SpinEcho(Spyrelet):
 		chn2pulse.heights = [0]
 		chn2pulse.widths = [1e-5]
 		chn2pulse.totaltime = 1e-5
-		chn2pulse.nrepeats = 500
+		chn2pulse.nrepeats = burn_rep
 		chn2pulse.repeatstring = 'repeat'
 		chn2pulse.markerstring = 'lowAtStart'
 		chn2pulse.markerloc = 0
@@ -211,9 +226,9 @@ class SpinEcho(Spyrelet):
 		chn2dc4 = Arbseq_Class('chn2dc4', timestep)
 		chn2dc4.delays = [0]
 		chn2dc4.heights = [0]
-		chn2dc4.widths = [pi_width]
-		chn2dc4.totaltime = pi_width
-		chn2dc4.nrepeats = 500
+		chn2dc4.widths = [1e-5]
+		chn2dc4.totaltime = 1e-5
+		chn2dc4.nrepeats = buffer_rep
 		chn2dc4.repeatstring = 'repeat'
 		chn2dc4.markerstring = 'lowAtStart'
 		chn2dc4.markerloc = 0
@@ -244,8 +259,31 @@ class SpinEcho(Spyrelet):
 		self.fungen.create_arbseq('twoPulse2', seq2, 2)
 
 		self.fungen.wait()
-		self.fungen.voltage[1] = 3.0
-		self.fungen.voltage[2] = 1.0
+		self.fungen.voltage[1] = 1.75
+		self.fungen.voltage[2] = 1.75
+		self.fungen.sync()
+		self.fungen.output[1] = 'ON'
+		self.fungen.output[2] = 'ON'
+
+
+	@Element(name='Pulse parameters')
+	def pulse_parameters(self):
+		params = [
+	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
+		('pulse height', {'type': float, 'default': 1.75, 'units':'V'}),
+		('pulse width', {'type': float, 'default': 300e-9, 'units':'s'}),
+		('period', {'type': float, 'default': 0.004, 'units':'s'}),
+		('repeat unit', {'type': float, 'default': 50e-9, 'units':'s'}),
+		('start tau', {'type': float, 'default': 10e-6, 'units':'s'}),
+		('stop tau', {'type': float, 'default': 20e-6, 'units':'s'}),
+		('step tau', {'type': float, 'default': 5e-6, 'units':'s'}),
+		# ('srs bias', {'type': float, 'default': 1.2, 'units':'V'}),
+		('burn_width', {'type': float, 'default': 1e-3, 'units':'s'}),
+		('wait_time', {'type': float, 'default': 10e-6, 'units':'s'}),
+		('buffer time', {'type': float, 'default': 10e-3, 'units':'s'}),
+		]
+		w = ParamWidget(params)
+		return w
 
 	@startpulse.initializer
 	def initialize(self):
