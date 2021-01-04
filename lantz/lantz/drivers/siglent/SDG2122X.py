@@ -37,7 +37,7 @@ class SDG2122X(MessageBasedDriver):
 		self.write('C{}:BSWV FRQ,{}'.format(key, freq))
 
 	@Action()
-	def DCvotage(self, key, volt):
+	def DCvoltage(self, key, volt):
 		self.write('C{}:BSWV WVTP,DC OFST,{}V'.format(key, volt))
 
 	@Action()
