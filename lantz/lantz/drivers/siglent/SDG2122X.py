@@ -12,7 +12,7 @@ class SDG2122X(MessageBasedDriver):
 	protocol implementation also has a native mechanism to specify the
 	end of the of a message.
 	"""
- 
+
 	DEFAULTS = {'COMMON':{'write_termination': '\n', 'read_termination': '\n'}}
 
 	@Feat()
@@ -37,7 +37,7 @@ class SDG2122X(MessageBasedDriver):
 		self.write('C{}:BSWV FRQ,{}'.format(key, freq))
 
 	@Action()
-	def DCvotage(self, key, volt):
+	def DCvoltage(self, key, volt):
 		self.write('C{}:BSWV WVTP,DC OFST,{}V'.format(key, volt))
 
 	@Action()
@@ -45,7 +45,7 @@ class SDG2122X(MessageBasedDriver):
 		self.write('C{}:BSWV OFST,{}V'.format(key, volt))
 
 
-	
+
 
 if __name__ == '__main__':
 	from time import sleep
