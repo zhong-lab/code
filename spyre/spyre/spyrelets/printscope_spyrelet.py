@@ -31,7 +31,7 @@ class PrintScope(Spyrelet):
 	field='2'
 
 	def saveData(self,x,y,x1,y1,index,field):
-		out_name = "D:\\Data\\12.16.2020_YSO_absorption"
+		out_name = "D:\\Data\\1.3.2021_YSO_spin echo"
 		np.savez(os.path.join(out_name,"trace"),np.c_[x,y])
 		#out_name = "D:\\Data\\1.16.2020\\ch2"
 		np.savez(os.path.join(out_name,"sweep"),np.c_[x1,y1])
@@ -44,7 +44,7 @@ class PrintScope(Spyrelet):
 		while True:
 			if msvcrt.kbhit():
 				if msvcrt.getwche() == '\r':
-					self.osc.datasource(1)
+					self.osc.datasource(4)
 					self.xs,self.ys=self.osc.curv()
 					self.osc.datasource(3)
 					self.x1s,self.y1s=self.osc.curv()
@@ -62,7 +62,7 @@ class PrintScope(Spyrelet):
 	@Element(name='Histogram')
 	def averaged(self):
 		p = LinePlotWidget()
-		p.plot('Ch1')
+		p.plot('Ch4')
 		p.plot('Ch3')
 		return p
 
