@@ -387,35 +387,36 @@ if __name__ == '__main__':
 		###############################################################################################################
 			
 
-		osc.datasource(1)
+		osc.datasource(3)
 		print("testing")
 
-		osc.data_start(1)
+		osc.data_start(3)
 		osc.data_stop(8000000)   
 		time.sleep(0)     
 		x,y=osc.curv()
 		x = np.array(x)
 		y = np.array(y)
-		np.savetxt('D:\\Data\\12.16.2020_YSO_absorption\\1T_absorption.txt', np.c_[y])
-		np.savetxt('D:\\Data\\12.16.2020_YSO_absorption\\1T_absorption_t.txt', np.c_[x])
+		np.savetxt('D:\\Data\\1.3.2021_YSO_spin echo\\echo_sweep.txt', np.c_[x])
+		np.savetxt('D:\\Data\\1.3.2021_YSO_spin echo\\echo_first off.txt', np.c_[y])
 		plt.plot(x,y)
-
-		osc.setmode('sample')
-		time.sleep(1)
-
-		osc.datasource(3)
-
-		osc.data_start(1)
-		osc.data_stop(8000000)   
-		time.sleep(0)     
-		x1,y1=osc.curv()
-		x1 = np.array(x1)
-		y1 = np.array(y1)
-		np.savetxt('D:\\Data\\12.16.2020_YSO_absorption\\1T_absorption_sweep.txt', np.c_[y1])
-		osc.setmode('sample')
-		time.sleep(1)
-		plt.plot(x1,y1)
 		plt.show()
+
+		#osc.setmode('sample')
+		#time.sleep(1)
+
+		# osc.datasource(3)
+
+		# osc.data_start(1)
+		# osc.data_stop(8000000)   
+		# time.sleep(0)     
+		# x1,y1=osc.curv()
+		# x1 = np.array(x1)
+		# y1 = np.array(y1)
+		# np.savetxt('D:\\Data\\12.16.2020_YSO_absorption\\1T_absorption_sweep.txt', np.c_[y1])
+		# osc.setmode('sample')
+		# time.sleep(1)
+		# plt.plot(x1,y1)
+		# plt.show()
 #  1570   ,  1561,   1551,  1535.5 ,1535.48,1535.455,1535.438,1535.407, 1521,  
 # 190936.8, 192000, 193500, *195220, 195223, 195226, 195228 ,195230*, 197000 , 199000 
 # End of the part that is normally not commented out for dumping data on screen with average
