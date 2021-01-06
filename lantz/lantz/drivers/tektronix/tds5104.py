@@ -385,24 +385,32 @@ if __name__ == '__main__':
 
 		# 	time.sleep(5)
 		###############################################################################################################
-			
-
+		path='D:\\Data\\1.6.2021_YSO_holeburning\\1T\\195110\\'
+		osc.setmode('average')
+		osc.average(200) 
+		time.sleep(10)
 		osc.datasource(3)
-		print("testing")
-
-		osc.data_start(3)
-		osc.data_stop(8000000)   
+ 
 		time.sleep(0)     
 		x,y=osc.curv()
 		x = np.array(x)
 		y = np.array(y)
-		np.savetxt('D:\\Data\\1.3.2021_YSO_spin echo\\echo_sweep.txt', np.c_[x])
-		np.savetxt('D:\\Data\\1.3.2021_YSO_spin echo\\echo_first off.txt', np.c_[y])
+		np.savetxt(path+'time.txt', np.c_[x])
+		np.savetxt(path+'hole.txt', np.c_[y])
+		plt.plot(x,y)
+		osc.datasource(1)
+ 
+		time.sleep(0)     
+		x,y=osc.curv()
+		x = np.array(x)
+		y = np.array(y)
+		#np.savetxt('D:\\Data\\1.5.2021_YSO_holeburning\\1T\\voltage_sweep.txt', np.c_[x])
+		np.savetxt(path+'sweep.txt', np.c_[y])
 		plt.plot(x,y)
 		plt.show()
 
-		#osc.setmode('sample')
-		#time.sleep(1)
+		osc.setmode('sample')
+		
 
 		# osc.datasource(3)
 

@@ -30,7 +30,7 @@ class Holeburing(Spyrelet):
 	}
 
 	def saveData(self,x,y,index,ind):
-		out_name = "D:\\Data\\12.16.2020_YSO_absorption"
+		out_name = "D:\\Data\\1.6.2021_YSO_holeburning\\1T\\195110\\lifetime"
 		index=str(round(index,8))
 		ind='.'+str(ind)
 		np.savez(os.path.join(out_name,str(index+ind)),x,y)
@@ -192,8 +192,30 @@ class Holeburing(Spyrelet):
 		self.fungen.voltage[1] = 1.75
 		self.fungen.voltage[2] = 1.75
 		self.fungen.sync()
-		#self.fungen.output[1] = 'ON'
-		#self.fungen.output[2] = 'ON'
+		self.fungen.output[1] = 'ON'
+		self.fungen.output[2] = 'ON'
+
+		print("start hole burning for 60s")
+
+		time.sleep(30)
+		
+		self.osc.datasource(3)
+
+		self.fungen.output[2] = 'OFF'
+		print("hole burning stop")
+		start=time.time()
+
+		for j in range(50):
+			t=time.time()-start
+			x,y=self.osc.curv()
+			x = np.array(x)
+			y = np.array(y)
+			self.saveData(x,y,t,j)
+			print(time.time()-start)
+
+
+
+
 		# self.fungen.output[1] = 'ON'
 		# self.fungen.output[2] = 'ON'
 		#self.fungen.trigger_delay(2,burn_width+wait_time+2*pi_width+2*tau)
@@ -221,6 +243,13 @@ class Holeburing(Spyrelet):
 		]
 		w = ParamWidget(params)
 		return w
+
+	# @Element(name='Histogram')
+	# def averaged(self):
+	# 	p = LinePlotWidget()
+	# 	p.plot('Ch4')
+	# 	p.plot('Ch3')
+	# 	return p
 
 	@startpulse.initializer
 	def initialize(self):
