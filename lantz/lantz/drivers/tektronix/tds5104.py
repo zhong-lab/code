@@ -294,8 +294,9 @@ if __name__ == '__main__':
 
 	log_to_screen(DEBUG)
 	with TDS5104(args.port) as osc:
-		# osc.init()
+		osc.init()
 		print(osc.idn)
+		osc.screensaver_off()
 		#osc.scale(1,0.005)
 		#osc.scale(4,0.05)
 		# #osc.set_time(0)
@@ -385,31 +386,35 @@ if __name__ == '__main__':
 
 		# 	time.sleep(5)
 		###############################################################################################################
-		path='D:\\Data\\1.6.2021_YSO_holeburning\\1T\\195110\\'
+		path='D:\\Data\\1.6.2021_YSO_holeburning\\lifetime\\lineshape\\'
 		osc.setmode('average')
 		osc.average(200) 
-		time.sleep(10)
+		time.sleep(20)
 		osc.datasource(3)
+		osc.screensaver_off()
  
 		time.sleep(0)     
 		x,y=osc.curv()
 		x = np.array(x)
 		y = np.array(y)
-		np.savetxt(path+'time.txt', np.c_[x])
-		np.savetxt(path+'hole.txt', np.c_[y])
+		#np.savetxt(path+'time.txt', np.c_[x])
+		np.savetxt(path+'line.txt', np.c_[y])
 		plt.plot(x,y)
 		osc.datasource(1)
- 
-		time.sleep(0)     
-		x,y=osc.curv()
-		x = np.array(x)
-		y = np.array(y)
-		#np.savetxt('D:\\Data\\1.5.2021_YSO_holeburning\\1T\\voltage_sweep.txt', np.c_[x])
-		np.savetxt(path+'sweep.txt', np.c_[y])
-		plt.plot(x,y)
 		plt.show()
-
 		osc.setmode('sample')
+		
+ 
+		# time.sleep(0)     
+		# x,y=osc.curv()
+		# x = np.array(x)
+		# y = np.array(y)
+		# #np.savetxt('D:\\Data\\1.5.2021_YSO_holeburning\\1T\\voltage_sweep.txt', np.c_[x])
+		# #np.savetxt(path+'sweep.txt', np.c_[y])
+		# plt.plot(x,y)
+		# plt.show()
+
+		# osc.setmode('sample')
 		
 
 		# osc.datasource(3)

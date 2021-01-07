@@ -30,7 +30,7 @@ class Holeburing(Spyrelet):
 	}
 
 	def saveData(self,x,y,index,ind):
-		out_name = "D:\\Data\\1.6.2021_YSO_holeburning\\1T\\195110\\lifetime"
+		out_name = "D:\\Data\\1.6.2021_YSO_holeburning\\lifetime\\lifetime_m_0"
 		index=str(round(index,8))
 		ind='.'+str(ind)
 		np.savez(os.path.join(out_name,str(index+ind)),x,y)
@@ -202,31 +202,20 @@ class Holeburing(Spyrelet):
 		self.osc.datasource(3)
 
 		self.fungen.output[2] = 'OFF'
-		print("hole burning stop")
+		print("hole burning stop, turn off ID photonic laser")
 		start=time.time()
 
-		for j in range(50):
+		for j in range(100):
 			t=time.time()-start
 			x,y=self.osc.curv()
 			x = np.array(x)
 			y = np.array(y)
 			self.saveData(x,y,t,j)
 			print(time.time()-start)
+			if j>30:
+				time.sleep(10)
 
 
-
-
-		# self.fungen.output[1] = 'ON'
-		# self.fungen.output[2] = 'ON'
-		#self.fungen.trigger_delay(2,burn_width+wait_time+2*pi_width+2*tau)
-		# for _ in range(10):
-		# 	self.fungen.trigger()
-		# 	self.fungen.wait()
-		# 	print("triggered")
-		# 	time.sleep(1)
-
-
-		#self.fungen.wait()
 
 
 	@Element(name='Pulse parameters')
@@ -237,9 +226,9 @@ class Holeburing(Spyrelet):
 		('burning_switch2', {'type': int, 'default': 1}),
 		('detection_switch1', {'type': int, 'default': 1}),
 		('detection_switch2', {'type': int, 'default': 0}),
-		('burn_width', {'type': float, 'default': 1e-3, 'units':'s'}),
-		('wait_time', {'type': float, 'default': 10e-6, 'units':'s'}),
-		('buffer time', {'type': float, 'default': 100e-3, 'units':'s'}),
+		('burn_width', {'type': float, 'default': 10e-3, 'units':'s'}),
+		('wait_time', {'type': float, 'default': 100e-6, 'units':'s'}),
+		('buffer time', {'type': float, 'default': 300e-3, 'units':'s'}),
 		]
 		w = ParamWidget(params)
 		return w
@@ -261,5 +250,5 @@ class Holeburing(Spyrelet):
 		# self.fungen.output[2] = 'OFF'
 		# self.fungen.clear_mem(1)
 		# self.fungen.clear_mem(2)
-		print('Two Pulse measurements complete.')
+		print('hole lifetime measurement complete.')
 		return
