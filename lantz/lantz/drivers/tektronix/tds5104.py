@@ -59,6 +59,12 @@ class TDS5104(MessageBasedDriver):
 		"""
 		return self.query('ACQ?')
 
+	@Feat()
+	def query_chn(self,channel):
+		"""Trigger state.
+		"""
+		return self.query('CH{}?'.format(channel))
+
 	# @mode.setter
 	# def mode(self, typemode):
 	#     """Set trigger state.
@@ -273,6 +279,16 @@ class TDS5104(MessageBasedDriver):
 	def delay_time(self, time):
 
 		return self.write('HORizontal:DELay:TIMe {}'.format(time))
+	@Action()
+	def bandwidth_query(self, channel):
+
+		return self.query('CH{}:BANdwidth?'.format(channel))
+
+	@Action()
+	def bandwidth_full(self, channel):
+
+		return self.write('CH{}:BANdwidth FULl'.format(channel))
+
 
 # End of extra delay commands
 
@@ -302,7 +318,7 @@ if __name__ == '__main__':
 		# #osc.set_time(0)
 		# print(osc.trigger)
 		# print(osc.delaymode_query)
-		# print(osc.scale_query(2))
+		print(osc.scale_query(3))
 
 		# osc.delaymode_on()
 		# osc.delay_position(0)
@@ -385,22 +401,28 @@ if __name__ == '__main__':
 		# 	osc.setmode('sample')
 
 		# 	time.sleep(5)
+		#osc.query_chn(3)
+		osc.bandwidth_query(3)
+		osc.bandwidth_full(3)
+		osc.set_horizontal_resolution(100000)
 		###############################################################################################################
-		path='D:\\Data\\1.6.2021_YSO_holeburning\\lifetime\\lineshape\\'
-		osc.setmode('average')
-		osc.average(200) 
-		time.sleep(20)
+		path='D:\\Data\\1.7.2021_spinecho\\beatsignal testing\\'
+		#osc.setmode('average')
+		# osc.average(200) 
+		# time.sleep(30)
 		osc.datasource(3)
-		osc.screensaver_off()
+		#osc.screensaver_off()
+		#osc.measure_frequency(3)
+		
  
 		time.sleep(0)     
 		x,y=osc.curv()
 		x = np.array(x)
 		y = np.array(y)
-		#np.savetxt(path+'time.txt', np.c_[x])
-		np.savetxt(path+'line.txt', np.c_[y])
+		np.savetxt(path+'time.txt', np.c_[x])
+		np.savetxt(path+'beat.txt', np.c_[y])
 		plt.plot(x,y)
-		osc.datasource(1)
+		#osc.datasource(1)
 		plt.show()
 		osc.setmode('sample')
 		

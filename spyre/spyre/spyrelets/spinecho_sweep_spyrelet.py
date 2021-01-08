@@ -30,7 +30,7 @@ class SpinEcho(Spyrelet):
 	}
 
 	def saveData(self,x,y,index,ind):
-		out_name = "D:\\Data\\1.3.2021_YSO_spin echo\\tau_sweep"
+		out_name = "D:\\Data\\1.7.2021_spinecho\\optical_T2"
 		index=str(round(index,8))
 		ind='.'+str(ind)
 		np.savez(os.path.join(out_name,str(index+ind)),x,y)
@@ -56,11 +56,6 @@ class SpinEcho(Spyrelet):
 		#wholeRange=params['measuring range'].magnitude
 		#Pulsechannel=params['Pulse channel']
 		#Shutterchannel=params['Shutter channel']
-		self.fungen.output[1] = 'OFF'
-		self.fungen.output[2] = 'OFF'
-		self.fungen.clear_mem(1)
-		self.fungen.clear_mem(2)
-		self.fungen.wait()
 
 		burn_width = params['burn_width'].magnitude
 		wait_time = params['wait_time'].magnitude
@@ -70,7 +65,7 @@ class SpinEcho(Spyrelet):
 
 		self.osc.datasource(3)
 		tau_num=int((stop_tau-tau)/step_tau)
-		copies=5
+		copies=30
 
 
 		#import pdb; pdb. set_trace()
@@ -286,22 +281,19 @@ class SpinEcho(Spyrelet):
 			self.fungen.create_arbseq('twoPulse2', seq2, 2)
 
 			self.fungen.wait()
-			self.fungen.voltage[1] = 1.75
-			self.fungen.voltage[2] = 1.75
+			self.fungen.voltage[1] = 1.75+0.000000000001*i
+			self.fungen.voltage[2] = 1.75+0.000000000001*i
 			self.fungen.sync()
 			self.fungen.output[1] = 'ON'
 			self.fungen.output[2] = 'ON'
-			time.sleep(1)
-			self.osc.data_start(3)
-			self.osc.data_stop(8000000)   
-			time.sleep(0)     
+			time.sleep(1)   
 			x,y=self.osc.curv()
 			x = np.array(x)
 			y = np.array(y)
 			for j in range(copies):
 				self.saveData(x,y,tau,j)
-
 			tau=tau+step_tau
+			print(tau)
 
 			
 

@@ -280,8 +280,8 @@ class SpinEcho(Spyrelet):
 		self.fungen.voltage[1] = 1.75
 		self.fungen.voltage[2] = 1.75
 		self.fungen.sync()
-		self.fungen.output[1] = 'ON'
-		self.fungen.output[2] = 'ON'
+		# self.fungen.output[1] = 'ON'
+		# self.fungen.output[2] = 'ON'
 		#self.fungen.trigger_delay(2,burn_width+wait_time+2*pi_width+2*tau)
 
 
@@ -292,14 +292,14 @@ class SpinEcho(Spyrelet):
 		('pulse height', {'type': float, 'default': 1.75, 'units':'V'}),
 		('pulse width', {'type': float, 'default': 2000e-9, 'units':'s'}),
 		('detection width', {'type': int, 'default': 2}),
-		('burning_switch1', {'type': int, 'default': 1}),
+		('burning_switch1', {'type': int, 'default': 0}),
 		('burning_switch2', {'type': int, 'default': 0}),
 		('detection_switch1', {'type': int, 'default': 1}),
 		('detection_switch2', {'type': int, 'default': 0}),
-		('pulse_switch1', {'type': int, 'default': 1}),
+		('pulse_switch1', {'type': int, 'default': 0}),
 		('pulse_switch2', {'type': int, 'default': 1}),
 		#('repeat unit', {'type': float, 'default': 50e-9, 'units':'s'}),
-		('start tau', {'type': float, 'default': 50e-6, 'units':'s'}),
+		('start tau', {'type': float, 'default': 500e-6, 'units':'s'}),
 		('stop tau', {'type': float, 'default': 20e-6, 'units':'s'}),
 		('step tau', {'type': float, 'default': 5e-6, 'units':'s'}),
 		# ('srs bias', {'type': float, 'default': 1.2, 'units':'V'}),
