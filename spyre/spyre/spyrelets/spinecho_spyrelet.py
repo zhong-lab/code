@@ -270,8 +270,8 @@ class SpinEcho(Spyrelet):
 		self.fungen.send_arb(chn2pulse4, 2)
 		self.fungen.send_arb(chn2dc4, 2)
 
-		seq = [chn1pulse, chn1dc, chn1pulse2, chn1dc2, chn1pulse3, chn1dc3, chn1pulse4, chn1dc4]
-		seq2 = [chn2pulse, chn2dc, chn2pulse2, chn2dc2, chn2pulse3, chn2dc3, chn2pulse4, chn2dc4]
+		seq = [chn1pulse, chn1dc, chn1dc4, chn1pulse2, chn1dc2, chn1pulse3, chn1dc3, chn1pulse4, chn1dc4]
+		seq2 = [chn2pulse, chn2dc, chn2dc4, chn2pulse2, chn2dc2, chn2pulse3, chn2dc3, chn2pulse4, chn2dc4]
 		
 		self.fungen.create_arbseq('twoPulse', seq, 1)
 		self.fungen.create_arbseq('twoPulse2', seq2, 2)
@@ -280,8 +280,8 @@ class SpinEcho(Spyrelet):
 		self.fungen.voltage[1] = 1.75
 		self.fungen.voltage[2] = 1.75
 		self.fungen.sync()
-		# self.fungen.output[1] = 'ON'
-		# self.fungen.output[2] = 'ON'
+		self.fungen.output[1] = 'ON'
+		self.fungen.output[2] = 'ON'
 		#self.fungen.trigger_delay(2,burn_width+wait_time+2*pi_width+2*tau)
 
 
@@ -290,7 +290,7 @@ class SpinEcho(Spyrelet):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
 		('pulse height', {'type': float, 'default': 1.75, 'units':'V'}),
-		('pulse width', {'type': float, 'default': 2000e-9, 'units':'s'}),
+		('pulse width', {'type': float, 'default': 3000e-9, 'units':'s'}),
 		('detection width', {'type': int, 'default': 2}),
 		('burning_switch1', {'type': int, 'default': 0}),
 		('burning_switch2', {'type': int, 'default': 0}),
@@ -303,9 +303,9 @@ class SpinEcho(Spyrelet):
 		('stop tau', {'type': float, 'default': 20e-6, 'units':'s'}),
 		('step tau', {'type': float, 'default': 5e-6, 'units':'s'}),
 		# ('srs bias', {'type': float, 'default': 1.2, 'units':'V'}),
-		('burn_width', {'type': float, 'default': 20e-3, 'units':'s'}),
+		('burn_width', {'type': float, 'default': 10e-3, 'units':'s'}),
 		('wait_time', {'type': float, 'default': 10e-6, 'units':'s'}),
-		('buffer time', {'type': float, 'default': 10e-3, 'units':'s'}),
+		('buffer time', {'type': float, 'default': 100e-3, 'units':'s'}),
 		]
 		w = ParamWidget(params)
 		return w

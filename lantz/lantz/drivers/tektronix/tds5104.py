@@ -402,14 +402,14 @@ if __name__ == '__main__':
 
 		# 	time.sleep(5)
 		#osc.query_chn(3)
-		osc.bandwidth_query(3)
-		osc.bandwidth_full(3)
-		osc.set_horizontal_resolution(100000)
+		#osc.bandwidth_query(3)
+		#osc.bandwidth_full(3)
+		#osc.set_horizontal_resolution(100000)
 		###############################################################################################################
-		path='D:\\Data\\1.7.2021_spinecho\\beatsignal testing\\'
-		#osc.setmode('average')
-		# osc.average(200) 
-		# time.sleep(30)
+		path='D:\\Data\\1.7.2021_spinecho\\hole\\'
+		osc.setmode('average')
+		osc.average(200) 
+		time.sleep(30)
 		osc.datasource(3)
 		#osc.screensaver_off()
 		#osc.measure_frequency(3)
@@ -420,7 +420,7 @@ if __name__ == '__main__':
 		x = np.array(x)
 		y = np.array(y)
 		np.savetxt(path+'time.txt', np.c_[x])
-		np.savetxt(path+'beat.txt', np.c_[y])
+		np.savetxt(path+'no hole.txt', np.c_[y])
 		plt.plot(x,y)
 		#osc.datasource(1)
 		plt.show()

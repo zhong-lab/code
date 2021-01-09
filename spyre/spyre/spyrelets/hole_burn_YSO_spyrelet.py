@@ -196,29 +196,29 @@ class Holeburing(Spyrelet):
 		self.fungen.output[2] = 'ON'
 
 
-		path='D:\\Data\\1.7.2021_YSO_toptica_burn\\m=0_moving\\'
-		self.osc.setmode('average')
-		self.osc.average(200) 
-		time.sleep(30)
-		self.osc.datasource(3)
-		print("start data saving")
-		time.sleep(0)     
-		x,y=self.osc.curv()
-		x = np.array(x)
-		y = np.array(y)
-		np.savetxt(path+'time.txt', np.c_[x])
-		np.savetxt(path+str((burn_width*1000))+'ms.txt', np.c_[y])
-		self.osc.datasource(1)
+		# path='D:\\Data\\1.7.2021_YSO_toptica_burn\\m=0_moving\\'
+		# self.osc.setmode('average')
+		# self.osc.average(200) 
+		# time.sleep(30)
+		# self.osc.datasource(3)
+		# print("start data saving")
+		# time.sleep(0)     
+		# x,y=self.osc.curv()
+		# x = np.array(x)
+		# y = np.array(y)
+		# np.savetxt(path+'time.txt', np.c_[x])
+		# np.savetxt(path+str((burn_width*1000))+'ms.txt', np.c_[y])
+		# self.osc.datasource(1)
  
-		time.sleep(0)     
-		x,y=self.osc.curv()
-		x = np.array(x)
-		y = np.array(y)
-		np.savetxt(path+'sweep.txt', np.c_[y])
+		# time.sleep(0)     
+		# x,y=self.osc.curv()
+		# x = np.array(x)
+		# y = np.array(y)
+		# np.savetxt(path+'sweep.txt', np.c_[y])
 
 
-		self.osc.setmode('sample')
-		self.fungen.output[2] = 'OFF'
+		# self.osc.setmode('sample')
+		# self.fungen.output[2] = 'OFF'
 
 
 	@Element(name='Pulse parameters')
