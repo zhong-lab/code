@@ -192,8 +192,8 @@ class Holeburing(Spyrelet):
 		self.fungen.voltage[1] = 1.75
 		self.fungen.voltage[2] = 1.75
 		self.fungen.sync()
-		self.fungen.output[1] = 'ON'
-		self.fungen.output[2] = 'ON'
+		# self.fungen.output[1] = 'ON'
+		# self.fungen.output[2] = 'ON'
 
 
 		# path='D:\\Data\\1.7.2021_YSO_toptica_burn\\m=0_moving\\'

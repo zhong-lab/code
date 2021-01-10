@@ -406,11 +406,13 @@ if __name__ == '__main__':
 		#osc.bandwidth_full(3)
 		#osc.set_horizontal_resolution(100000)
 		###############################################################################################################
-		path='D:\\Data\\1.7.2021_spinecho\\hole\\'
-		osc.setmode('average')
-		osc.average(200) 
-		time.sleep(30)
+		path='D:\\Data\\1.9.2021_spinecho\\lineshape\\'
+		# osc.setmode('average')
+		# osc.average(200) 
+		# time.sleep(30)
 		osc.datasource(3)
+		# osc.data_start(1)
+		# osc.data_stop(2000000)
 		#osc.screensaver_off()
 		#osc.measure_frequency(3)
 		
@@ -420,26 +422,24 @@ if __name__ == '__main__':
 		x = np.array(x)
 		y = np.array(y)
 		np.savetxt(path+'time.txt', np.c_[x])
-		np.savetxt(path+'no hole.txt', np.c_[y])
+		np.savetxt(path+'hole_200MHz_sideband_ramp.txt', np.c_[y])
 		plt.plot(x,y)
-		#osc.datasource(1)
+		
 		plt.show()
-		osc.setmode('sample')
+		#osc.setmode('sample')
+
+		# osc.datasource(1)
 		
  
 		# time.sleep(0)     
 		# x,y=osc.curv()
 		# x = np.array(x)
 		# y = np.array(y)
-		# #np.savetxt('D:\\Data\\1.5.2021_YSO_holeburning\\1T\\voltage_sweep.txt', np.c_[x])
-		# #np.savetxt(path+'sweep.txt', np.c_[y])
+		# np.savetxt(path+'sweep.txt', np.c_[y])
 		# plt.plot(x,y)
 		# plt.show()
 
-		# osc.setmode('sample')
-		
-
-		# osc.datasource(3)
+		osc.setmode('sample')
 
 		# osc.data_start(1)
 		# osc.data_stop(8000000)   
