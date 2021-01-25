@@ -2,7 +2,6 @@
 """
 	lantz.drivers.tektronix.tds5104
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 	Implements the drivers to control an oscilloscope.
 """
 
@@ -135,7 +134,6 @@ class TDS5104(MessageBasedDriver):
 	# @Action()
 	def curv(self):
 		"""Get data.
-
 			Returns:
 			xdata, ydata as list
 		"""
@@ -359,16 +357,16 @@ if __name__ == '__main__':
 			osc.data_start(1)
 			osc.data_stop(2000000)   
 
-			osc.setmode('average')
-			osc.average(25)
+			# osc.setmode('average')
+			# osc.average(25)
 
-			time.sleep(25*2)     
+			# time.sleep(25*2)     
 
 			x,y=osc.curv()
 			x = np.array(x)
 			x = x-x.min()
 			y = np.array(y)
-			np.savetxt('D:/MW data/20201111/OpticalSaturation/Scan8/ch3/1952277_{}.txt'.format(i), np.c_[x,y])
+			np.savetxt('D:/MW data/1952277_{}.txt'.format(i), np.c_[x,y])
 
 			osc.datasource(4)
 
@@ -378,7 +376,7 @@ if __name__ == '__main__':
 			x1 = np.array(x1)
 			x1 = x1-x1.min()
 			y1 = np.array(y1)
-			np.savetxt('D:/MW data/20201111/OpticalSaturation/Scan8/ch4/1952277_{}.txt'.format(i), np.c_[x1,y1])
+			np.savetxt('D:/MW data/1952277_{}.txt'.format(i), np.c_[x1,y1])
 
 			osc.setmode('sample')
 

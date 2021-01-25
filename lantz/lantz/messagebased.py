@@ -12,7 +12,7 @@
 from collections import ChainMap
 import types
 
-import visa
+import pyvisa as visa
 
 from .errors import NotSupportedError
 from .driver import Driver
@@ -401,7 +401,7 @@ class MessageBasedDriver(Driver):
         if delay > 0.0:
             sleep(delay)
 
-        return self.resource.read_ascii_values(converter, separator, container, delay)
+        return self.resource.read_ascii_values(converter, separator, container)
 
     def query_binary(self, command, datatype='f', isbigendian=False,
                            container=list, delay=None, header='ieee'):

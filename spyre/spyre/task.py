@@ -118,8 +118,8 @@ class TaskWrapper(QtCore.QObject):
         p_init = partial(self.initialize, spyrelet)
         p_final = partial(self.finalize, spyrelet)
         p_func = partial(self.task_init_f, spyrelet, *args, **kwargs)
-        async = (self.get_thread_id() == self.main_thread_id)
-        if async:
+        asyncc = (self.get_thread_id() == self.main_thread_id)
+        if asyncc:
             proxy.start.emit(p_init, p_final, p_func)
         else:
             proxy.exec_(p_init, p_final, p_func)
