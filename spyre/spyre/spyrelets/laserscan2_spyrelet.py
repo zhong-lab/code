@@ -34,7 +34,7 @@ class LaserScan(Spyrelet):
         'pmd':PM100D
 
     }
-    conn1 = NetworkConnection('1.1.1.2')
+    conn1 = SerialConnection('1.1.1.2')
 
     dlc = Client(conn1)
     
