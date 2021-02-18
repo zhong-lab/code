@@ -374,9 +374,9 @@ class PLThinFilm(Spyrelet):
 	def startpulse(self, timestep=100e-9):
 
 		self.fungen.output[1]='OFF'
-		self.fungen.output[2]='OFF'
+		#self.fungen.output[2]='OFF'
 		self.SRS.SIMmodule_on[6] ##Turn on the power supply of the SNSPD
-		time.sleep(1)  ##wait 1s to turn on the SNSPD
+		time.sleep(3)  ##wait 1s to turn on the SNSPD
 
 		##Qutag Part
 		self.configureQutag()
@@ -393,20 +393,20 @@ class PLThinFilm(Spyrelet):
 		start = qutagparams['Start Channel']
 		stop = qutagparams['Stop Channel']
 
-		self.fungen.frequency[2]=expparams['AWG Pulse Frequency']
-		self.fungen.voltage[2]=3.5
-		self.fungen.offset[2]=1.75
-		self.fungen.phase[2]=0
-		self.fungen.pulse_width[2]=expparams['AWG Pulse Width']
-		self.fungen.waveform[2]='PULS'
-		self.fungen.output[2]='ON'
+		self.fungen.frequency[1]=expparams['AWG Pulse Frequency']
+		self.fungen.voltage[1]=3.5
+		self.fungen.offset[1]=1.75
+		self.fungen.phase[1]=0
+		self.fungen.pulse_width[1]=expparams['AWG Pulse Width']
+		self.fungen.waveform[1]='PULS'
+		self.fungen.output[1]='ON'
 		
 
 		#PATH="C:\\Data\\12.18.2020_ffpc\\"+self.exp_parameters.widget.get()['File Name']+"\\motor_scan"
-		PATH="C:\\Data\\12.29.2020_ffpc\\wEOM1mW20dBatt1kHzwlssweep\\supplementary_1\\"+self.exp_parameters.widget.get()['File Name']
+		PATH="C:\\Data\\2.18.2021_GrapheneRibbon_Er\\"+self.exp_parameters.widget.get()['File Name']
 		print('here')
 		print('PATH: '+str(PATH))
-		if PATH!="C:\\Data\\12.29.2020_ffpc\\wEOM1mW20dBatt1kHzwlssweep\\supplementary_1\\":
+		if PATH!="C:\\Data\\2.18.2021_GrapheneRibbon_Er\\":
 			if (os.path.exists(PATH)):
 				print('deleting old directory with same name')
 				os.system('rm -rf '+str(PATH))
@@ -493,7 +493,7 @@ class PLThinFilm(Spyrelet):
 			self.createHistogram(stoparray, timebase, bincount, expparams['AWG Pulse Repetition Period'].magnitude,str(i), wls,PATH)
 			# self.createHistogram(stoparray, timebase, bincount,period,str(i),
 			# 	wls,PATH,savefreqs)
-		self.fungen.output[2]='OFF'
+		self.fungen.output[1]='OFF'
 		self.SRS.SIMmodule_off[6] ##turn off the SNSPD power suppy after the measurement
 
 	#@Task()
@@ -860,12 +860,12 @@ class PLThinFilm(Spyrelet):
 	def exp_parameters(self):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
-		('# of points', {'type': int, 'default': 6}),
-		('Measurement Time', {'type': int, 'default': 200, 'units':'s'}),
+		('# of points', {'type': int, 'default': 1}),
+		('Measurement Time', {'type': int, 'default': 2000, 'units':'s'}),
 		('File Name', {'type': str}),
-		('AWG Pulse Repetition Period',{'type': float,'default': 0.001,'units':'s'}),
-		('AWG Pulse Frequency',{'type': int,'default': 1000,'units':'Hz'}),
-		('AWG Pulse Width',{'type': float,'default': 500e-9,'units':'s'}),
+		('AWG Pulse Repetition Period',{'type': float,'default': 0.1,'units':'s'}),
+		('AWG Pulse Frequency',{'type': int,'default': 10,'units':'Hz'}),
+		('AWG Pulse Width',{'type': float,'default': 1000e-9,'units':'s'}),
 		]
 		w = ParamWidget(params)
 		return w
