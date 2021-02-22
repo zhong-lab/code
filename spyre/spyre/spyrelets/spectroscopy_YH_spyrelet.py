@@ -403,10 +403,10 @@ class PLThinFilm(Spyrelet):
 		
 
 		#PATH="C:\\Data\\12.18.2020_ffpc\\"+self.exp_parameters.widget.get()['File Name']+"\\motor_scan"
-		PATH="C:\\Data\\2.21.2021_Graphene_Er\\"+self.exp_parameters.widget.get()['File Name']
+		PATH="C:\\Data\\2.22.2021_Graphene_Er\\31st_try\\"+self.exp_parameters.widget.get()['File Name']
 		print('here')
 		print('PATH: '+str(PATH))
-		if PATH!="C:\\Data\\2.21.2021_Graphene_Er\\":
+		if PATH!="C:\\Data\\2.22.2021_Graphene_Er\\31st_try\\":
 			if (os.path.exists(PATH)):
 				print('deleting old directory with same name')
 				os.system('rm -rf '+str(PATH))
@@ -865,7 +865,7 @@ class PLThinFilm(Spyrelet):
 		('File Name', {'type': str}),
 		('AWG Pulse Repetition Period',{'type': float,'default': 0.05,'units':'s'}),
 		('AWG Pulse Frequency',{'type': int,'default': 20,'units':'Hz'}),
-		('AWG Pulse Width',{'type': float,'default': 100e-6,'units':'s'}),
+		('AWG Pulse Width',{'type': float,'default': 200e-6,'units':'s'}),
 		]
 		w = ParamWidget(params)
 		return w
