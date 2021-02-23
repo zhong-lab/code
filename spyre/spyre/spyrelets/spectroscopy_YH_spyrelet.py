@@ -403,10 +403,10 @@ class PLThinFilm(Spyrelet):
 		
 
 		#PATH="C:\\Data\\12.18.2020_ffpc\\"+self.exp_parameters.widget.get()['File Name']+"\\motor_scan"
-		PATH="C:\\Data\\2.22.2021_Graphene_Er\\31st_try\\"+self.exp_parameters.widget.get()['File Name']
+		PATH="C:\\Data\\2.22.2021_Graphene_Er\\TohighVol\\"+self.exp_parameters.widget.get()['File Name']
 		print('here')
 		print('PATH: '+str(PATH))
-		if PATH!="C:\\Data\\2.22.2021_Graphene_Er\\31st_try\\":
+		if PATH!="C:\\Data\\2.22.2021_Graphene_Er\\TohighVol\\":
 			if (os.path.exists(PATH)):
 				print('deleting old directory with same name')
 				os.system('rm -rf '+str(PATH))
@@ -837,8 +837,8 @@ class PLThinFilm(Spyrelet):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
 		# ('start', {'type': float, 'default': 1535.665}),
-		('start', {'type': float, 'default': 1535.90}),
-		('stop', {'type': float, 'default':  1535.90})
+		('start', {'type': float, 'default': 1465}),
+		('stop', {'type': float, 'default':  1555})
 		# ('stop', {'type': float, 'default': 1535.61})
 		]
 		w = ParamWidget(params)
@@ -860,7 +860,7 @@ class PLThinFilm(Spyrelet):
 	def exp_parameters(self):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
-		('# of points', {'type': int, 'default': 1}),
+		('# of points', {'type': int, 'default': 20}),
 		('Measurement Time', {'type': int, 'default': 300, 'units':'s'}),
 		('File Name', {'type': str}),
 		('AWG Pulse Repetition Period',{'type': float,'default': 0.05,'units':'s'}),
