@@ -403,10 +403,10 @@ class PLThinFilm(Spyrelet):
 		
 
 		#PATH="C:\\Data\\12.18.2020_ffpc\\"+self.exp_parameters.widget.get()['File Name']+"\\motor_scan"
-		PATH="C:\\Data\\2.26.2021_GNR_Er\\another_gate\\"+self.exp_parameters.widget.get()['File Name']
+		PATH="C:\\Data\\2.26.2021_GNR_Er\\bare_Er2O3_76\\"+self.exp_parameters.widget.get()['File Name']
 		print('here')
 		print('PATH: '+str(PATH))
-		if PATH!="C:\\Data\\2.26.2021_GNR_Er\\another_gate\\":
+		if PATH!="C:\\Data\\2.26.2021_GNR_Er\\bare_Er2O3_76\\":
 			if (os.path.exists(PATH)):
 				print('deleting old directory with same name')
 				os.system('rm -rf '+str(PATH))
