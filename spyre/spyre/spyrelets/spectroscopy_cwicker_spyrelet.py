@@ -443,7 +443,7 @@ class PLThinFilm(Spyrelet):
 					print('current target wavelength: '+str(wlTargets[i]))
 					print('actual wavelength: '+str(self.wm.measure_wavelength()))
 					time.sleep(1)
-			#self.fungen.output[2]='ON'
+			self.fungen.output[2]='ON'
 
 			print('taking data')
 			print('current target wavelength: '+str(wlTargets[i]))
@@ -501,7 +501,7 @@ class PLThinFilm(Spyrelet):
 			self.createHistogram(stoparray, timebase, bincount, expparams['AWG Pulse Repetition Period'].magnitude,str(i), wls,PATH)
 			# self.createHistogram(stoparray, timebase, bincount,period,str(i),
 			# 	wls,PATH,savefreqs)
-		self.fungen.output[2]='OFF'
+			self.fungen.output[2]='OFF'
 		#self.SRS.SIMmodule_off[6] ##turn off the SNSPD power suppy after the measurement
 
 	#@Task()
