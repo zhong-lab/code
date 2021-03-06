@@ -443,7 +443,7 @@ class PLThinFilm(Spyrelet):
 					print('current target wavelength: '+str(wlTargets[i]))
 					print('actual wavelength: '+str(self.wm.measure_wavelength()))
 					time.sleep(1)
-			self.fungen.output[2]='ON'
+			#self.fungen.output[2]='ON'
 
 			print('taking data')
 			print('current target wavelength: '+str(wlTargets[i]))
