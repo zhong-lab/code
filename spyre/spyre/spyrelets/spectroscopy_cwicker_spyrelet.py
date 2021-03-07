@@ -373,7 +373,7 @@ class PLThinFilm(Spyrelet):
 	def startpulse(self, timestep=100e-9):
 
 		#self.fungen.output[1]='OFF'
-		self.fungen.output[2]='OFF'
+		#self.fungen.output[2]='OFF'
 		
 		#self.SRS.SIMmodule_on[6] ##Turn on the power supply of the SNSPD
 		time.sleep(3)  ##wait 1s to turn on the SNSPD
@@ -423,11 +423,11 @@ class PLThinFilm(Spyrelet):
 
 		wlTargets=np.linspace(wlparams['start'],wlparams['stop'],expparams['# of points'])
 		
-		self.fungen.voltage[2]=ditherV
+		#self.fungen.voltage[2]=ditherV
 		print('wlTargets: '+str(wlTargets))
 		for i in range(expparams['# of points']):
 			print(i)
-			self.fungen.output[2]='OFF'
+			#self.fungen.output[2]='OFF'
 
 			with Client(self.laser) as client:
 
@@ -501,7 +501,7 @@ class PLThinFilm(Spyrelet):
 			self.createHistogram(stoparray, timebase, bincount, expparams['AWG Pulse Repetition Period'].magnitude,str(i), wls,PATH)
 			# self.createHistogram(stoparray, timebase, bincount,period,str(i),
 			# 	wls,PATH,savefreqs)
-			self.fungen.output[2]='OFF'
+			#self.fungen.output[2]='OFF'
 		#self.SRS.SIMmodule_off[6] ##turn off the SNSPD power suppy after the measurement
 
 	#@Task()
