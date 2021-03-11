@@ -490,12 +490,12 @@ class PLThinFilm(Spyrelet):
 				# 	self.fungen.output[2]='OFF'
 				# 	endloop
 
-				"""
+				
 				while ((wl<wlTargets[i]-0.001) or (wl>wlTargets[i]+0.001)) and (time.time()-startTime < expparams['Measurement Time'].magnitude):
 					print('correcting for laser drift')
 					self.homelaser(wlTargets[i])
 					wl=self.wm.measure_wavelength()
-				"""
+				
 			print('actual  wavelength: '+str(wl))
 			#print('I am here')
 			self.createHistogram(stoparray, timebase, bincount, expparams['AWG Pulse Repetition Period'].magnitude,str(i), wls,PATH)
@@ -650,24 +650,13 @@ class PLThinFilm(Spyrelet):
 		# turnn off the RF output of the N5181A whenn done
 		self.source.RF_OFF()
 		"""
+	
 	@Task()
-	def spectralDiffusion_wAWG(self):
-		""" Task to measure spectral diffusion on timescales < T1. Uses the 
-		Agilent N5181A RF source to send a sine wave to the phase EOM. The
-		amplitude of the RF drive for the EOM is set such that the sidebands
-		have an equal amplitude to the pump beam (Calibrated on 11/19/20 to 
-		be 6Vpp for the JDSU phase EOM). This tasks sweeps the
-		frequency of the sine wave (separation of the EOM sidebands) while
-		collecting PL, which can be used to determine the spectral diffusion
-		linewidth since the saturation of the ions will be determined by how
-		much the sidebands overlap with the spectral  diffusion lineshape.
-		
-		The Keysight AWG only works up to 80MHz. 
+	def fiberFilter(self):
 
-		Could potentially modify code to use Siglent AWG which can go up to 120MHz
-		"""
 		self.fungen.output[1]='OFF'
 		self.fungen.output[2]='OFF'
+
 		# some initialization of the function generator
 		self.fungen.clear_mem(1)
 		self.fungen.clear_mem(2)
@@ -678,45 +667,29 @@ class PLThinFilm(Spyrelet):
 
 
 		# get the parameters for the experiment from the widget
-		SD_wAWGparams=self.SD_wAWGparams.widget.get()
-		startFreq=SD_wAWGparams['Start frequency']
-		stopFreq=SD_wAWGparams['Stop frequency']
-		EOMvoltage=SD_wAWGparams['EOM voltage']
-		runtime=SD_wAWGparams['Runtime']
-		EOMchannel=SD_wAWGparams['EOM channel']
-		Pulsechannel=SD_wAWGparams['Pulse channel']
-		Pulsefreq=SD_wAWGparams['Pulse Frequency']
-		Pulsewidth=SD_wAWGparams['Pulse Width']
-		period=SD_wAWGparams['Pulse Repetition Period']
-		wl=SD_wAWGparams['Wavelength']
-		points=SD_wAWGparams['# of points']
-		foldername=SD_wAWGparams['File Name']
+		fiberFilter_params=self.fiberFilter_params.widget.get()
+		startV=SD_wAWGparams['Start voltage']
+		stopV=SD_wAWGparams['Stop voltage']
+		runtime=fiberFilter_params['Runtime']
+		filterChannel=fiberFilter_params['Filter channel']
+		Pulsechannel=fiberFilter_params['Pulse channel']
+		Pulsefreq=fiberFilter_params['Pulse Frequency']
+		Pulsewidth=fiberFilter_params['Pulse Width']
+		period=fiberFilter_params['Pulse Repetition Period']
+		wl=fiberFilter_params['Wavelength']
+		points=fiberFilter_params['# of points']
+		foldername=fiberFilter_params['File Name']
 
 		# convert the period & runtime to floats
 		period=period.magnitude
 		runtime=runtime.magnitude
-		self.fungen.clear_mem(EOMchannel)
-		self.fungen.clear_mem(Pulsechannel)
-		self.fungen.waveform[Pulsechannel]='PULS'
-		self.fungen.waveform[EOMchannel]='SIN'
 
+		self.fungen.offset[filterChannel]=0
 
-		# set the sine wave driving the EOM on the other channel
-		self.fungen.waveform[EOMchannel]='SIN'
-		self.fungen.voltage[EOMchannel]=EOMvoltage
-		self.fungen.offset[EOMchannel]=0
-		self.fungen.phase[EOMchannel]=0
-
-
-		self.fungen.waveform[Pulsechannel]='PULS'
-		self.fungen.frequency[Pulsechannel]=Pulsefreq
-		self.fungen.voltage[Pulsechannel]=3.5
-		self.fungen.offset[Pulsechannel]=1.75
-		self.fungen.phase[Pulsechannel]=0
 		self.fungen.pulse_width[Pulsechannel]=Pulsewidth
 
 
-		self.fungen.output[EOMchannel]='ON'
+		self.fungen.output[filterChannel]='ON'
 		self.fungen.output[Pulsechannel]='ON'
 		
 
@@ -748,15 +721,10 @@ class PLThinFilm(Spyrelet):
 			print("Specify a foldername & rerun task.")
 			print("Task will error trying to saving data.")
 
-		# make a vector containing all the frequency setpoints for the EOM
-		freqs=np.linspace(startFreq,stopFreq,points)
-
-		# now loop through all the set frequencies of the EOM modulation
-		# and record the PL on the qutag
-
+		voltages=np.linspace(startV,stopV,points)
 
 		for i in range(points):
-			self.fungen.frequency[EOMchannel]=freqs[i]
+			self.fungen.frequency[filterChannel]=voltages[i]
 
 			# want to actively stabilize the laser frequency since it can
 			# drift on the MHz scale
@@ -777,9 +745,7 @@ class PLThinFilm(Spyrelet):
 
 
 			print('taking data')
-			print('current frequency: '+str(freqs[i]))
-			print('current target wavelength: '+str(wl))
-			print('actual wavelength: '+str(self.wm.measure_wavelength()))
+			print('current target voltage: '+str(voltages[i]))
 			
 			time.sleep(1)
 
@@ -787,7 +753,7 @@ class PLThinFilm(Spyrelet):
 			stoparray = []
 			startTime = time.time()
 			wls=[]
-			savefreqs=[]
+			saveVoltages=[]
 			lost = self.qutag.getLastTimestamps(True)
 
 			looptime=startTime
@@ -813,7 +779,7 @@ class PLThinFilm(Spyrelet):
 						stoparray.append(stoptimestamp)
 				currentwl=self.wm.measure_wavelength()
 				wls.append(str(currentwl))
-				savefreqs.append(float(freqs[i]))
+				saveVoltages.append(float(voltages[i]))
 				looptime+=time.time()-loopstart
 
 				# quenchfix=self.reset_quench()
@@ -829,12 +795,11 @@ class PLThinFilm(Spyrelet):
 					currentwl=self.wm.measure_wavelength()
 			print('actual  wavelength: '+str(currentwl))
 
-			self.createHistogram(stoparray, timebase, bincount,period,str(i),wls,PATH,savefreqs)
+			self.createHistogram(stoparray, timebase, bincount,period,str(i),wls,PATH,saveVoltages)
 
-		self.fungen.output[EOMchannel]='OFF'  ##turn off the AWG for both channels
-		self.fungen.output[Pulsechannel]='OFF'
+		self.fungen.output[filterChannel]='OFF'  ##turn off the AWG for both channels
 		#self.SRS.SIMmodule_off[6] ##turn off the SNSPD power suppy after the measurement
-
+		
 
 	@Task()
 	def qutagInit(self):
@@ -914,6 +879,31 @@ class PLThinFilm(Spyrelet):
 		('Pulse Width',{'type': float,'default': 500e-9,'units':'s'}),
 		('Wavelength',{'type':float,'default':1535.61}),
 		('# of points',{'type':int,'default':2}),
+		('File Name',{'type':str}),
+		]
+		w=ParamWidget(params)
+		return w
+
+
+	@Element(name='fiber filter scan params ')
+	def fiberFilter_params(self):
+		""" Widget containing the parameters used in the spectral diffusion
+		experiment.
+
+		Default EOM voltage calibrated by Christina and Yizhong on 11/19/20.
+		(rough estimate for equal amplitude sidebands)
+		"""
+		params=[
+		('Start voltage',{'type':float,'default':0,'units':'V'}),
+		('Stop voltage',{'type':float,'default':1.366,'units':'V'}),
+		('Runtime',{'type':float,'default':600,'units':'s'}),
+		('Filter channel',{'type':int,'default':2}),
+		('Pulse channel',{'type':int,'default':1}),
+		('Pulse Repetition Period',{'type': float,'default': 0.050,'units':'s'}),
+		('Pulse Frequency',{'type': int,'default': 20,'units':'Hz'}),
+		('Pulse Width',{'type': float,'default': 8e-3,'units':'s'}),
+		('Wavelength',{'type':float,'default':1535.61}),
+		('# of points',{'type':int,'default':15}),
 		('File Name',{'type':str}),
 		]
 		w=ParamWidget(params)
