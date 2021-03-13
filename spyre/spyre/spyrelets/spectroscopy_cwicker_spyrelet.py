@@ -21,6 +21,7 @@ import time
 from lantz.drivers.bristol import Bristol_771
 from toptica.lasersdk.client import NetworkConnection, Client
 from lantz.drivers.keysight import Keysight_33622A
+from lantz.drivers.thorlabs.pm100d import PM100D
 #from lantz.drivers.agilent import N5181A
 
 #from lantz.drivers.keysight import Arbseq_Class_MW
@@ -42,7 +43,8 @@ class PLThinFilm(Spyrelet):
 	requires = {
 		'wm': Bristol_771,
 		'fungen': Keysight_33622A,
-		#'SRS': SRS900
+		#'SRS': SRS900,
+		'pmd':PM100D
 	}
 	qutag = None
 	laser = NetworkConnection('1.1.1.2')
@@ -114,6 +116,35 @@ class PLThinFilm(Spyrelet):
 		self.homelaser(current)
 		wl=self.wm.measure_wavelength()
 		return voltageTargets,totalShift,wl
+
+	def avgPower(self):
+		plist=[]
+		while len(plist)<50:
+			p=self.pmd.power.magnitude
+			plist.append(p)
+		pcurr=np.mean(plist)
+		return pcurr
+
+	def stabilizePower(self,power_target,pcurr):
+		while abs(pcurr-power_target)>0.03*power_target:
+				with Client(self.laser) as client:
+					setpoint=client.get('laser1:power-stabilization:setpoint',float)
+					newsetpoint=setpoint+(power_target-pcurr)/float(pcurr)*setpoint
+					rsetpoint=round(newsetpoint,2)
+					print('difference: '+str(pcurr-power_target))
+					print('powers: '+str(power_target)+' '+str(pcurr))
+					print('power stabilization: '+str(setpoint)+', '+str(rsetpoint))
+					if (rsetpoint==setpoint):
+						'quitting because no more stabilization possible'
+						break
+					if (rsetpoint>56.00) or (rsetpoint<0):
+						'quitting because target power is out of bounds'
+						break
+					client.set('laser1:power-stabilization:setpoint',rsetpoint)
+					pcurr=self.avgPower()
+					
+		return pcurr
+
 	"""
 	def reset_quench(self):
 		#A typical quench shows the voltage exceeding 2mV.
@@ -504,6 +535,139 @@ class PLThinFilm(Spyrelet):
 			#self.fungen.output[2]='OFF'
 		#self.SRS.SIMmodule_off[6] ##turn off the SNSPD power suppy after the measurement
 
+	@Task()
+	def startpulse_wPM(self, timestep=100e-9):
+
+		#self.fungen.output[1]='OFF'
+		#self.fungen.output[2]='OFF'
+		
+		#self.SRS.SIMmodule_on[6] ##Turn on the power supply of the SNSPD
+		time.sleep(3)  ##wait 1s to turn on the SNSPD
+
+		##Qutag Part
+		self.configureQutag()
+		expparams = self.exp_parameters.widget.get()
+		wlparams = self.wl_parameters.widget.get()
+		self.homelaser(wlparams['start'])
+		print('Laser Homed!')
+		qutagparams = self.qutag_params.widget.get()
+		lost = self.qutag.getLastTimestamps(True) # clear Timestamp buffer
+		stoptimestamp = 0
+		synctimestamp = 0
+		bincount = qutagparams['Bin Count']
+		timebase = self.qutag.getTimebase()
+		start = qutagparams['Start Channel']
+		stop = qutagparams['Stop Channel']
+		ditherV=expparams['Dither Voltage'].magnitude
+
+		"""
+		self.fungen.frequency[1]=expparams['AWG Pulse Frequency']
+		self.fungen.voltage[1]=3.5
+		self.fungen.offset[1]=1.75
+		self.fungen.phase[1]=-3
+		"""   
+		self.fungen.pulse_width[1]=expparams['AWG Pulse Width']
+		"""
+		self.fungen.waveform[1]='PULS'
+		self.fungen.output[1]='ON'
+		"""
+
+		#PATH="C:\\Data\\12.18.2020_ffpc\\"+self.exp_parameters.widget.get()['File Name']+"\\motor_scan"
+		PATH="D:\\Data\\"+self.exp_parameters.widget.get()['File Name']
+		print('here')
+		print('PATH: '+str(PATH))
+		if PATH!="C:\\Data\\2.26.2021_GNR_Er\\bare_Er2O3_76\\":
+			if (os.path.exists(PATH)):
+				print('deleting old directory with same name')
+				os.system('rm -rf '+str(PATH))
+			print('making new directory')
+			Path(PATH).mkdir(parents=True, exist_ok=True)
+			#os.mkdir(PATH)
+		else:
+			print("Specify a foldername & rerun task.")
+			print("Task will error trying to saving data.")
+
+		wlTargets=np.linspace(wlparams['start'],wlparams['stop'],expparams['# of points'])
+		
+		power_target=0
+		#self.fungen.voltage[2]=ditherV
+		print('wlTargets: '+str(wlTargets))
+		for i in range(expparams['# of points']):
+			print(i)
+			#self.fungen.output[2]='OFF'
+
+			with Client(self.laser) as client:
+				setting=client.get('laser1:ctl:wavelength-set', float)
+				client.set('laser1:ctl:wavelength-set', wlTargets[i])
+				wl=self.wm.measure_wavelength()
+
+			while ((wl<wlTargets[i]-0.001) or (wl>wlTargets[i]+0.001)):
+					print('correcting for laser drift')
+					self.homelaser(wlTargets[i])
+					wl=self.wm.measure_wavelength()
+					print('current target wavelength: '+str(wlTargets[i]))
+					print('actual wavelength: '+str(self.wm.measure_wavelength()))
+					time.sleep(1)
+			#self.fungen.output[2]='ON'
+			if power_target==0:
+				power_target=self.avgPower()
+				print('power target: '+str(power_target))
+
+			print('taking data')
+			print('current target wavelength: '+str(wlTargets[i]))
+			print('actual wavelength: '+str(self.wm.measure_wavelength()))
+			
+			time.sleep(1)
+			##Wavemeter measurements
+			stoparray = []
+			startTime = time.time()
+			wls=[]
+			lost = self.qutag.getLastTimestamps(True)
+
+			looptime=startTime
+			while looptime-startTime < expparams['Measurement Time'].magnitude:
+				loopstart=time.time()
+				# get the lost timestamps
+				lost = self.qutag.getLastTimestamps(True)
+				# wait half a milisecond
+				time.sleep(5*0.1)   #
+				# get thte timestamps in the last half milisecond
+				timestamps = self.qutag.getLastTimestamps(True)
+
+				tstamp = timestamps[0] # array of timestamps
+				tchannel = timestamps[1] # array of channels
+				values = timestamps[2] # number of recorded timestamps
+
+				for k in range(values):
+					# output all stop events together with the latest start event
+					if tchannel[k] == start:
+						synctimestamp = tstamp[k]
+					else:
+						stoptimestamp = tstamp[k]
+						stoparray.append(stoptimestamp)
+				wl=self.wm.measure_wavelength()
+				wls.append(str(wl))
+
+				looptime+=time.time()-loopstart
+				#print('i: '+str(i)+', looptime-startTime: '+str(looptime-startTime))
+				# quenchfix=self.reset_quench()
+				# if quenchfix!='YES':
+				# 	print('SNSPD quenched and could not be reset')
+				# 	# self.fungen.output[1]='OFF'
+				# 	self.fungen.output[2]='OFF'
+				# 	endloop
+				
+				while ((wl<wlTargets[i]-0.001) or (wl>wlTargets[i]+0.001)) and (time.time()-startTime < expparams['Measurement Time'].magnitude):
+					print('correcting for laser drift')
+					self.homelaser(wlTargets[i])
+					wl=self.wm.measure_wavelength()
+
+				pcurr=self.avgPower()
+				self.stabilizePower(power_target,pcurr)
+				
+			print('actual  wavelength: '+str(wl))
+			#print('I am here')
+			self.createHistogram(stoparray, timebase, bincount, expparams['AWG Pulse Repetition Period'].magnitude,str(i), wls,PATH)
 	#@Task()
 	#def spectralDiffusion_wRFsource(self):
 		""" Task to measure spectral diffusion on timescales < T1. Assumes that
