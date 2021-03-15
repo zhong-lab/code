@@ -832,8 +832,8 @@ class PLThinFilm(Spyrelet):
 
 		# get the parameters for the experiment from the widget
 		fiberFilter_params=self.fiberFilter_params.widget.get()
-		startV=SD_wAWGparams['Start voltage']
-		stopV=SD_wAWGparams['Stop voltage']
+		startV=fiberFilter_params['Start voltage']
+		stopV=fiberFilter_params['Stop voltage']
 		runtime=fiberFilter_params['Runtime']
 		filterChannel=fiberFilter_params['Filter channel']
 		Pulsechannel=fiberFilter_params['Pulse channel']
@@ -888,7 +888,7 @@ class PLThinFilm(Spyrelet):
 		voltages=np.linspace(startV,stopV,points)
 
 		for i in range(points):
-			self.fungen.frequency[filterChannel]=voltages[i]
+			self.fungen.offset[filterChannel]=voltages[i]
 
 			# want to actively stabilize the laser frequency since it can
 			# drift on the MHz scale
