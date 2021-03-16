@@ -4,6 +4,7 @@ import time
 import csv
 import os
 from pathlib import Path
+import pickle # for saving large arrays
 
 from PyQt5.Qsci import QsciScintilla, QsciLexerPython
 import matplotlib.pyplot as plt
@@ -88,10 +89,12 @@ class PLThinFilm(Spyrelet):
 				print('error')
 			else:
 				hist[binNumber]+=1
+				
 		if extra_data==False:
 			np.savez(os.path.join(out_name,str(index)),hist,wls)
 		if extra_data!=False:
 			np.savez(os.path.join(out_name,str(index)),hist,wls,extra_data)
+
 		#np.savez(os.path.join(out_name,str(index+40)),hist,wls)
 		print('Data stored under File Name: ' + out_name +'\\'+str(index)+'.npz')
 
@@ -441,7 +444,7 @@ class PLThinFilm(Spyrelet):
 		PATH="D:\\Data\\"+self.exp_parameters.widget.get()['File Name']
 		print('here')
 		print('PATH: '+str(PATH))
-		if PATH!="C:\\Data\\2.26.2021_GNR_Er\\bare_Er2O3_76\\":
+		if PATH!="D:\\Data\\":
 			if (os.path.exists(PATH)):
 				print('deleting old directory with same name')
 				os.system('rm -rf '+str(PATH))
@@ -486,7 +489,11 @@ class PLThinFilm(Spyrelet):
 			startTime = time.time()
 			wls=[]
 			lost = self.qutag.getLastTimestamps(True)
-			#counter2=0
+
+			# open pickle files to save timestamp data
+			times=open(str(i)+'_times.p','wb')
+			channels=open(str(i)+'_channels.p','wb')
+			vals=open(str(i)+'_vals.p','wb')
 
 			looptime=startTime
 			while looptime-startTime < expparams['Measurement Time'].magnitude:
@@ -501,6 +508,11 @@ class PLThinFilm(Spyrelet):
 				tstamp = timestamps[0] # array of timestamps
 				tchannel = timestamps[1] # array of channels
 				values = timestamps[2] # number of recorded timestamps
+
+				# dump timestamp data to pickle file
+				times.dump(tstamp)
+				channels.dump(tchannel)
+				vals.dump(values)
 
 				for k in range(values):
 					# output all stop events together with the latest start event
@@ -526,10 +538,16 @@ class PLThinFilm(Spyrelet):
 					print('correcting for laser drift')
 					self.homelaser(wlTargets[i])
 					wl=self.wm.measure_wavelength()
-				
+					
+			# close pickle files with timestamp data
+			times.close()
+			channels.close()
+			vals.close()
+
 			print('actual  wavelength: '+str(wl))
 			#print('I am here')
-			self.createHistogram(stoparray, timebase, bincount, expparams['AWG Pulse Repetition Period'].magnitude,str(i), wls,PATH)
+			self.createHistogram(stoparray, timebase, bincount, expparams['AWG Pulse Repetition Period'].magnitude,
+				str(i), wls,PATH,timestamps=True)
 			# self.createHistogram(stoparray, timebase, bincount,period,str(i),
 			# 	wls,PATH,savefreqs)
 			#self.fungen.output[2]='OFF'
