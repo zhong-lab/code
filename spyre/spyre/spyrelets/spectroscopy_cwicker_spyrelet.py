@@ -491,9 +491,9 @@ class PLThinFilm(Spyrelet):
 			lost = self.qutag.getLastTimestamps(True)
 
 			# open pickle files to save timestamp data
-			times=open(str(i)+'_times.p','wb')
-			channels=open(str(i)+'_channels.p','wb')
-			vals=open(str(i)+'_vals.p','wb')
+			times=open(PATH+'\\'+str(i)+'_times.p','wb')
+			channels=open(PATH+'\\'+str(i)+'_channels.p','wb')
+			vals=open(PATH+'\\'+str(i)+'_vals.p','wb')
 
 			looptime=startTime
 			while looptime-startTime < expparams['Measurement Time'].magnitude:
@@ -508,11 +508,6 @@ class PLThinFilm(Spyrelet):
 				tstamp = timestamps[0] # array of timestamps
 				tchannel = timestamps[1] # array of channels
 				values = timestamps[2] # number of recorded timestamps
-
-				# dump timestamp data to pickle file
-				times.dump(tstamp)
-				channels.dump(tchannel)
-				vals.dump(values)
 
 				for k in range(values):
 					# output all stop events together with the latest start event
@@ -533,6 +528,10 @@ class PLThinFilm(Spyrelet):
 				# 	self.fungen.output[2]='OFF'
 				# 	endloop
 
+				# dump timestamp data to pickle file
+				pickle.dump(tstamp,times)
+				pickle.dump(tchannel,channels)
+				pickle.dump(values,vals)
 				
 				while ((wl<wlTargets[i]-0.001) or (wl>wlTargets[i]+0.001)) and (time.time()-startTime < expparams['Measurement Time'].magnitude):
 					print('correcting for laser drift')
@@ -547,7 +546,7 @@ class PLThinFilm(Spyrelet):
 			print('actual  wavelength: '+str(wl))
 			#print('I am here')
 			self.createHistogram(stoparray, timebase, bincount, expparams['AWG Pulse Repetition Period'].magnitude,
-				str(i), wls,PATH,timestamps=True)
+				str(i), wls,PATH)
 			# self.createHistogram(stoparray, timebase, bincount,period,str(i),
 			# 	wls,PATH,savefreqs)
 			#self.fungen.output[2]='OFF'
