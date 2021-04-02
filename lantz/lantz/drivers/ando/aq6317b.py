@@ -111,12 +111,12 @@ class AQ6317B(MessageBasedDriver):
     @Feat()
     def resolution(self):
         """ Gets the resolution in nm. """
-        return self.query("RESLNO?")
+        return self.query("RESLN?")
 
     @resolution.setter
     def resolution(self,value):
         """ Sets the resolution in nm. """
-        self.write("RESLNO{}".format(value))
+        self.write("RESLN{}".format(value))
 
     @Feat()
     def avgCount(self):
@@ -165,7 +165,6 @@ class AQ6317B(MessageBasedDriver):
     def read_status_byte(self):
         """ Read the status byte. """
         S=self.write("\"SRQ1\": POLL 1,S")
-        print(S)
         return S
 
     @Feat()
@@ -186,7 +185,6 @@ class AQ6317B(MessageBasedDriver):
         check=1
         while check!=0:
             check=self.sweep_check
-            print('check: '+str(check))
         t2=time.time()
         print('sweep time: '+str(t2-t1))
         return None
@@ -266,9 +264,9 @@ if __name__ == '__main__':
       #inst.start_wl=start
       #inst.stop_wl=stop
       inst.levelScale=0.8
-      inst.resolution=0.05
+      inst.resolution=0.1
       inst.avgCount=800
-      
+
       inst.set_measSensitivity()
 
       inst.tracing_conditions('A',('WRT','DSP'))
@@ -282,7 +280,7 @@ if __name__ == '__main__':
     plt.ylabel('Power (dBm)')
     plt.show()
 
-    with open('scan.csv','w',newline='') as csvfile:
+    with open('0.1nmResolution.csv','w',newline='') as csvfile:
         writer=csv.writer(
               csvfile,
               delimiter=',',
@@ -291,7 +289,6 @@ if __name__ == '__main__':
         for i in range(len(p)):
             writer.writerow([str(wl[i]),str(p[i])])
 
-      
 
 
 
