@@ -13,7 +13,8 @@ from collections import OrderedDict
 import sys
 import time
 import numpy as np
-
+import csv
+import matplotlib.pyplot as plt
 
 
 class AQ6317B(MessageBasedDriver):
@@ -28,7 +29,7 @@ class AQ6317B(MessageBasedDriver):
 
 
     DEFAULTS = {'COMMON': {'write_termination': '\n',
-                           'read_termination': '\n'}}
+                           'read_termination': '\r\n'}}
 
 
     def query(self, command, send_args=(None, None), recv_args=(None, None),delay=None):
@@ -110,12 +111,12 @@ class AQ6317B(MessageBasedDriver):
     @Feat()
     def resolution(self):
         """ Gets the resolution in nm. """
-        return self.query("RESLNO?")
+        return self.query("RESLN?")
 
     @resolution.setter
     def resolution(self,value):
         """ Sets the resolution in nm. """
-        self.write("RESLNO{}".format(value))
+        self.write("RESLN{}".format(value))
 
     @Feat()
     def avgCount(self):
@@ -164,37 +165,80 @@ class AQ6317B(MessageBasedDriver):
     def read_status_byte(self):
         """ Read the status byte. """
         S=self.write("\"SRQ1\": POLL 1,S")
-        print(S)
         return S
 
+    @Feat()
+    def sweep_check(self):
+      ans=''
+      while len(ans)==0:
+        ans=self.query('SWEEP?')
+        time.sleep(3)
+      return int(ans)
+
+    @Action()
     def sweep(self):
         """ Sweeps for a single time. While loop waits for execution to finish."""
+        print('starting sweep')
         self.write("SGL")
         S=self.write("POLL 1,S")
         t1=time.time()
-        while True:
-            check=self.write('SWEEP?')[0]
-            if check>0:
-                t2=time.time()
-                print('sweep time: '+str(t2-t1))
-                break
+        check=1
+        while check!=0:
+            check=self.sweep_check
+        t2=time.time()
+        print('sweep time: '+str(t2-t1))
+        return None
+
+
+    @Action()
+    def dataencoding(self):
+        self.write(':DAT:ENC ascii;WID 2;')
+
+    @Feat()
+    def start_wl(self):
+        return self.query("STAWL?")
+
+    @Feat()
+    def stop_wl(self):
+        return self.query("STPWL?")
+
+    @start_wl.setter
+    def start_wl(self,value):
+        """ Get the center wavelength."""
+        self.write("STAWL{}".format(value))
+
+    @stop_wl.setter
+    def stop_wl(self,value):
+      """ Set the center wavelength."""
+      self.write("STPWL{}".format(value))
         
     @Action()
-    def read_waveform(self):
-        """ Sets the CRLF string delimiter for data output, and requests an output of 
-        the waveform data. 
-
-        Reads the waveforms data and assigns them in array A. 
+    def read_waveform(self,key):
+        """
+        Reads the waveforms data. 
 
         key is 'A'/'B'/'C' for the channel you want to get data from
         """
         #self.query("*IDN?")
-        
-        self.write("SD1")
-        for i in range(500):
-            res=self.query("LDATAR{}".format(i))
-            print(res)
-       
+        #self.write("ISET IFC")
+        #self.write("ISET REN")
+        #self.write("INIT")
+        #self.dataencoding()
+        #wllist=np.linspace(wlsta,wlstp,1001)
+        #print(wllist)
+
+        self.write("SD0") # make sure to set the delimiter to comma
+        #self.write("HD0") # get rid of the unit header
+        # or set to HD1 if you want to do something with the unit
+        #self.write("B=A")
+        #self.write("SAVEB1")
+        p=self.raw_query("LDAT{}".format(key))
+        wl=self.raw_query("WDAT{}".format(key))
+
+        plist=np.fromstring(p,dtype=np.float,sep=',')[1:]
+        wllist=np.fromstring(wl,dtype=np.float,sep=',')[1:]
+
+        return plist,wllist
 
 if __name__ == '__main__':
     from time import sleep
@@ -209,28 +253,42 @@ if __name__ == '__main__':
     log_to_screen(DEBUG)
     # this is the GPIB Address:
     with AQ6317B('GPIB0::1::INSTR') as inst:
+      
       #inst.set_timeout(100)
-      #inst.get_spectrum()
       inst.initial()
       inst.set_CRLF(0)
 
       inst.centerWl=1538.50
 
-      inst.span=14.0
-      inst.refLevel=-63.1
-      inst.levelScale=2.0
-      inst.resolution=0.05
-      inst.avgCount=10
-      
+      inst.span=24.0
+      #inst.start_wl=start
+      #inst.stop_wl=stop
+      inst.levelScale=0.8
+      inst.resolution=2
+      inst.avgCount=800
+
       inst.set_measSensitivity()
 
-      inst.samplingPoint()
-      
       inst.tracing_conditions('A',('WRT','DSP'))
-      inst.sweep()
-
-      inst.read_waveform()
+      #inst.tracing_conditions('B',('WRT','DSP'))
       
+      inst.sweep()
+      p,wl=inst.read_waveform('A')
+
+    plt.plot(wl,p,'k')
+    plt.xlabel('Wavelength (nm)')
+    plt.ylabel('Power (dBm)')
+    plt.show()
+
+    with open('2nmResolution.csv','w',newline='') as csvfile:
+        writer=csv.writer(
+              csvfile,
+              delimiter=',',
+              quotechar='|',
+              quoting=csv.QUOTE_MINIMAL)
+        for i in range(len(p)):
+            writer.writerow([str(wl[i]),str(p[i])])
+
 
 
 

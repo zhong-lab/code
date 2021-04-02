@@ -408,3 +408,25 @@ class MessageBasedDriver(Driver):
                            container=list, delay=None, header='ieee'):
 
         return self.resource.query_binary_values(command, datatype, isbigendian, container, delay, header)
+
+    def raw_query(self, command, *, send_args=(None, None), recv_args=(None, None), delay=None):
+        """Send query to the instrument and return the answer
+
+        :param command: command to be sent to the instrument
+        :type command: string
+
+        :param send_args: (termination, encoding) to override class defaults
+        :param recv_args: (termination, encoding) to override class defaults
+
+        Uses read_raw instead of read for cases in which pi-visa handling does not work well. 
+        """
+
+        self.write(command, *send_args)
+        delay = 0.0 if delay is None else delay
+
+        if delay > 0.0:
+            sleep(delay)
+
+        ret=self.resource.read_raw()
+        self.log_debug('Read {!r}', ret)
+        return ret
