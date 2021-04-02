@@ -394,16 +394,39 @@ class MessageBasedDriver(Driver):
 
     def query_ascii(self, command, converter='f', separator=',',
                            container=list, termination=None, encoding=None, delay=None):
-        
+        #print("4 varibles:",converter, separator, container, delay)
         self.resource.write(command, termination, encoding)
         if delay is None:
             delay = 0.0
         if delay > 0.0:
             sleep(delay)
-
-        return self.resource.read_ascii_values(converter, separator, container, delay)
+        #simport pdb; pdb.set_trace()
+        #print("4 varibles:",converter, separator, container, delay)
+        return self.resource.read_ascii_values()
 
     def query_binary(self, command, datatype='f', isbigendian=False,
                            container=list, delay=None, header='ieee'):
 
         return self.resource.query_binary_values(command, datatype, isbigendian, container, delay, header)
+
+    def raw_query(self, command, *, send_args=(None, None), recv_args=(None, None), delay=None):
+        """Send query to the instrument and return the answer
+
+        :param command: command to be sent to the instrument
+        :type command: string
+
+        :param send_args: (termination, encoding) to override class defaults
+        :param recv_args: (termination, encoding) to override class defaults
+
+        Uses read_raw instead of read for cases in which pi-visa handling does not work well. 
+        """
+
+        self.write(command, *send_args)
+        delay = 0.0 if delay is None else delay
+
+        if delay > 0.0:
+            sleep(delay)
+
+        ret=self.resource.read_raw()
+        self.log_debug('Read {!r}', ret)
+        return ret
