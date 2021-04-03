@@ -45,7 +45,7 @@ class PLThinFilm(Spyrelet):
 		'wm': Bristol_771,
 		'fungen': Keysight_33622A,
 		#'SRS': SRS900,
-		'pmd':PM100D
+		#'pmd':PM100D
 	}
 	qutag = None
 	laser = NetworkConnection('1.1.1.2')
@@ -88,6 +88,7 @@ class PLThinFilm(Spyrelet):
 				continue
 				print('error')
 			else:
+				print('binNumber: '+str(binNumber))
 				hist[binNumber]+=1
 				
 		if extra_data==False:
@@ -120,6 +121,7 @@ class PLThinFilm(Spyrelet):
 		wl=self.wm.measure_wavelength()
 		return voltageTargets,totalShift,wl
 
+	"""
 	def avgPower(self):
 		plist=[]
 		while len(plist)<50:
@@ -127,7 +129,8 @@ class PLThinFilm(Spyrelet):
 			plist.append(p)
 		pcurr=np.mean(plist)
 		return pcurr
-
+		"""
+	"""
 	def stabilizePower(self,power_target,pcurr):
 		while abs(pcurr-power_target)>0.03*power_target:
 				with Client(self.laser) as client:
@@ -147,7 +150,7 @@ class PLThinFilm(Spyrelet):
 					pcurr=self.avgPower()
 					
 		return pcurr
-
+		"""
 	"""
 	def reset_quench(self):
 		#A typical quench shows the voltage exceeding 2mV.
@@ -410,7 +413,7 @@ class PLThinFilm(Spyrelet):
 		#self.fungen.output[2]='OFF'
 		
 		#self.SRS.SIMmodule_on[6] ##Turn on the power supply of the SNSPD
-		time.sleep(3)  ##wait 1s to turn on the SNSPD
+		#time.sleep(3)  ##wait 1s to turn on the SNSPD
 
 		##Qutag Part
 		self.configureQutag()
@@ -426,7 +429,7 @@ class PLThinFilm(Spyrelet):
 		timebase = self.qutag.getTimebase()
 		start = qutagparams['Start Channel']
 		stop = qutagparams['Stop Channel']
-		ditherV=expparams['Dither Voltage'].magnitude
+		#ditherV=expparams['Dither Voltage'].magnitude
 
 		"""
 		self.fungen.frequency[1]=expparams['AWG Pulse Frequency']
@@ -434,7 +437,7 @@ class PLThinFilm(Spyrelet):
 		self.fungen.offset[1]=1.75
 		self.fungen.phase[1]=-3
 		"""   
-		self.fungen.pulse_width[1]=expparams['AWG Pulse Width']
+		#self.fungen.pulse_width[1]=expparams['AWG Pulse Width']
 		"""
 		self.fungen.waveform[1]='PULS'
 		self.fungen.output[1]='ON'
@@ -491,9 +494,10 @@ class PLThinFilm(Spyrelet):
 			lost = self.qutag.getLastTimestamps(True)
 
 			# open pickle files to save timestamp data
-			times=open(PATH+'\\'+str(i)+'_times.p','wb')
-			channels=open(PATH+'\\'+str(i)+'_channels.p','wb')
-			vals=open(PATH+'\\'+str(i)+'_vals.p','wb')
+
+			#times=open(PATH+'\\'+str(i)+'_times.p','wb')
+			#channels=open(PATH+'\\'+str(i)+'_channels.p','wb')
+			#vals=open(PATH+'\\'+str(i)+'_vals.p','wb')
 
 			looptime=startTime
 			while looptime-startTime < expparams['Measurement Time'].magnitude:
@@ -501,7 +505,7 @@ class PLThinFilm(Spyrelet):
 				# get the lost timestamps
 				lost = self.qutag.getLastTimestamps(True)
 				# wait half a milisecond
-				time.sleep(5*0.1)   #
+				time.sleep(2)   #
 				# get thte timestamps in the last half milisecond
 				timestamps = self.qutag.getLastTimestamps(True)
 
@@ -529,9 +533,9 @@ class PLThinFilm(Spyrelet):
 				# 	endloop
 
 				# dump timestamp data to pickle file
-				pickle.dump(tstamp,times)
-				pickle.dump(tchannel,channels)
-				pickle.dump(values,vals)
+				#pickle.dump(tstamp,times)
+				#pickle.dump(tchannel,channels)
+				#pickle.dump(values,vals)
 				
 				while ((wl<wlTargets[i]-0.001) or (wl>wlTargets[i]+0.001)) and (time.time()-startTime < expparams['Measurement Time'].magnitude):
 					print('correcting for laser drift')
@@ -539,19 +543,19 @@ class PLThinFilm(Spyrelet):
 					wl=self.wm.measure_wavelength()
 					
 			# close pickle files with timestamp data
-			times.close()
-			channels.close()
-			vals.close()
+			#times.close()
+			#channels.close()
+			#vals.close()
 
 			print('actual  wavelength: '+str(wl))
 			#print('I am here')
-			self.createHistogram(stoparray, timebase, bincount, expparams['AWG Pulse Repetition Period'].magnitude,
-				str(i), wls,PATH)
+			self.createHistogram(stoparray, timebase, bincount, expparams['AWG Pulse Repetition Period'].magnitude,str(i),wls,PATH)
 			# self.createHistogram(stoparray, timebase, bincount,period,str(i),
 			# 	wls,PATH,savefreqs)
 			#self.fungen.output[2]='OFF'
 		#self.SRS.SIMmodule_off[6] ##turn off the SNSPD power suppy after the measurement
 
+	"""
 	@Task()
 	def startpulse_wPM(self, timestep=100e-9):
 
@@ -577,17 +581,17 @@ class PLThinFilm(Spyrelet):
 		stop = qutagparams['Stop Channel']
 		ditherV=expparams['Dither Voltage'].magnitude
 
-		"""
+		
 		self.fungen.frequency[1]=expparams['AWG Pulse Frequency']
 		self.fungen.voltage[1]=3.5
 		self.fungen.offset[1]=1.75
 		self.fungen.phase[1]=-3
-		"""   
+		   
 		self.fungen.pulse_width[1]=expparams['AWG Pulse Width']
-		"""
+		
 		self.fungen.waveform[1]='PULS'
 		self.fungen.output[1]='ON'
-		"""
+		
 
 		#PATH="C:\\Data\\12.18.2020_ffpc\\"+self.exp_parameters.widget.get()['File Name']+"\\motor_scan"
 		PATH="D:\\Data\\"+self.exp_parameters.widget.get()['File Name']
@@ -685,9 +689,11 @@ class PLThinFilm(Spyrelet):
 			print('actual  wavelength: '+str(wl))
 			#print('I am here')
 			self.createHistogram(stoparray, timebase, bincount, expparams['AWG Pulse Repetition Period'].magnitude,str(i), wls,PATH)
-	#@Task()
-	#def spectralDiffusion_wRFsource(self):
-		""" Task to measure spectral diffusion on timescales < T1. Assumes that
+			"""
+	"""
+	@Task()
+	def spectralDiffusion_wRFsource(self):
+		Task to measure spectral diffusion on timescales < T1. Assumes that
 		1 channel of the keysight AWG is sending a sine wave to an EOM. The
 		amplitude of the RF drive for the EOM is set such that the sidebands
 		have an equal amplitude to the pump beam. This tasks sweeps the
@@ -699,10 +705,10 @@ class PLThinFilm(Spyrelet):
 		This task is good for modulating between 1MHz and 200MHz. 
 		JDSU EOM amplifier has nonlinear performance below 1MHz (amplification
 		increases), but the N5181A works down to 100kHz if desired.
-		"""
+		
 
 		# get the parameters for the experiment from the widget
-		"""
+		
 		SD_wRFparams=self.SD_wRFparams.widget.get()
 		startFreq=SD_wRFparams['Start frequency']
 		stopFreq=SD_wRFparams['Stop frequency']

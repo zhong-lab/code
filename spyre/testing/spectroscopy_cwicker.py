@@ -8,12 +8,13 @@ devices = {
         'lantz.drivers.bristol.bristol771.Bristol_771',
         [6535],
         {}
-    ],
-    'pmd':[
-        'lantz.drivers.thorlabs.pm100d.PM100D',
-        ['USB0::0x1313::0x8078::P0019269::INSTR'],
-        {}
     ]
+    
+    #'pmd':[
+    #    'lantz.drivers.thorlabs.pm100d.PM100D',
+    #    ['USB0::0x1313::0x8078::P0019269::INSTR'],
+    #    {}
+    #]
     #'SRS':[
     #    'lantz.drivers.stanford.srs900.SRS900',
     #    ['GPIB0::2::INSTR'],   ##SRS - power suppy for the SNSPD
@@ -28,7 +29,7 @@ spyrelets = {
         {
             'fungen': 'fungen',
             'wm':'wm',
-            'pmd':'pmd'
+            #'pmd':'pmd'
             #'SRS':'SRS',
         }, 
         {}
