@@ -88,7 +88,7 @@ class PLThinFilm(Spyrelet):
 				continue
 				print('error')
 			else:
-				print('binNumber: '+str(binNumber))
+				#print('binNumber: '+str(binNumber))
 				hist[binNumber]+=1
 				
 		if extra_data==False:
