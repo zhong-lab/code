@@ -431,13 +431,14 @@ class PLThinFilm(Spyrelet):
 		stop = qutagparams['Stop Channel']
 		#ditherV=expparams['Dither Voltage'].magnitude
 
-		"""
-		self.fungen.frequency[1]=expparams['AWG Pulse Frequency']
-		self.fungen.voltage[1]=3.5
-		self.fungen.offset[1]=1.75
-		self.fungen.phase[1]=-3
-		"""   
-		#self.fungen.pulse_width[1]=expparams['AWG Pulse Width']
+		
+		#self.fungen.frequency[1]=expparams['AWG Pulse Frequency']
+
+		#self.fungen.voltage[1]=3.5
+		#self.fungen.offset[1]=1.75
+		#self.fungen.phase[1]=-3
+		 
+		self.fungen.pulse_width[1]=expparams['AWG Pulse Width']
 		"""
 		self.fungen.waveform[1]='PULS'
 		self.fungen.output[1]='ON'
