@@ -74,23 +74,29 @@ class PLThinFilm(Spyrelet):
 				current=self.wm.measure_wavelength()
 				print(current, start)
 
-	def createHistogram(self,stoparray, timebase, bincount, period, index, wls,out_name,extra_data=False):
+	def createHistogram(self,stoparray,timebase, bincount, period,
+		index, wls,out_name,extra_data=False):
 		print('creating histogram')
 
 		hist = [0]*bincount
-		for stoptime in stoparray:
-			# stoptime=ps
-			# timebase = converts to seconds
-			# bincount: # of bins specified by user
-			# period: measurement time specified by user
-			binNumber = int(stoptime*timebase*bincount/(period))
-			if binNumber >= bincount:
-				continue
-				print('error')
-			else:
-				#print('binNumber: '+str(binNumber))
-				hist[binNumber]+=1
-				
+
+		tstart=0
+		for k in range(len(stoparray)):
+				tdiff=stoparray[k]
+
+				binNumber = int(tdiff*timebase*bincount/(period))
+				"""
+				print('tdiff: '+str(tdiff))
+				print('binNumber: '+str(binNumber))
+				print('stoparray[k]: '+str(stoparray[k]))
+				print('tstart: '+str(tstart))
+				"""
+				if binNumber >= bincount:
+					continue
+				else:
+					#print('binNumber: '+str(binNumber))
+					hist[binNumber]+=1
+						
 		if extra_data==False:
 			np.savez(os.path.join(out_name,str(index)),hist,wls)
 		if extra_data!=False:
@@ -355,6 +361,7 @@ class PLThinFilm(Spyrelet):
 					if tchannel[k] == start:
 						synctimestamp = tstamp[k]
 					else:
+						print('stop')
 						stoptimestamp = tstamp[k]
 						stoparray.append(stoptimestamp)
 				wl=self.wm.measure_wavelength()
@@ -424,7 +431,6 @@ class PLThinFilm(Spyrelet):
 		qutagparams = self.qutag_params.widget.get()
 		lost = self.qutag.getLastTimestamps(True) # clear Timestamp buffer
 		stoptimestamp = 0
-		synctimestamp = 0
 		bincount = qutagparams['Bin Count']
 		timebase = self.qutag.getTimebase()
 		start = qutagparams['Start Channel']
@@ -496,29 +502,45 @@ class PLThinFilm(Spyrelet):
 
 			# open pickle files to save timestamp data
 
-			#times=open(PATH+'\\'+str(i)+'_times.p','wb')
-			#channels=open(PATH+'\\'+str(i)+'_channels.p','wb')
-			#vals=open(PATH+'\\'+str(i)+'_vals.p','wb')
+			times=open(PATH+'\\'+str(i)+'_times.p','wb')
+			channels=open(PATH+'\\'+str(i)+'_channels.p','wb')
+			vals=open(PATH+'\\'+str(i)+'_vals.p','wb')
 
+			synctimestamp=[]
 			looptime=startTime
 			while looptime-startTime < expparams['Measurement Time'].magnitude:
 				loopstart=time.time()
-				# get the lost timestamps
-				lost = self.qutag.getLastTimestamps(True)
-				# wait half a milisecond
-				time.sleep(2)   #
-				# get thte timestamps in the last half milisecond
+
+				time.sleep(0.5)
+
+				dataloss = self.qutag.getDataLost()
+				#print("dataloss: " + str(dataloss))
+
+				dataloss = self.qutag.getDataLost()
+				#print("dataloss: " + str(dataloss))
+
+				# get the timestamps
 				timestamps = self.qutag.getLastTimestamps(True)
 
 				tstamp = timestamps[0] # array of timestamps
 				tchannel = timestamps[1] # array of channels
 				values = timestamps[2] # number of recorded timestamps
+				"""
+				print('timestamps')
+				print(tstamp[:100])
 
+				print('channels')
+				print(tchannel[:100])
+				"""
 				for k in range(values):
 					# output all stop events together with the latest start event
-					if tchannel[k] == start:
-						synctimestamp = tstamp[k]
+					if tchannel[k] == 0: # 104 is the index of the start channel
+						synctimestamp.append(tstamp[k])
+						stoparray.append(False)
 					else:
+						#print('synctimestamp: '+str(synctimestamp))
+						#print('stoptimestamp: '+str(stoptimestamp))
+						synctimestamp.append(False)
 						stoptimestamp = tstamp[k]
 						stoparray.append(stoptimestamp)
 				wl=self.wm.measure_wavelength()
@@ -534,23 +556,25 @@ class PLThinFilm(Spyrelet):
 				# 	endloop
 
 				# dump timestamp data to pickle file
-				#pickle.dump(tstamp,times)
-				#pickle.dump(tchannel,channels)
-				#pickle.dump(values,vals)
+				pickle.dump(tstamp,times)
+				pickle.dump(tchannel,channels)
+				pickle.dump(values,vals)
 				
+				"""
 				while ((wl<wlTargets[i]-0.001) or (wl>wlTargets[i]+0.001)) and (time.time()-startTime < expparams['Measurement Time'].magnitude):
 					print('correcting for laser drift')
 					self.homelaser(wlTargets[i])
 					wl=self.wm.measure_wavelength()
+				"""
 					
 			# close pickle files with timestamp data
-			#times.close()
-			#channels.close()
-			#vals.close()
+			times.close()
+			channels.close()
+			vals.close()
 
 			print('actual  wavelength: '+str(wl))
 			#print('I am here')
-			self.createHistogram(stoparray, timebase, bincount, expparams['AWG Pulse Repetition Period'].magnitude,str(i),wls,PATH)
+			self.createHistogram(stoparray,timebase, bincount, expparams['AWG Pulse Repetition Period'].magnitude,str(i),wls,PATH)
 			# self.createHistogram(stoparray, timebase, bincount,period,str(i),
 			# 	wls,PATH,savefreqs)
 			#self.fungen.output[2]='OFF'
