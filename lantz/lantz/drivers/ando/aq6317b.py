@@ -258,14 +258,14 @@ if __name__ == '__main__':
       inst.initial()
       inst.set_CRLF(0)
 
-      inst.centerWl=1538.50
+      inst.centerWl=1400
 
-      inst.span=24.0
+      inst.span=400.0
       #inst.start_wl=start
       #inst.stop_wl=stop
-      inst.levelScale=0.8
-      inst.resolution=2
-      inst.avgCount=800
+      #inst.levelScale=0.8
+      #inst.resolution=2
+      inst.avgCount=3
 
       inst.set_measSensitivity()
 
@@ -277,10 +277,10 @@ if __name__ == '__main__':
 
     plt.plot(wl,p,'k')
     plt.xlabel('Wavelength (nm)')
-    plt.ylabel('Power (dBm)')
+    plt.ylabel('Power (nW)')
     plt.show()
 
-    with open('2nmResolution.csv','w',newline='') as csvfile:
+    with open('SC_DWDM_BPF_AOM.csv','w',newline='') as csvfile:
         writer=csv.writer(
               csvfile,
               delimiter=',',

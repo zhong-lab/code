@@ -511,16 +511,19 @@ class PLThinFilm(Spyrelet):
 			while looptime-startTime < expparams['Measurement Time'].magnitude:
 				loopstart=time.time()
 
-				time.sleep(0.5)
+				time.sleep(2)
 
-				dataloss = self.qutag.getDataLost()
+				dataloss1 = self.qutag.getDataLost()
 				#print("dataloss: " + str(dataloss))
 
-				dataloss = self.qutag.getDataLost()
+				dataloss2 = self.qutag.getDataLost()
 				#print("dataloss: " + str(dataloss))
 
 				# get the timestamps
 				timestamps = self.qutag.getLastTimestamps(True)
+
+				if dataloss1!=0:
+					print('dataloss: '+str(dataloss1))
 
 				tstamp = timestamps[0] # array of timestamps
 				tchannel = timestamps[1] # array of channels
