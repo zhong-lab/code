@@ -509,6 +509,15 @@ class PLThinFilm(Spyrelet):
 			synctimestamp=[]
 			looptime=startTime
 			while looptime-startTime < expparams['Measurement Time'].magnitude:
+				dataloss1 = self.qutag.getDataLost()
+				#print("dataloss: " + str(dataloss))
+
+				dataloss2 = self.qutag.getDataLost()
+				#print("dataloss: " + str(dataloss))
+
+				# get the timestamps
+				timestamps = self.qutag.getLastTimestamps(True)
+
 				loopstart=time.time()
 
 				time.sleep(2)
@@ -521,6 +530,8 @@ class PLThinFilm(Spyrelet):
 
 				# get the timestamps
 				timestamps = self.qutag.getLastTimestamps(True)
+
+				looptime+=time.time()-loopstart
 
 				if dataloss1!=0:
 					print('dataloss: '+str(dataloss1))
@@ -549,7 +560,7 @@ class PLThinFilm(Spyrelet):
 				wl=self.wm.measure_wavelength()
 				wls.append(str(wl))
 
-				looptime+=time.time()-loopstart
+				
 				#print('i: '+str(i)+', looptime-startTime: '+str(looptime-startTime))
 				# quenchfix=self.reset_quench()
 				# if quenchfix!='YES':
@@ -563,12 +574,12 @@ class PLThinFilm(Spyrelet):
 				pickle.dump(tchannel,channels)
 				pickle.dump(values,vals)
 				
-				"""
-				while ((wl<wlTargets[i]-0.001) or (wl>wlTargets[i]+0.001)) and (time.time()-startTime < expparams['Measurement Time'].magnitude):
+				
+				while ((wl<wlTargets[i]-0.0008) or (wl>wlTargets[i]+0.0008)) and (time.time()-startTime < expparams['Measurement Time'].magnitude):
 					print('correcting for laser drift')
 					self.homelaser(wlTargets[i])
 					wl=self.wm.measure_wavelength()
-				"""
+				
 					
 			# close pickle files with timestamp data
 			times.close()
