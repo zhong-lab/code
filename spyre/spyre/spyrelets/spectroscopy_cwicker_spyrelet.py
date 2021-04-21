@@ -27,7 +27,7 @@ from lantz.drivers.thorlabs.pm100d import PM100D
 
 #from lantz.drivers.keysight import Arbseq_Class_MW
 from lantz.drivers.keysight import Keysight_33622A
-#from lantz.drivers.stanford.srs900 import SRS900
+from lantz.drivers.stanford.srs900 import SRS900
 
 from lantz.log import log_to_screen, DEBUG
 
@@ -44,7 +44,7 @@ class PLThinFilm(Spyrelet):
 	requires = {
 		'wm': Bristol_771,
 		'fungen': Keysight_33622A,
-		#'SRS': SRS900,
+		'SRS': SRS900
 		#'pmd':PM100D
 	}
 	qutag = None
@@ -421,14 +421,23 @@ class PLThinFilm(Spyrelet):
 		
 		#self.SRS.SIMmodule_on[6] ##Turn on the power supply of the SNSPD
 		#time.sleep(3)  ##wait 1s to turn on the SNSPD
+		qutagparams = self.qutag_params.widget.get()
 
+		vm1=qutagparams['Voltmeter Channel 1']
+		#vm2=qutagparams['Voltmeter Channel 2']
+		vs1=qutagparams['Battery Port 1']
+		#vs2=qutagparams['Battery Port 2']
+
+		self.SRS.clear_status()
+		self.SRS.SIM928_on_off[vs1]='OFF'		
+		self.SRS.SIM928_on_off[vs1]='ON'
 		##Qutag Part
 		self.configureQutag()
 		expparams = self.exp_parameters.widget.get()
 		wlparams = self.wl_parameters.widget.get()
 		self.homelaser(wlparams['start'])
 		print('Laser Homed!')
-		qutagparams = self.qutag_params.widget.get()
+
 		lost = self.qutag.getLastTimestamps(True) # clear Timestamp buffer
 		stoptimestamp = 0
 		bincount = qutagparams['Bin Count']
@@ -438,7 +447,7 @@ class PLThinFilm(Spyrelet):
 		#ditherV=expparams['Dither Voltage'].magnitude
 
 		
-		#self.fungen.frequency[1]=expparams['AWG Pulse Frequency']
+		self.fungen.frequency[1]=expparams['AWG Pulse Frequency']
 
 		#self.fungen.voltage[1]=3.5
 		#self.fungen.offset[1]=1.75
@@ -575,7 +584,7 @@ class PLThinFilm(Spyrelet):
 				pickle.dump(values,vals)
 				
 				
-				while ((wl<wlTargets[i]-0.0008) or (wl>wlTargets[i]+0.0008)) and (time.time()-startTime < expparams['Measurement Time'].magnitude):
+				while ((wl<wlTargets[i]-0.001) or (wl>wlTargets[i]+0.001)) and (time.time()-startTime < expparams['Measurement Time'].magnitude):
 					print('correcting for laser drift')
 					self.homelaser(wlTargets[i])
 					wl=self.wm.measure_wavelength()
@@ -589,6 +598,8 @@ class PLThinFilm(Spyrelet):
 			print('actual  wavelength: '+str(wl))
 			#print('I am here')
 			self.createHistogram(stoparray,timebase, bincount, expparams['AWG Pulse Repetition Period'].magnitude,str(i),wls,PATH)
+		self.SRS.SIM928_on_off[vs1]='OFF'
+
 			# self.createHistogram(stoparray, timebase, bincount,period,str(i),
 			# 	wls,PATH,savefreqs)
 			#self.fungen.output[2]='OFF'
@@ -1077,9 +1088,9 @@ class PLThinFilm(Spyrelet):
 		('Start Channel', {'type': int, 'default': 0}),
 		('Stop Channel', {'type': int, 'default': 4}),
 		('Bin Count', {'type': int, 'default': 1000}),
-		# ('Voltmeter Channel 1',{'type':int,'default':1}),
+		('Voltmeter Channel 1',{'type':int,'default':1}),
 		('Voltmeter Channel 2',{'type':int,'default':2}),
-		# ('Battery Port 1',{'type':int,'default':5}),
+		('Battery Port 1',{'type':int,'default':5}),
 		('Battery Port 2',{'type':int,'default':6})
 		]
 		w = ParamWidget(params)
