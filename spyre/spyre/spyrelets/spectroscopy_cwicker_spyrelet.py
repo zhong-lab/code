@@ -215,6 +215,17 @@ class PLThinFilm(Spyrelet):
 		"""
 	@Task()
 	def piezo_scan(self,timestep=100e-9):
+
+		qutagparams = self.qutag_params.widget.get()
+
+		vm1=qutagparams['Voltmeter Channel 1']
+		#vm2=qutagparams['Voltmeter Channel 2']
+		vs1=qutagparams['Battery Port 1']
+		#vs2=qutagparams['Battery Port 2']
+
+		self.SRS.clear_status()
+		self.SRS.SIM928_on_off[vs1]='OFF'		
+		self.SRS.SIM928_on_off[vs1]='ON'
 		
 		#self.fungen.output[1]='ON'
 		piezo_params=self.piezo_parameters.widget.get()
@@ -231,13 +242,20 @@ class PLThinFilm(Spyrelet):
 
 		channel=piezo_params['AWG channel']
 
-		# turn off AWG
-		self.fungen.output[channel]='OFF'
-
 		##Qutag Part
 		self.configureQutag()
 		expparams = self.exp_parameters.widget.get()
 		wlparams = self.wl_parameters.widget.get()
+
+		# turn off AWG
+		self.fungen.output[channel]='OFF'
+		self.fungen.frequency[1]=expparams['AWG Pulse Frequency']
+
+		#self.fungen.voltage[1]=3.5
+		#self.fungen.offset[1]=1.75
+		#self.fungen.phase[1]=-3
+		 
+		self.fungen.pulse_width[1]=expparams['AWG Pulse Width']
 
 		# drive to the offset estimated by the piezo voltage
 		# 1MOhm impedance of laser mismatch with 50Ohm impedance of AWG
@@ -262,14 +280,16 @@ class PLThinFilm(Spyrelet):
 		start = qutagparams['Start Channel']
 		stop = qutagparams['Stop Channel']
 
-		PATH="C:\\Data\\"+self.exp_parameters.widget.get()['File Name']
-
-		if PATH!="C:\\Data\\":
+		PATH="D:\\Data\\"+self.exp_parameters.widget.get()['File Name']
+		print('here')
+		print('PATH: '+str(PATH))
+		if PATH!="D:\\Data\\":
 			if (os.path.exists(PATH)):
 				print('deleting old directory with same name')
 				os.system('rm -rf '+str(PATH))
 			print('making new directory')
 			Path(PATH).mkdir(parents=True, exist_ok=True)
+			#os.mkdir(PATH)
 		else:
 			print("Specify a foldername & rerun task.")
 			print("Task will error trying to saving data.")
@@ -297,7 +317,7 @@ class PLThinFilm(Spyrelet):
 			
 			print('i: '+str(i)+', initializing')
 
-			while ((wl<wlpts[i]-0.0002) or (wl>wlpts[i]+0.0002)):
+			while ((wl<wlpts[i]-0.0004) or (wl>wlpts[i]+0.0004)):
 					offset=wl-wlpts[i]
 					Voff=offset/0.315*140/(piezo_params['Scale factor']*2)
 					if offset<0:
@@ -310,7 +330,7 @@ class PLThinFilm(Spyrelet):
 							newTargets=[j+Voff for j in voltageTargets]
 							voltageTargets=newTargets
 							self.fungen.offset[channel]=Q_(newTargets[i],'V')
-							time.sleep(3)
+							time.sleep(2)
 							wl=self.wm.measure_wavelength()
 							counter+=Voff
 							totalShift+=Voff
@@ -324,7 +344,7 @@ class PLThinFilm(Spyrelet):
 							newTargets=[j+Voff for j in voltageTargets]
 							voltageTargets=newTargets
 							self.fungen.offset[channel]=Q_(newTargets[i],'V')
-							time.sleep(3)
+							time.sleep(2)
 							wl=self.wm.measure_wavelength()
 							counter+=Voff
 							totalShift+=Voff
@@ -342,41 +362,69 @@ class PLThinFilm(Spyrelet):
 			lost = self.qutag.getLastTimestamps(True)
 			counter2=0
 
+			# open pickle files to save timestamp data
+
+			times=open(PATH+'\\'+str(i)+'_times.p','wb')
+			channels=open(PATH+'\\'+str(i)+'_channels.p','wb')
+			vals=open(PATH+'\\'+str(i)+'_vals.p','wb')
+
 			looptime=startTime
 			while looptime-startTime < expparams['Measurement Time'].magnitude:
-				loopstart=time.time()
-				# get the lost timestamps
-				lost = self.qutag.getLastTimestamps(True)
-				# wait half a milisecond
-				time.sleep(5*0.1)
-				# get thte timestamps in the last half milisecond
+				dataloss1 = self.qutag.getDataLost()
+				#print("dataloss: " + str(dataloss))
+
+				dataloss2 = self.qutag.getDataLost()
+				#print("dataloss: " + str(dataloss))
+
+				# get the timestamps
 				timestamps = self.qutag.getLastTimestamps(True)
+
+				loopstart=time.time()
+
+				time.sleep(2)
+
+				dataloss1 = self.qutag.getDataLost()
+				#print("dataloss: " + str(dataloss))
+
+				dataloss2 = self.qutag.getDataLost()
+				#print("dataloss: " + str(dataloss))
+
+				# get the timestamps
+				timestamps = self.qutag.getLastTimestamps(True)
+
+				looptime+=time.time()-loopstart
+
+				if dataloss1!=0:
+					print('dataloss: '+str(dataloss1))
 
 				tstamp = timestamps[0] # array of timestamps
 				tchannel = timestamps[1] # array of channels
 				values = timestamps[2] # number of recorded timestamps
+				"""
+				print('timestamps')
+				print(tstamp[:100])
 
+				print('channels')
+				print(tchannel[:100])
+				"""
 				for k in range(values):
 					# output all stop events together with the latest start event
-					if tchannel[k] == start:
-						synctimestamp = tstamp[k]
-					else:
-						print('stop')
+					if tchannel[k] == 2: # 104 is the index of the start channel
+						#print('synctimestamp: '+str(synctimestamp))
+						#print('stoptimestamp: '+str(stoptimestamp))
 						stoptimestamp = tstamp[k]
 						stoparray.append(stoptimestamp)
 				wl=self.wm.measure_wavelength()
 				wls.append(str(wl))
-				looptime+=time.time()-loopstart
-				#print('i: '+str(i)+', looptime-startTime: '+str(looptime-startTime))
-				quenchfix=self.reset_quench()
-				if quenchfix!='YES':
-					print('SNSPD quenched and could not be reset')
-					self.fungen.output[1]='OFF'
-					self.fungen.output[2]='OFF'
-					endloop
 
-				
-				while ((wl<wlpts[i]-0.0002) or (wl>wlpts[i]+0.0002)) and (time.time()-startTime < expparams['Measurement Time'].magnitude):
+				# dump timestamp data to pickle file
+				pickle.dump(tstamp,times)
+				pickle.dump(tchannel,channels)
+				pickle.dump(values,vals)
+
+				"""
+							
+				while ((wl<wlpts[i]-0.0004) or (wl>wlpts[i]+0.0004)) and (time.time()-startTime < expparams['Measurement Time'].magnitude):
 					offset=wl-wlpts[i]
 					Voff=offset/0.315*140/(piezo_params['Scale factor']*2)
 					if offset<0:
@@ -386,7 +434,7 @@ class PLThinFilm(Spyrelet):
 							newTargets=[j+Voff for j in voltageTargets]
 							voltageTargets=newTargets
 							self.fungen.offset[channel]=Q_(newTargets[i],'V')
-							time.sleep(3)
+							time.sleep(2)
 							wl=self.wm.measure_wavelength()
 							counter2+=Voff
 							totalShift+=Voff
@@ -397,20 +445,27 @@ class PLThinFilm(Spyrelet):
 							newTargets=[j+Voff for j in voltageTargets]
 							voltageTargets=newTargets
 							self.fungen.offset[channel]=Q_(newTargets[i],'V')
-							time.sleep(3)
+							time.sleep(2)
 							wl=self.wm.measure_wavelength()
 							counter2+=Voff
 							totalShift+=Voff
+				"""
 				
 			print('actual  wavelength: '+str(wl))
 			print('targets shift during measurement:  '+str(counter2)+'V')
 				
+			# close pickle files with timestamp data
+			times.close()
+			channels.close()
+			vals.close()
 
-			self.createHistogram(stoparray, timebase, bincount,
-				expparams['AWG Pulse Repetition Period'].magnitude,i, wls,
-				"C:\\Data\\"+self.exp_parameters.widget.get()['File Name'])
+			print('actual  wavelength: '+str(wl))
+			#print('I am here')
+			self.createHistogram(stoparray,timebase, bincount, expparams['AWG Pulse Repetition Period'].magnitude,str(i),wls,PATH)
+
 		# turn off AWG
 		self.fungen.output[channel]='OFF'
+		self.SRS.SIM928_on_off[vs1]='OFF'
 	
 
 	@Task()
