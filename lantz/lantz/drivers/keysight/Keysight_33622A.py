@@ -143,7 +143,7 @@ class Keysight_33622A(MessageBasedDriver):
 		"""
 		self.write('SOURCE{}:VOLT {}'.format(key, value))
 	
-	@DictFeat(units='V', limits=(-5, 5, .01), keys=(1, 2))
+	@DictFeat(units='V', limits=(-5, 5, .0001), keys=(1, 2))
 	def offset(self, key):
 		"""returns current voltage offset
 		"""

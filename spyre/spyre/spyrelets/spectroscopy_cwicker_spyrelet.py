@@ -269,6 +269,10 @@ class PLThinFilm(Spyrelet):
 		wl_stop=wlparams['stop']+piezo_range
 		wlpts=np.linspace(wl_start,wl_stop,pts)
 
+		self.fungen.offset[channel]=Q_(voltageTargets[0],'V')
+		# turn on AWG
+		self.fungen.output[channel]='ON'
+
 		self.homelaser(wlparams['start']-piezo_range)
 		print('Laser Homed!')
 		qutagparams = self.qutag_params.widget.get()
@@ -294,9 +298,6 @@ class PLThinFilm(Spyrelet):
 			print("Specify a foldername & rerun task.")
 			print("Task will error trying to saving data.")
 
-		# turn on AWG
-		self.fungen.output[channel]='ON'
-
 		last_wl=self.wm.measure_wavelength()
 		wls=[]
 		totalShift=0
@@ -311,11 +312,13 @@ class PLThinFilm(Spyrelet):
 
 			self.fungen.offset[channel]=Q_(voltageTargets[i],'V')
 			wl=self.wm.measure_wavelength()
+			print(wl)
 			counter=0
 			if len(wls)!=0:
 				last_wl=np.mean(np.array(wls).astype(np.float))
 			
 			print('i: '+str(i)+', initializing')
+			print('target wavelength: '+str(wlpts[i]))
 
 			while ((wl<wlpts[i]-0.0004) or (wl>wlpts[i]+0.0004)):
 					offset=wl-wlpts[i]
@@ -332,6 +335,7 @@ class PLThinFilm(Spyrelet):
 							self.fungen.offset[channel]=Q_(newTargets[i],'V')
 							time.sleep(2)
 							wl=self.wm.measure_wavelength()
+							print(wl)
 							counter+=Voff
 							totalShift+=Voff
 					else:
@@ -346,6 +350,7 @@ class PLThinFilm(Spyrelet):
 							self.fungen.offset[channel]=Q_(newTargets[i],'V')
 							time.sleep(2)
 							wl=self.wm.measure_wavelength()
+							print(wl)
 							counter+=Voff
 							totalShift+=Voff
 
