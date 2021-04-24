@@ -426,8 +426,6 @@ class PLThinFilm(Spyrelet):
 				pickle.dump(tstamp,times)
 				pickle.dump(tchannel,channels)
 				pickle.dump(values,vals)
-
-				"""
 							
 				while ((wl<wlpts[i]-0.0004) or (wl>wlpts[i]+0.0004)) and (time.time()-startTime < expparams['Measurement Time'].magnitude):
 					offset=wl-wlpts[i]
@@ -454,7 +452,7 @@ class PLThinFilm(Spyrelet):
 							wl=self.wm.measure_wavelength()
 							counter2+=Voff
 							totalShift+=Voff
-				"""
+				
 				
 			print('actual  wavelength: '+str(wl))
 			print('targets shift during measurement:  '+str(counter2)+'V')
