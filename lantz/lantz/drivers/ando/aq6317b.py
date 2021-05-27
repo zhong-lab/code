@@ -240,6 +240,12 @@ class AQ6317B(MessageBasedDriver):
 
         return plist,wllist
 
+    @Feat()
+    def read_marker(self):
+        """ Reads the first peak value. """
+        pk,pwr=self.query('MKR?').split(',')
+        return pk,pwr
+
 if __name__ == '__main__':
     from time import sleep
     from lantz import Q_
@@ -250,37 +256,54 @@ if __name__ == '__main__':
     volt = Q_(1, 'V')
     milivolt = Q_(1, 'mV')
 
-    log_to_screen(DEBUG)
+    #log_to_screen(DEBUG)
     # this is the GPIB Address:
-    with AQ6317B('GPIB0::1::INSTR') as inst:
+    with AQ6317B('GPIB1::1::INSTR') as inst:
+      
       
       #inst.set_timeout(100)
+      
       inst.initial()
       inst.set_CRLF(0)
-
-      inst.centerWl=1538.50
-
-      inst.span=24.0
+      #inst.read_peak
+      #inst.centerWl=1400
+      #inst.span=400.0
       #inst.start_wl=start
       #inst.stop_wl=stop
-      inst.levelScale=0.8
-      inst.resolution=0.1
-      inst.avgCount=800
-
-      inst.set_measSensitivity()
-
-      inst.tracing_conditions('A',('WRT','DSP'))
+      #inst.levelScale=0.8
+      #inst.resolution=2
+      #inst.avgCount=3
+      #inst.set_measSensitivity()
+      #inst.tracing_conditions('A',('WRT','DSP'))
       #inst.tracing_conditions('B',('WRT','DSP'))
-      
-      inst.sweep()
-      p,wl=inst.read_waveform('A')
+      #inst.sweep()
+      #p,wl=inst.read_waveform('A')"""
 
+      # read peak position for a while
+      start=time.time()
+      t=start
+      
+      with open('peak_drift_60min.csv','w',newline='') as csvfile:
+        writer=csv.writer(
+            csvfile,
+            delimiter=',',
+            quotechar='|',
+            quoting=csv.QUOTE_MINIMAL)
+        while (t-start)<3600:
+            pk,pwr=inst.read_marker
+            t=time.time()
+            print('t: '+str(t-start)+', '+str(pk))
+            writer.writerow([t-start,pk])
+            time.sleep(1)
+            
+
+    """
     plt.plot(wl,p,'k')
     plt.xlabel('Wavelength (nm)')
-    plt.ylabel('Power (dBm)')
+    plt.ylabel('Power (nW)')
     plt.show()
 
-    with open('0.1nmResolution.csv','w',newline='') as csvfile:
+    with open('SC_DWDM_BPF_AOM.csv','w',newline='') as csvfile:
         writer=csv.writer(
               csvfile,
               delimiter=',',
@@ -288,7 +311,7 @@ if __name__ == '__main__':
               quoting=csv.QUOTE_MINIMAL)
         for i in range(len(p)):
             writer.writerow([str(wl[i]),str(p[i])])
-
+    """
 
 
 
