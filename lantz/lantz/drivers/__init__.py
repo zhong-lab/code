@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-    lantz.drivers
-    ~~~~~~~~~~~~~
-
-    Legacy drivers for different companies.
-
-    :copyright: 2015 by Lantz Authors, see AUTHORS for more details.
-    :license: BSD, see LICENSE for more details.
+    lantz.drivers.princetoninstruments.winspec
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Implementation of Winspec PI Camera over a Socket
+    Author: Berk Diler
+    Date: 29/08/2017
 """
+
+
+from .winspec import Winspec
+from .spectrapro import SpectraPro
+
+__all__ = ['Winspec','SpectraPro']
