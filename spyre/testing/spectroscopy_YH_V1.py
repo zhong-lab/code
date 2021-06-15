@@ -14,23 +14,16 @@ devices = {
         ['GPIB0::2::INSTR'],   ##SRS - power suppy for the SNSPD
         {}
     ]
-    #'pmd':[
-    #    'lantz.drivers.thorlabs.pm100d.PM100D',
-    #    ['USB0::0x1313::0x8078::P0019269::INSTR'],
-    #    {}
-    #]
 }
 
 # Experiment List
 spyrelets = {
-    'spectroscopy_cwicker':[
-        'spyre.spyrelets.spectroscopy_cwicker_spyrelet.PLThinFilm',
+    'spectroscopy_YH_V1':[
+        'spyre.spyrelets.spectroscopy_YH_V1_spyrelet.PLThinFilm',
         {
             'fungen': 'fungen',
             'wm':'wm',
-            'SRS':'SRS'
-            #'pmd':'pmd'
-            
+            'SRS':'SRS',
         }, 
         {}
     ],
