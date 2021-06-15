@@ -9,5 +9,6 @@
 
 
 from .winspec import Winspec
+from .spectrapro import SpectraPro
 
-__all__ = ['Winspec']
+__all__ = ['Winspec','SpectraPro']
