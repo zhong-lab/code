@@ -21,6 +21,7 @@ class Winspec(MessageBasedDriver):
         'COMMON': {
             'write_termination': '',
             'read_termination': '\r\n',
+            "timeout": None
         }
     }
 
@@ -72,7 +73,7 @@ class Winspec(MessageBasedDriver):
     def wavelength(self, wl):
         if self.query("set wavelength {:1.3e}".format(wl)) != "OK":
             raise Exception
-        
+
     @Feat(values=GRATINGS)
     def grating(self):
         return int(self.query("get grating"))
@@ -81,7 +82,7 @@ class Winspec(MessageBasedDriver):
     def grating(self, wl):
         if self.query("set grating {:1.3e}".format(wl)) != "OK":
             raise Exception
-    
+
     @Feat(units="kelvin", limits=(174,248))
     def target_temperature(self):
         temp_c = float(self.query("get target temperature"))
