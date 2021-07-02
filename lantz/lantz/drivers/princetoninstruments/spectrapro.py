@@ -22,23 +22,38 @@ class SpectraPro(MessageBasedDriver):
             "timeout": None
         }
     }
+    def get_grating(self):
+        return int(self.query("get grating"))
 
-    @Feat(units="s")
-    def grating(self):
-        return float(self.query("get grating"))
-
-    @grating.setter
-    def grating(self, grating):
-        res=self.query("set grating {:1.3e}".format(grating))
+    def set_grating(self, grating):
+        res=self.query("set grating {}".format(grating))
         if res == 0:
             raise Exception
+        return res
 
-    @Feat(units="nm")
-    def wavelength(self):
+    def get_wavelength(self):
         return float(self.query("get wavelength"))
 
-    @wavelength.setter
-    def wavelength(self, wl):
-        res=self.query("set wavelength {:1.3e}".format(wl))
+    def set_wavelength(self, wl):
+        res=self.query("set wavelength {}".format(wl))
         if res == 0:
             raise Exception
+        return res
+
+if __name__ == '__main__':
+    from time import sleep
+    from lantz import Q_
+    from lantz.log import log_to_screen, DEBUG
+    # from gpib_ctypes import make_default_gpib
+    # make_default_gpib()
+
+    volt = Q_(1, 'V')
+    milivolt = Q_(1, 'mV')
+
+    log_to_screen(DEBUG)
+    # this is the GPIB Address:
+    with SpectraPro('TCPIP::169.254.48.177::12345::SOCKET') as inst:
+        inst.set_grating(1)
+        inst.get_grating()
+        inst.set_wavelength(1500.0)
+        inst.get_wavelength()
