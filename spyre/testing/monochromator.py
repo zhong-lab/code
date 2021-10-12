@@ -17,7 +17,11 @@ devices = {
     'sp':[
       'lantz.drivers.princetoninstruments.spectrapro.SpectraPro',
 <<<<<<< HEAD
+<<<<<<< HEAD
       ['TCPIP::205.208.56.217::12345::SOCKET'], # check the IP address,
+=======
+      ['TCPIP::<IP Address>::12345::SOCKET'], # check the IP address,
+>>>>>>> 6aaa88ed54b1098234fc40753aab9fe4af5e562d
 =======
       ['TCPIP::<IP Address>::12345::SOCKET'], # check the IP address,
 >>>>>>> 6aaa88ed54b1098234fc40753aab9fe4af5e562d
@@ -29,7 +33,11 @@ devices = {
 spyrelets = {
     'spectroscopy_cwicker':[
 <<<<<<< HEAD
+<<<<<<< HEAD
         'spyre.spyrelets.monochromator_spyrelet.MonochromatorSpyrelet',
+=======
+        'spyre.spyrelets.spectroscopy_cwicker_spyrelet.PLThinFilm',
+>>>>>>> 6aaa88ed54b1098234fc40753aab9fe4af5e562d
 =======
         'spyre.spyrelets.spectroscopy_cwicker_spyrelet.PLThinFilm',
 >>>>>>> 6aaa88ed54b1098234fc40753aab9fe4af5e562d
@@ -42,7 +50,11 @@ spyrelets = {
         {}
     ],
 <<<<<<< HEAD
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 6aaa88ed54b1098234fc40753aab9fe4af5e562d
 =======
 }
 >>>>>>> 6aaa88ed54b1098234fc40753aab9fe4af5e562d

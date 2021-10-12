@@ -23,6 +23,7 @@ class SpectraPro(MessageBasedDriver):
         }
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
     def get_grating(self):
         return int(self.query("get grating"))
 
@@ -59,6 +60,8 @@ if __name__ == '__main__':
         inst.set_wavelength(1500.0)
         inst.get_wavelength()
 =======
+=======
+>>>>>>> 6aaa88ed54b1098234fc40753aab9fe4af5e562d
 
     @Feat(units="s")
     def grating(self):
@@ -79,4 +82,7 @@ if __name__ == '__main__':
         res=self.query("set wavelength {:1.3e}".format(wl))
         if res == 0:
             raise Exception
+<<<<<<< HEAD
+>>>>>>> 6aaa88ed54b1098234fc40753aab9fe4af5e562d
+=======
 >>>>>>> 6aaa88ed54b1098234fc40753aab9fe4af5e562d

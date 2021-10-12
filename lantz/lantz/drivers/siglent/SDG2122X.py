@@ -13,7 +13,11 @@ class SDG2122X(MessageBasedDriver):
 	end of the of a message.
 	"""
 <<<<<<< HEAD
+<<<<<<< HEAD
  
+=======
+
+>>>>>>> 6aaa88ed54b1098234fc40753aab9fe4af5e562d
 =======
 
 >>>>>>> 6aaa88ed54b1098234fc40753aab9fe4af5e562d
@@ -50,7 +54,11 @@ class SDG2122X(MessageBasedDriver):
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	
+=======
+
+>>>>>>> 6aaa88ed54b1098234fc40753aab9fe4af5e562d
 =======
 
 >>>>>>> 6aaa88ed54b1098234fc40753aab9fe4af5e562d
