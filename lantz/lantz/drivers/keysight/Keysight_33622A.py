@@ -391,7 +391,7 @@ if __name__ == '__main__':
 
 	log_to_screen(DEBUG)
 	# this is the USB VISA Address:
-	with Keysight_33622A('USB0::0x0957::0x5707::MY53801461::0::INSTR') as inst:
+	with Keysight_33622A('TCPIP0::A-33622A-01461.local::inst0::INSTR') as inst:
 		print('The identification of this instrument is :' + inst.idn)
 		# inst.waveform[2] = 'PULS'
 		# inst.frequency[2] = 60 * Hz

@@ -5,8 +5,10 @@ import csv
 import os
 from pathlib import Path
 import pickle # for saving large arrays
+import math
 
 from PyQt5.Qsci import QsciScintilla, QsciLexerPython
+from PyQt5.QtWidgets import QPushButton, QTextEdit, QVBoxLayout 
 import matplotlib.pyplot as plt
 
 from spyre import Spyrelet, Task, Element
@@ -213,6 +215,43 @@ class PLThinFilm(Spyrelet):
 				break
 		return quenchfix
 		"""
+
+	@Task()
+	def reset_quench(self):
+		#A typical quench shows the voltage exceeding 3mV.
+		
+		qutagparams = self.qutag_params.widget.get()
+		vm1=qutagparams['Voltmeter Channel 1']
+		vm2=qutagparams['Voltmeter Channel 2']
+		vs1=qutagparams['Battery Port 1']
+		vs2=qutagparams['Battery Port 2']
+
+		self.SRS.clear_status()
+
+		self.SRS.SIM928_on_off[vs1]='OFF'
+		self.SRS.SIM928_on_off[vs2]='OFF'
+		self.SRS.SIM928_on_off[vs1]='ON'
+		self.SRS.SIM928_on_off[vs2]='ON'
+
+		return None
+
+	@Task()
+	def turn_off_SNSPD(self):
+		#A typical quench shows the voltage exceeding 3mV.
+		
+		qutagparams = self.qutag_params.widget.get()
+		vm1=qutagparams['Voltmeter Channel 1']
+		vm2=qutagparams['Voltmeter Channel 2']
+		vs1=qutagparams['Battery Port 1']
+		vs2=qutagparams['Battery Port 2']
+
+		self.SRS.clear_status()
+
+		self.SRS.SIM928_on_off[vs1]='OFF'
+		self.SRS.SIM928_on_off[vs2]='OFF'
+
+		return None
+	
 	@Task()
 	def piezo_scan(self,timestep=100e-9):
 
@@ -284,10 +323,10 @@ class PLThinFilm(Spyrelet):
 		start = qutagparams['Start Channel']
 		stop = qutagparams['Stop Channel']
 
-		PATH="D:\\Data\\"+self.exp_parameters.widget.get()['File Name']
+		PATH="Q:\\Data\\"+self.exp_parameters.widget.get()['File Name']
 		print('here')
 		print('PATH: '+str(PATH))
-		if PATH!="D:\\Data\\":
+		if PATH!="Q:\\Data\\":
 			if (os.path.exists(PATH)):
 				print('deleting old directory with same name')
 				os.system('rm -rf '+str(PATH))
@@ -479,16 +518,18 @@ class PLThinFilm(Spyrelet):
 		
 		#self.SRS.SIMmodule_on[6] ##Turn on the power supply of the SNSPD
 		#time.sleep(3)  ##wait 1s to turn on the SNSPD
+		self.fungen.output[2]='OFF'
 		qutagparams = self.qutag_params.widget.get()
 
 		vm1=qutagparams['Voltmeter Channel 1']
-		#vm2=qutagparams['Voltmeter Channel 2']
+		vm2=qutagparams['Voltmeter Channel 2']
 		vs1=qutagparams['Battery Port 1']
-		#vs2=qutagparams['Battery Port 2']
+		vs2=qutagparams['Battery Port 2']
 
 		self.SRS.clear_status()
-		self.SRS.SIM928_on_off[vs1]='OFF'		
-		self.SRS.SIM928_on_off[vs1]='ON'
+
+		self.SRS.SIM928_on_off[vs2]='OFF'		
+		self.SRS.SIM928_on_off[vs2]='ON'
 		##Qutag Part
 		self.configureQutag()
 		expparams = self.exp_parameters.widget.get()
@@ -503,7 +544,7 @@ class PLThinFilm(Spyrelet):
 		start = qutagparams['Start Channel']
 		stop = qutagparams['Stop Channel']
 		#ditherV=expparams['Dither Voltage'].magnitude
-
+		print('here')
 		
 		self.fungen.frequency[1]=expparams['AWG Pulse Frequency']
 
@@ -512,16 +553,16 @@ class PLThinFilm(Spyrelet):
 		#self.fungen.phase[1]=-3
 		 
 		self.fungen.pulse_width[1]=expparams['AWG Pulse Width']
-		"""
-		self.fungen.waveform[1]='PULS'
+
+		#self.fungen.waveform[1]='PULS'
 		self.fungen.output[1]='ON'
-		"""
+		
 
 		#PATH="C:\\Data\\12.18.2020_ffpc\\"+self.exp_parameters.widget.get()['File Name']+"\\motor_scan"
-		PATH="D:\\Data\\"+self.exp_parameters.widget.get()['File Name']
+		PATH="Q:\\Data\\"+self.exp_parameters.widget.get()['File Name']
 		print('here')
 		print('PATH: '+str(PATH))
-		if PATH!="D:\\Data\\":
+		if PATH!="Q:\\Data\\":
 			if (os.path.exists(PATH)):
 				print('deleting old directory with same name')
 				os.system('rm -rf '+str(PATH))
@@ -534,6 +575,12 @@ class PLThinFilm(Spyrelet):
 
 		wlTargets=np.linspace(wlparams['start'],wlparams['stop'],expparams['# of points'])
 		
+		qutagparams = self.qutag_params.widget.get()
+		bins=qutagparams['Bin Count']
+		self.cutoff=int(
+			math.ceil(
+				expparams['AWG Pulse Width'].magnitude/expparams['AWG Pulse Repetition Period'].magnitude*bins))
+
 		#self.fungen.voltage[2]=ditherV
 		print('wlTargets: '+str(wlTargets))
 		for i in range(expparams['# of points']):
@@ -554,6 +601,7 @@ class PLThinFilm(Spyrelet):
 					print('current target wavelength: '+str(wlTargets[i]))
 					print('actual wavelength: '+str(self.wm.measure_wavelength()))
 					time.sleep(1)
+					
 			#self.fungen.output[2]='ON'
 
 			print('taking data')
@@ -573,6 +621,10 @@ class PLThinFilm(Spyrelet):
 			channels=open(PATH+'\\'+str(i)+'_channels.p','wb')
 			vals=open(PATH+'\\'+str(i)+'_vals.p','wb')
 
+			self.hist = [0]*bincount
+			self.bins=list(range(len(self.hist)))
+			stopscheck=[]
+
 			synctimestamp=[]
 			looptime=startTime
 			while looptime-startTime < expparams['Measurement Time'].magnitude:
@@ -580,7 +632,7 @@ class PLThinFilm(Spyrelet):
 				#print("dataloss: " + str(dataloss))
 
 				dataloss2 = self.qutag.getDataLost()
-				#print("dataloss: " + str(dataloss))
+				#print("dataloss: " + str(dataloss2SS))
 
 				# get the timestamps
 				timestamps = self.qutag.getLastTimestamps(True)
@@ -599,23 +651,17 @@ class PLThinFilm(Spyrelet):
 				timestamps = self.qutag.getLastTimestamps(True)
 
 				looptime+=time.time()-loopstart
-
+				
 				if dataloss1!=0:
 					print('dataloss: '+str(dataloss1))
-
+				
 				tstamp = timestamps[0] # array of timestamps
 				tchannel = timestamps[1] # array of channels
 				values = timestamps[2] # number of recorded timestamps
-				"""
-				print('timestamps')
-				print(tstamp[:100])
-
-				print('channels')
-				print(tchannel[:100])
-				"""
+				
 				for k in range(values):
 					# output all stop events together with the latest start event
-					if tchannel[k] == 0: # 104 is the index of the start channel
+					if tchannel[k] == 0: 
 						synctimestamp.append(tstamp[k])
 						stoparray.append(False)
 					else:
@@ -624,45 +670,452 @@ class PLThinFilm(Spyrelet):
 						synctimestamp.append(False)
 						stoptimestamp = tstamp[k]
 						stoparray.append(stoptimestamp)
+						stopscheck.append(stoptimestamp)
 				wl=self.wm.measure_wavelength()
 				wls.append(str(wl))
 
-				
-				#print('i: '+str(i)+', looptime-startTime: '+str(looptime-startTime))
-				# quenchfix=self.reset_quench()
-				# if quenchfix!='YES':
-				# 	print('SNSPD quenched and could not be reset')
-				# 	# self.fungen.output[1]='OFF'
-				# 	self.fungen.output[2]='OFF'
-				# 	endloop
-
-				# dump timestamp data to pickle file
+				#dump timestamp data to pickle file
 				pickle.dump(tstamp,times)
 				pickle.dump(tchannel,channels)
 				pickle.dump(values,vals)
-				
-				
+
 				while ((wl<wlTargets[i]-0.001) or (wl>wlTargets[i]+0.001)) and (time.time()-startTime < expparams['Measurement Time'].magnitude):
 					print('correcting for laser drift')
 					self.homelaser(wlTargets[i])
 					wl=self.wm.measure_wavelength()
-				
-					
+
+				for k in range(len(stopscheck)):
+					tdiff=stopscheck[k]
+					binNumber = int(tdiff*timebase*bincount/(expparams['AWG Pulse Repetition Period'].magnitude))
+					if binNumber<bincount:
+						self.hist[binNumber]+=1
+				stopscheck=[]
+
+				values = {
+					'x': self.bins,
+					'y': self.hist,
+				}
+
+				self.startpulse.acquire(values)
+
+			# very important to flush the buffer
+			# if you don't do this, or don't close the files,
+			# then data stored for writing will use up RAM space
+			# and affect saving timestamps if the program is interrupted
+			times.flush() 
+			channels.flush()
+			vals.flush()
+
 			# close pickle files with timestamp data
 			times.close()
 			channels.close()
 			vals.close()
 
-			print('actual  wavelength: '+str(wl))
+			#print('actual  wavelength: '+str(wl))
 			#print('I am here')
 			self.createHistogram(stoparray,timebase, bincount, expparams['AWG Pulse Repetition Period'].magnitude,str(i),wls,PATH)
 		self.SRS.SIM928_on_off[vs1]='OFF'
-
+		self.SRS.SIM928_on_off[vs2]='OFF'
 			# self.createHistogram(stoparray, timebase, bincount,period,str(i),
 			# 	wls,PATH,savefreqs)
 			#self.fungen.output[2]='OFF'
 		#self.SRS.SIMmodule_off[6] ##turn off the SNSPD power suppy after the measurement
+	@Task()
+	def darkcounts(self, timestep=100e-9):
 
+		qutagparams = self.qutag_params.widget.get()
+
+		vm1=qutagparams['Voltmeter Channel 1']
+		vm2=qutagparams['Voltmeter Channel 2']
+		vs1=qutagparams['Battery Port 1']
+		vs2=qutagparams['Battery Port 2']
+
+		self.SRS.clear_status()
+
+		self.SRS.SIM928_on_off[vs2]='OFF'		
+		self.SRS.SIM928_on_off[vs2]='ON'
+		##Qutag Part
+		self.configureQutag()
+		expparams = self.exp_parameters.widget.get()
+
+		lost = self.qutag.getLastTimestamps(True) # clear Timestamp buffer
+		stoptimestamp = 0
+		bincount = qutagparams['Bin Count']
+		timebase = self.qutag.getTimebase()
+		start = qutagparams['Start Channel']
+		stop = qutagparams['Stop Channel']
+		
+		PATH="Q:\\Data\\"+self.exp_parameters.widget.get()['File Name']
+		print('here')
+		print('PATH: '+str(PATH))
+		if PATH!="Q:\\Data\\":
+			if (os.path.exists(PATH)):
+				print('deleting old directory with same name')
+				os.system('rm -rf '+str(PATH))
+			print('making new directory')
+			Path(PATH).mkdir(parents=True, exist_ok=True)
+			#os.mkdir(PATH)
+		else:
+			print("Specify a foldername & rerun task.")
+			print("Task will error trying to saving data.")
+
+		qutagparams = self.qutag_params.widget.get()
+		bins=qutagparams['Bin Count']
+		self.cutoff=int(
+			math.ceil(
+				expparams['AWG Pulse Width'].magnitude/expparams['AWG Pulse Repetition Period'].magnitude*bins))				
+
+		print('taking data')
+		
+		time.sleep(1)
+		##Wavemeter measurements
+		stoparray = []
+		startTime = time.time()
+		wls=[]
+		lost = self.qutag.getLastTimestamps(True)
+
+		# open pickle files to save timestamp data
+
+		times=open(PATH+'\\_times.p','wb')
+		channels=open(PATH+'\\_channels.p','wb')
+		vals=open(PATH+'\\_vals.p','wb')
+
+		self.hist = [0]*bincount
+		self.bins=list(range(len(self.hist)))
+		stopscheck=[]
+
+		synctimestamp=[]
+		looptime=startTime
+		while looptime-startTime < expparams['Measurement Time'].magnitude:
+			dataloss1 = self.qutag.getDataLost()
+			#print("dataloss: " + str(dataloss))
+
+			dataloss2 = self.qutag.getDataLost()
+			#print("dataloss: " + str(dataloss2SS))
+
+			# get the timestamps
+			timestamps = self.qutag.getLastTimestamps(True)
+
+			loopstart=time.time()
+
+			time.sleep(2)
+
+			dataloss1 = self.qutag.getDataLost()
+			#print("dataloss: " + str(dataloss))
+
+			dataloss2 = self.qutag.getDataLost()
+			#print("dataloss: " + str(dataloss))
+
+			# get the timestamps
+			timestamps = self.qutag.getLastTimestamps(True)
+
+			looptime+=time.time()-loopstart
+				
+			if dataloss1!=0:
+				print('dataloss: '+str(dataloss1))
+				
+			tstamp = timestamps[0] # array of timestamps
+			tchannel = timestamps[1] # array of channels
+			values = timestamps[2] # number of recorded timestamps
+				
+			for k in range(values):
+				# output all stop events together with the latest start event
+				if tchannel[k] == 0: 
+					synctimestamp.append(tstamp[k])
+					stoparray.append(False)
+				else:
+					#print('synctimestamp: '+str(synctimestamp))
+					#print('stoptimestamp: '+str(stoptimestamp))
+					synctimestamp.append(False)
+					stoptimestamp = tstamp[k]
+					stoparray.append(stoptimestamp)
+					stopscheck.append(stoptimestamp)
+
+			#dump timestamp data to pickle file
+			pickle.dump(tstamp,times)
+			pickle.dump(tchannel,channels)
+			pickle.dump(values,vals)
+
+			for k in range(len(stopscheck)):
+				tdiff=stopscheck[k]
+				binNumber = int(tdiff*timebase*bincount/(expparams['AWG Pulse Repetition Period'].magnitude))
+				if binNumber<bincount:
+					self.hist[binNumber]+=1
+			stopscheck=[]
+
+			values = {
+				'x': self.bins,
+				'y': self.hist,
+			}
+
+			self.darkcounts.acquire(values)
+
+		times.flush() 
+		channels.flush()
+		vals.flush()
+
+		# close pickle files with timestamp data
+		times.close()
+		channels.close()
+		vals.close()
+
+		self.createHistogram(stoparray,timebase, bincount, expparams['AWG Pulse Repetition Period'].magnitude,str(i),wls,PATH)
+		self.SRS.SIM928_on_off[vs1]='OFF'
+		self.SRS.SIM928_on_off[vs2]='OFF'
+	@Task()
+	def spectralDiffusion_wAWG(self):
+		""" Task to measure spectral diffusion on timescales < T1. Uses the 
+		Agilent N5181A RF source to send a sine wave to the phase EOM. The
+		amplitude of the RF drive for the EOM is set such that the sidebands
+		have an equal amplitude to the pump beam (Calibrated on 11/19/20 to 
+		be 6Vpp for the JDSU phase EOM). This tasks sweeps the
+		frequency of the sine wave (separation of the EOM sidebands) while
+		collecting PL, which can be used to determine the spectral diffusion
+		linewidth since the saturation of the ions will be determined by how
+		much the sidebands overlap with the spectral  diffusion lineshape.
+		
+		The Keysight AWG only works up to 80MHz. 
+
+		Could potentially modify code to use Siglent AWG which can go up to 120MHz
+		"""
+		self.fungen.output[1]='OFF'
+		self.fungen.output[2]='OFF'
+		# some initialization of the function generator
+		self.fungen.clear_mem(1)
+		self.fungen.clear_mem(2)
+		self.fungen.wait()
+		#self.fungen.output[1]='ON'
+		
+		time.sleep(1)  ##wait 1s to turn on the SNSPD
+
+
+		# get the parameters for the experiment from the widget
+		SD_wAWGparams=self.SD_wAWGparams.widget.get()
+		startFreq=SD_wAWGparams['Start frequency']
+		stopFreq=SD_wAWGparams['Stop frequency']
+		EOMvoltage=SD_wAWGparams['EOM voltage']
+		runtime=SD_wAWGparams['Runtime']
+		EOMchannel=SD_wAWGparams['EOM channel']
+		Pulsechannel=SD_wAWGparams['Pulse channel']
+		Pulsefreq=SD_wAWGparams['Pulse Frequency']
+		Pulsewidth=SD_wAWGparams['Pulse Width']
+		period=SD_wAWGparams['Pulse Repetition Period']
+		wl=SD_wAWGparams['Wavelength']
+		points=SD_wAWGparams['# of points']
+		foldername=SD_wAWGparams['File Name']
+
+		# convert the period & runtime to floats
+		period=period.magnitude
+		runtime=runtime.magnitude
+		self.fungen.clear_mem(EOMchannel)
+		self.fungen.clear_mem(Pulsechannel)
+		self.fungen.waveform[Pulsechannel]='PULS'
+		self.fungen.waveform[EOMchannel]='SIN'
+
+
+		# set the sine wave driving the EOM on the other channel
+		self.fungen.waveform[EOMchannel]='SIN'
+		self.fungen.voltage[EOMchannel]=EOMvoltage
+		self.fungen.offset[EOMchannel]=0
+		self.fungen.phase[EOMchannel]=0
+
+
+		self.fungen.waveform[Pulsechannel]='PULS'
+		self.fungen.frequency[Pulsechannel]=Pulsefreq
+		self.fungen.voltage[Pulsechannel]=4
+		self.fungen.offset[Pulsechannel]=2
+		#self.fungen.phase[Pulsechannel]=0
+		self.fungen.pulse_width[Pulsechannel]=Pulsewidth
+
+
+		self.fungen.output[EOMchannel]='ON'
+		self.fungen.output[Pulsechannel]='ON'
+		
+
+		# home the laser
+		self.configureQutag()
+		self.homelaser(wl)
+		print('Laser Homed!')
+
+		##Qutag Part
+		qutagparams = self.qutag_params.widget.get()
+		lost = self.qutag.getLastTimestamps(True) # clear Timestamp buffer
+		stoptimestamp = 0
+		synctimestamp = 0
+		bincount = qutagparams['Bin Count']
+		timebase = self.qutag.getTimebase()
+		start = qutagparams['Start Channel']
+		stop = qutagparams['Stop Channel']
+		vs2=qutagparams['Battery Port 2']
+		
+		self.SRS.SIM928_on_off[vs2]='ON'
+
+		PATH="Q:\\Data\\"+foldername
+		print('here')
+		print('PATH: '+str(PATH))
+		if PATH!="Q:\\Data\\":
+			if (os.path.exists(PATH)):
+				print('deleting old directory with same name')
+				os.system('rm -rf '+str(PATH))
+			print('making new directory')
+			Path(PATH).mkdir(parents=True, exist_ok=True)
+			#os.mkdir(PATH)
+		else:
+			print("Specify a foldername & rerun task.")
+			print("Task will error trying to saving data.")
+
+		# make a vector containing all the frequency setpoints for the EOM
+		freqs=np.linspace(startFreq,stopFreq,points)
+
+		# now loop through all the set frequencies of the EOM modulation
+		# and record the PL on the qutag
+
+		qutagparams = self.qutag_params.widget.get()
+		bins=qutagparams['Bin Count']
+		self.cutoff=int(math.ceil(Pulsewidth.magnitude/period*bins))
+
+		for i in range(points):
+			self.fungen.frequency[EOMchannel]=freqs[i]
+
+			# want to actively stabilize the laser frequency since it can
+			# drift on the MHz scale
+			with Client(self.laser) as client:
+
+				setting=client.get('laser1:ctl:wavelength-set', float)
+				client.set('laser1:ctl:wavelength-set', wl)
+				currentwl=self.wm.measure_wavelength()
+				
+
+			while ((currentwl<wl-0.001) or (currentwl>wl+0.001)):
+					print('correcting for laser drift')
+					self.homelaser(wl)
+					currentwl=self.wm.measure_wavelength()
+					print('current target wavelength: '+str(wl))
+					print('actual wavelength: '+str(currentwl))
+					time.sleep(1)
+
+
+			print('taking data')
+			print('current frequency: '+str(freqs[i]))
+			print('current target wavelength: '+str(wl))
+			print('actual wavelength: '+str(self.wm.measure_wavelength()))
+			
+			time.sleep(1)
+
+			stoparray = []
+			startTime = time.time()
+			wls=[]
+			savefreqs=[]
+
+			self.hist = [0]*bincount
+			self.bins=list(range(len(self.hist)))
+			stopscheck=[]
+
+			# open pickle files to save timestamp data
+			times=open(PATH+'\\'+str(i)+'_times.p','wb')
+			channels=open(PATH+'\\'+str(i)+'_channels.p','wb')
+			vals=open(PATH+'\\'+str(i)+'_vals.p','wb')
+
+			lost = self.qutag.getLastTimestamps(True)
+
+			looptime=startTime
+			while looptime-startTime < runtime:
+				dataloss1 = self.qutag.getDataLost()
+				#print("dataloss: " + str(dataloss))
+
+				dataloss2 = self.qutag.getDataLost()
+				#print("dataloss: " + str(dataloss2SS))
+
+				# get the timestamps
+				timestamps = self.qutag.getLastTimestamps(True)
+
+				loopstart=time.time()
+
+				time.sleep(2)
+
+				dataloss1 = self.qutag.getDataLost()
+				#print("dataloss: " + str(dataloss))
+
+				dataloss2 = self.qutag.getDataLost()
+				#print("dataloss: " + str(dataloss))
+
+				# get the timestamps
+				timestamps = self.qutag.getLastTimestamps(True)
+
+				looptime+=time.time()-loopstart
+				
+				if dataloss1!=0:
+					print('dataloss: '+str(dataloss1))
+				
+				tstamp = timestamps[0] # array of timestamps
+				tchannel = timestamps[1] # array of channels
+				values = timestamps[2] # number of recorded timestamps
+
+				for k in range(values):
+					# output all stop events together with the latest start event
+					if tchannel[k] == start:
+						synctimestamp = tstamp[k]
+					else:
+						stoptimestamp = tstamp[k]
+						stoparray.append(stoptimestamp)
+						stopscheck.append(stoptimestamp)
+				currentwl=self.wm.measure_wavelength()
+				wls.append(str(currentwl))
+				savefreqs.append(float(freqs[i]))
+				looptime+=time.time()-loopstart
+
+				# quenchfix=self.reset_quench()
+				# if quenchfix!='YES':
+				# 	print('SNSPD quenched and could not be reset')
+				# 	self.fungen.output[1]='OFF'
+				# 	self.fungen.output[2]='OFF'
+				# 	endloop
+
+				#dump timestamp data to pickle file
+				pickle.dump(tstamp,times)
+				pickle.dump(tchannel,channels)
+				pickle.dump(values,vals)
+
+				while ((currentwl<wl-0.001) or (currentwl>wl+0.001)) and (time.time()-startTime < runtime):
+					print('correcting for laser drift')
+					self.homelaser(wl)
+					currentwl=self.wm.measure_wavelength()
+
+				for k in range(len(stopscheck)):
+					tdiff=stopscheck[k]
+					binNumber = int(tdiff*timebase*bincount/(period))
+					if binNumber<bincount:
+						self.hist[binNumber]+=1
+				stopscheck=[]
+
+				values = {
+					'x': self.bins,
+					'y': self.hist,
+				}
+
+				self.spectralDiffusion_wAWG.acquire(values)
+
+			# very important to flush the buffer
+			# if you don't do this, or don't close the files,
+			# then data stored for writing will use up RAM space
+			# and affect saving timestamps if the program is interrupted
+			times.flush() 
+			channels.flush()
+			vals.flush()
+
+			# close pickle files with timestamp data
+			times.close()
+			channels.close()
+			vals.close()
+
+			print('actual  wavelength: '+str(currentwl))
+
+			self.createHistogram(stoparray, timebase, bincount,period,str(i),wls,PATH,savefreqs)
+
+		self.fungen.output[EOMchannel]='OFF'  ##turn off the AWG for both channels
+		self.fungen.output[Pulsechannel]='OFF'
+		self.SRS.SIM928_on_off[vs1]='OFF'
+		self.SRS.SIM928_on_off[vs2]='OFF'		
 	"""
 	@Task()
 	def startpulse_wPM(self, timestep=100e-9):
@@ -949,6 +1402,22 @@ class PLThinFilm(Spyrelet):
 	@Task()
 	def fiberFilter(self):
 
+		qutagparams = self.qutag_params.widget.get()
+
+		vm1=qutagparams['Voltmeter Channel 1']
+		#vm2=qutagparams['Voltmeter Channel 2']
+		vs1=qutagparams['Battery Port 1']
+		#vs2=qutagparams['Battery Port 2']
+
+		self.SRS.clear_status()
+		self.SRS.SIM928_on_off[vs1]='OFF'		
+		self.SRS.SIM928_on_off[vs1]='ON'
+
+		##Qutag Part
+		self.configureQutag()
+		expparams = self.exp_parameters.widget.get()
+		wlparams = self.wl_parameters.widget.get()
+
 		self.fungen.output[1]='OFF'
 		self.fungen.output[2]='OFF'
 
@@ -963,17 +1432,19 @@ class PLThinFilm(Spyrelet):
 
 		# get the parameters for the experiment from the widget
 		fiberFilter_params=self.fiberFilter_params.widget.get()
-		startV=fiberFilter_params['Start voltage']
-		stopV=fiberFilter_params['Stop voltage']
+		startV=fiberFilter_params['Start V']
+		stopV=fiberFilter_params['Stop V']
 		runtime=fiberFilter_params['Runtime']
 		filterChannel=fiberFilter_params['Filter channel']
 		Pulsechannel=fiberFilter_params['Pulse channel']
+		print('filterChannel: '+str(filterChannel))
+		print('Pulsechannel: '+str(Pulsechannel))
 		Pulsefreq=fiberFilter_params['Pulse Frequency']
 		Pulsewidth=fiberFilter_params['Pulse Width']
 		period=fiberFilter_params['Pulse Repetition Period']
-		wl=fiberFilter_params['Wavelength']
 		points=fiberFilter_params['# of points']
 		foldername=fiberFilter_params['File Name']
+		wl=fiberFilter_params['Wavelength']
 
 		# convert the period & runtime to floats
 		period=period.magnitude
@@ -981,6 +1452,7 @@ class PLThinFilm(Spyrelet):
 
 		self.fungen.offset[filterChannel]=0
 
+		self.fungen.frequency[Pulsechannel]=Pulsefreq
 		self.fungen.pulse_width[Pulsechannel]=Pulsewidth
 
 
@@ -990,8 +1462,8 @@ class PLThinFilm(Spyrelet):
 
 		# home the laser
 		self.configureQutag()
-		self.homelaser(wl)
-		print('Laser Homed!')
+		#self.homelaser(wl)
+		#print('Laser Homed!')
 
 		##Qutag Part
 		qutagparams = self.qutag_params.widget.get()
@@ -1003,9 +1475,9 @@ class PLThinFilm(Spyrelet):
 		start = qutagparams['Start Channel']
 		stop = qutagparams['Stop Channel']
 
-		PATH="D:\\Data\\"+str(foldername)
+		PATH="Q:\\Data\\"+str(foldername)
 		print('PATH: '+str(PATH))
-		if PATH!="D:\\Data\\":
+		if PATH!="Q:\\Data\\":
 			if (os.path.exists(PATH)):
 				print('deleting old directory with same name')
 				os.system('rm -rf '+str(PATH))
@@ -1016,7 +1488,25 @@ class PLThinFilm(Spyrelet):
 			print("Specify a foldername & rerun task.")
 			print("Task will error trying to saving data.")
 
-		voltages=np.linspace(startV,stopV,points)
+		#wlTargets=np.linspace(wlparams['start'],wlparams['stop'],points)
+		
+		# convert target wavelengths to target voltages
+		"""
+		wlmin=1530.340 # corresponds to 0V
+		wlmax=1552.540 # corresponds to 4V (2V on AWG)
+		slope=2/(wlmax-wlmin)
+
+		startV=(wlparams['start']-wlmin)*slope
+		stopV=(wlparams['stop']-wlmin)*slope
+		"""
+
+		voltages=np.linspace(float(startV),float(stopV),points)
+
+		pulsewidth=self.fiberFilter_params.widget.get()['Pulse Width']
+		period=self.fiberFilter_params.widget.get()['Pulse Repetition Period']
+		qutagparams = self.qutag_params.widget.get()
+		bins=qutagparams['Bin Count']
+		self.cutoff=int(math.ceil(pulsewidth/period*bins))
 
 		for i in range(points):
 			self.fungen.offset[filterChannel]=voltages[i]
@@ -1040,26 +1530,53 @@ class PLThinFilm(Spyrelet):
 
 
 			print('taking data')
+			print('current target wavelength: '+str(wl))
 			print('current target voltage: '+str(voltages[i]))
 			
 			time.sleep(1)
 
 
 			stoparray = []
+			stopscheck=[]
+
 			startTime = time.time()
 			wls=[]
 			saveVoltages=[]
 			lost = self.qutag.getLastTimestamps(True)
 
+			# open pickle files to save timestamp data
+			times=open(PATH+'\\'+str(i)+'_times.p','wb')
+			channels=open(PATH+'\\'+str(i)+'_channels.p','wb')
+			vals=open(PATH+'\\'+str(i)+'_vals.p','wb')
+
+			self.hist = [0]*bincount
+			self.bins=list(range(len(self.hist)))
+
 			looptime=startTime
 			while looptime-startTime < runtime:
-				loopstart=time.time()
-				# get the lost timestamps
-				lost = self.qutag.getLastTimestamps(True)
-				# wait half a milisecond
-				time.sleep(5*0.1)
-				# get thte timestamps in the last half milisecond
+				dataloss1 = self.qutag.getDataLost()
+				#print("dataloss: " + str(dataloss))
+
+				dataloss2 = self.qutag.getDataLost()
+				#print("dataloss: " + str(dataloss))
+
+				# get the timestamps
 				timestamps = self.qutag.getLastTimestamps(True)
+
+				loopstart=time.time()
+
+				time.sleep(2)
+
+				dataloss1 = self.qutag.getDataLost()
+				#print("dataloss: " + str(dataloss))
+
+				dataloss2 = self.qutag.getDataLost()
+				#print("dataloss: " + str(dataloss))
+
+				# get the timestamps
+				timestamps = self.qutag.getLastTimestamps(True)
+
+				looptime+=time.time()-loopstart
 
 				tstamp = timestamps[0] # array of timestamps
 				tchannel = timestamps[1] # array of channels
@@ -1067,15 +1584,32 @@ class PLThinFilm(Spyrelet):
 
 				for k in range(values):
 					# output all stop events together with the latest start event
-					if tchannel[k] == start:
-						synctimestamp = tstamp[k]
-					else:
+					if tchannel[k] == stop:
 						stoptimestamp = tstamp[k]
 						stoparray.append(stoptimestamp)
+						stopscheck.append(tstamp[k])
 				currentwl=self.wm.measure_wavelength()
 				wls.append(str(currentwl))
 				saveVoltages.append(float(voltages[i]))
-				looptime+=time.time()-loopstart
+
+				for k in range(len(stopscheck)):
+					tdiff=stopscheck[k]
+					binNumber = int(tdiff*timebase*bincount/(period))
+					if binNumber<bincount:
+						self.hist[binNumber]+=1
+				stopscheck=[]
+
+				values = {
+					'x': self.bins,
+					'y': self.hist,
+				}
+				#print('updating histogram')
+				self.fiberFilter.acquire(values)
+
+				#dump timestamp data to pickle file
+				pickle.dump(tstamp,times)
+				pickle.dump(tchannel,channels)
+				pickle.dump(values,vals)
 
 				# quenchfix=self.reset_quench()
 				# if quenchfix!='YES':
@@ -1092,9 +1626,121 @@ class PLThinFilm(Spyrelet):
 
 			self.createHistogram(stoparray, timebase, bincount,period,str(i),wls,PATH,saveVoltages)
 
+			times.flush() 
+			channels.flush()
+			vals.flush()
+
+			# close pickle files with timestamp data
+			times.close()
+			channels.close()
+			vals.close()
+
 		self.fungen.output[filterChannel]='OFF'  ##turn off the AWG for both channels
+		self.SRS.SIM928_on_off[vs1]='OFF'
 		#self.SRS.SIMmodule_off[6] ##turn off the SNSPD power suppy after the measurement
-		
+
+	# this task gets the current position of the attocube x,y, and z axes
+	@Task(name = 'Voltmeter')
+	def Voltmeter(self):
+		while True:
+			qutagparams = self.qutag_params.widget.get()
+			self.vm1=qutagparams['Voltmeter Channel 1']
+			self.vm2=qutagparams['Voltmeter Channel 2']
+			self.v1=float(self.SRS.SIM970_voltage[self.vm1].magnitude)
+			self.v2=float(self.SRS.SIM970_voltage[self.vm2].magnitude)
+			# don't really understand the point of acquiring the "values"
+			values = {
+				'vm1': self.v1,
+				'vm2': self.v2
+			}
+			self.Voltmeter.acquire(values)
+			#print(values)
+			time.sleep(0.05)
+			#print(self.Voltmeter.acquired)
+		return 
+
+	# sets up some formatting of x, y, and z positions
+	@Element(name='indicator')
+	def voltmeter_now(self):
+		text = QTextEdit()
+		text.setPlainText('Voltage 1: non V \nVoltage 2: non V\n')
+		return text
+
+	# more formatting of the position units
+	@voltmeter_now.on(Voltmeter.acquired)
+	def _voltmeter_now_update(self,ev):
+		w=ev.widget
+		w.setPlainText('Voltage 1: %f V \nVoltage 2: %f V \n'%(self.v1,self.v2))
+		return
+
+
+	# the 1D plot widget is used for the live histogram
+	@Element(name='fiberFilter Histogram')
+	def fiberFilter_Histogram(self):
+		p = LinePlotWidget()
+		p.plot('fiberFilter Histogram')
+		return p
+
+	# more code for the histogram plot
+	@fiberFilter_Histogram.on(fiberFilter.acquired)
+	def _fiberFilter_Histogram_update(self, ev):
+		w = ev.widget
+		# cut off pulse in display
+		xs = np.array(self.bins)[self.cutoff:]
+		ys = np.array(self.hist)[self.cutoff:]
+		w.set('fiberFilter Histogram',xs=xs,ys=ys)
+		return
+
+	# the 1D plot widget is used for the live histogram
+	@Element(name='SD Histogram')
+	def SD_Histogram(self):
+		p = LinePlotWidget()
+		p.plot('SD Histogram')
+		return p
+
+	# more code for the histogram plot
+	@SD_Histogram.on(spectralDiffusion_wAWG.acquired)
+	def _SD_Histogram_update(self, ev):
+		w = ev.widget
+		# cut off pulse in display
+		xs = np.array(self.bins)[(self.cutoff+1):]
+		ys = np.array(self.hist)[(self.cutoff+1):]
+		w.set('SD Histogram',xs=xs,ys=ys)
+		return
+
+	# the 1D plot widget is used for the live histogram
+	@Element(name='Histogram')
+	def Histogram(self):
+		p = LinePlotWidget()
+		p.plot('Histogram')
+		return p
+
+	# more code for the histogram plot
+	@Histogram.on(startpulse.acquired)
+	def _Histogram_update(self, ev):
+		w = ev.widget
+		# cut off pulse in display
+		xs = np.array(self.bins)[(self.cutoff+1):]
+		ys = np.array(self.hist)[(self.cutoff+1):]
+		w.set('Histogram',xs=xs,ys=ys)
+		return
+
+	# the 1D plot widget is used for the live histogram
+	@Element(name='dark count Histogram')
+	def dc_Histogram(self):
+		p = LinePlotWidget()
+		p.plot('dark count Histogram')
+		return p
+
+	# more code for the histogram plot
+	@dc_Histogram.on(darkcounts.acquired)
+	def _dc_Histogram_update(self, ev):
+		w = ev.widget
+		# cut off pulse in display
+		xs = np.array(self.bins)[(self.cutoff+1):]
+		ys = np.array(self.hist)[(self.cutoff+1):]
+		w.set('dark count Histogram',xs=xs,ys=ys)
+		return
 
 	@Task()
 	def qutagInit(self):
@@ -1189,15 +1835,15 @@ class PLThinFilm(Spyrelet):
 		(rough estimate for equal amplitude sidebands)
 		"""
 		params=[
-		('Start voltage',{'type':float,'default':0,'units':'V'}),
-		('Stop voltage',{'type':float,'default':1.366,'units':'V'}),
+		('Start V',{'type':float,'default':0}),
+		('Stop V',{'type':float,'default':2}),
+		('Wavelength',{'type':float,'default':1536}),
 		('Runtime',{'type':float,'default':600,'units':'s'}),
 		('Filter channel',{'type':int,'default':2}),
 		('Pulse channel',{'type':int,'default':1}),
 		('Pulse Repetition Period',{'type': float,'default': 0.050,'units':'s'}),
 		('Pulse Frequency',{'type': int,'default': 20,'units':'Hz'}),
 		('Pulse Width',{'type': float,'default': 8e-3,'units':'s'}),
-		('Wavelength',{'type':float,'default':1535.61}),
 		('# of points',{'type':int,'default':15}),
 		('File Name',{'type':str}),
 		]

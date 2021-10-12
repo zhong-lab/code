@@ -97,8 +97,8 @@ class SynthNVPro(MessageBasedDriver):
 if __name__=='__main__':
 	from lantz.log import log_to_screen, DEBUG
 	log_to_screen(DEBUG)
-	with SynthNVPro('ASRL16::INSTR') as inst:
+	with SynthNVPro('ASRL3::INSTR') as inst:
 		print(inst.output)
 		inst.frequency=200
-		inst.power=0
+		inst.power=17
 		inst.output=0

@@ -74,7 +74,7 @@ class ALIGNMENT(Spyrelet):
 
             # scan the along the x axis for this row
             j = 0
-            for while j < self.x_steps:
+            while j < self.x_steps:
                 self.attocube.single_step(self.axis_index_x,1)
                 #self.pw[i,j] = self.daq.read() # save the power at this point
                 p=self.pmd.power.magnitude*1000

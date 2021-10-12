@@ -396,17 +396,17 @@ class PLThinFilm(Spyrelet):
 		self.fungen.frequency[1]=expparams['AWG Pulse Frequency']
 		self.fungen.voltage[1]=3.5
 		self.fungen.offset[1]=1.75
-		self.fungen.phase[1]=-3   
+		self.fungen.phase[1]=0   
 		self.fungen.pulse_width[1]=expparams['AWG Pulse Width']
 		self.fungen.waveform[1]='PULS'
 		self.fungen.output[1]='ON'
 		
 
 		#PATH="C:\\Data\\12.18.2020_ffpc\\"+self.exp_parameters.widget.get()['File Name']+"\\motor_scan"
-		PATH="C:\\Data\\2.26.2021_GNR_Er\\bare_Er2O3_76\\"+self.exp_parameters.widget.get()['File Name']
+		PATH="Q:\\Data\\5.28.2021_ffpc\\"+self.exp_parameters.widget.get()['File Name']
 		print('here')
 		print('PATH: '+str(PATH))
-		if PATH!="C:\\Data\\2.26.2021_GNR_Er\\bare_Er2O3_76\\":
+		if PATH!="Q:\\Data\\5.28.2021_ffpc\\":
 			if (os.path.exists(PATH)):
 				print('deleting old directory with same name')
 				os.system('rm -rf '+str(PATH))
@@ -837,8 +837,8 @@ class PLThinFilm(Spyrelet):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
 		# ('start', {'type': float, 'default': 1535.665}),
-		('start', {'type': float, 'default': 1535.90}),
-		('stop', {'type': float, 'default':  1535.90})
+		('start', {'type': float, 'default': 1535.527}),
+		('stop', {'type': float, 'default':  1535.685})
 		# ('stop', {'type': float, 'default': 1535.61})
 		]
 		w = ParamWidget(params)
@@ -860,12 +860,12 @@ class PLThinFilm(Spyrelet):
 	def exp_parameters(self):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
-		('# of points', {'type': int, 'default': 1}),
-		('Measurement Time', {'type': int, 'default': 300, 'units':'s'}),
+		('# of points', {'type': int, 'default': 40}),
+		('Measurement Time', {'type': int, 'default': 180, 'units':'s'}),
 		('File Name', {'type': str}),
-		('AWG Pulse Repetition Period',{'type': float,'default': 0.05,'units':'s'}),
-		('AWG Pulse Frequency',{'type': int,'default': 20,'units':'Hz'}),
-		('AWG Pulse Width',{'type': float,'default': 200e-6,'units':'s'}),
+		('AWG Pulse Repetition Period',{'type': float,'default': 2e-3,'units':'s'}),
+		('AWG Pulse Frequency',{'type': int,'default': 500,'units':'Hz'}),
+		('AWG Pulse Width',{'type': float,'default': 300e-9,'units':'s'}),
 		]
 		w = ParamWidget(params)
 		return w
@@ -875,7 +875,7 @@ class PLThinFilm(Spyrelet):
 		params = [
 	#    ('arbname', {'type': str, 'default': 'arbitrary_name'}),,
 		('Start Channel', {'type': int, 'default': 0}),
-		('Stop Channel', {'type': int, 'default': 4}),
+		('Stop Channel', {'type': int, 'default': 2}),
 		('Bin Count', {'type': int, 'default': 1000}),
 		# ('Voltmeter Channel 1',{'type':int,'default':1}),
 		('Voltmeter Channel 2',{'type':int,'default':2}),

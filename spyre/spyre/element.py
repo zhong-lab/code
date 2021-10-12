@@ -60,6 +60,8 @@ class ElementWrapper(object):
                     trigger = getattr(self.widget, trigger)
                 self.get_on_handler(trigger, func, instance, force_process_all=force_process_all)
                 return
+            print(trigger)
+            print(self.ons)
             self.ons[trigger] = deferred
             return func
         return inner
