@@ -15,7 +15,7 @@ class MS2721B(MessageBasedDriver):
     end of the of a message.
     """
 
-    # DEFAULTS = {'COMMON': {'write_termination': '\n', 
+    # DEFAULTS = {'COMMON': {'write_termination': '\n',
     #                         'read_termination': '\n'}}
 
 
@@ -216,6 +216,25 @@ class MS2721B(MessageBasedDriver):
         # return self.write('MMEM:STOR:TRAC 0,"QvsBz_Rampdown_{}"'.format(value))
 
     @Action()
+    def format_usb_storage(self):
+        return self.write(':MMEMory:INITialize USB')
+        # Formats the USB Flash drive.
+
+    @Action()
+    def save_to_usb(self):
+        return self.write(':MMEMory:MSIS USB')
+        # Sets the USB Flash drive as the save location for all subsequently saved files.
+
+    @Action()
+    def save_to_internal_mem(self):
+        return self.write(':MMEMory:MSIS INTernal')
+        # Sets the instrument’s internal memory as the save location for all subsequently saved files.
+
+    @Feat()
+    def save_to_where(self):
+        return self.query(':MMEM:MSIS?')
+
+    @Action()
     def preset(self):
         self.write('*RST')
         # restores parameters in the current application as well as system settings to their factory default values
@@ -274,10 +293,9 @@ if __name__ == '__main__':
         #time.sleep(120)
         #inst.freq_cent=10*MHz
         #inst.freq_span=0*MHz
-        
+
         #inst.generator_power=-1*dBm
         #inst.generator='ON'
         #time.sleep(5)
         #print('generator power: {}'.format(inst.generator_power))
         #print('Marker_peak[{}]: {}'.format(channel,inst.marker_peak[channel]))
-        
