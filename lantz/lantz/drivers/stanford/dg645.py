@@ -324,8 +324,8 @@ if __name__ == '__main__':
 
     with DG645('TCPIP0::169.254.29.167::inst0::INSTR') as inst:
         # print('The identification number of this instrument is :' + str(inst.idn))
-        inst.Clear_Status
+        inst.idn
         # inst.Trigger_Source='Single shot'
         # inst.Trigger_Source='Internal'
         # inst.Trigger_Source='External falling edges'
-        inst.Trigger_Source='External rising edges'
+        #inst.Trigger_Source='External rising edges'

@@ -23,6 +23,8 @@ from lantz.drivers.keysight.seqbuild import SeqBuild
 from lantz.drivers.keysight import Keysight_33622A
 from lantz.drivers.stanford.srs900 import SRS900
 
+volt = Q_(1, 'V')
+
 class TwoPulse(Spyrelet):
 	requires = {
 		'fungen': Keysight_33622A
@@ -182,15 +184,17 @@ class TwoPulse(Spyrelet):
 			self.fungen.create_arbseq('twoPulse', seq, 1)
 			self.fungen.create_arbseq('shutter', seq2, 2)
 			self.fungen.wait()
-			self.fungen.voltage[1] = 3.3+0.000000000001*i
-			self.fungen.voltage[2]=0.6
-			self.fungen.offset[2] = 3.0
+			self.fungen.voltage[1] = (3.3+0.000000000001*i)*volt
+			self.fungen.voltage[2] = (0.6+0.000000000001*i)*volt
+			# self.fungen.offset[2] = 3.0*volt
 			
 			print(self.fungen.voltage[1], self.fungen.voltage[2])
 			self.fungen.output[1] = 'ON'
 			self.fungen.output[2] = 'ON'
-			self.fungen.trigger_delay(1,400e-9)
+			# self.fungen.trigger_delay(1,400e-9)
 			self.fungen.sync()
+			print(self.fungen.waveform[1])
+			print(self.fungen.waveform[2])
 
 			time.sleep(10000)
 

@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <key name="Software" modified="2019-06-26 14:19:54" build="180528">
 	<key name="ConEmu" modified="2019-06-26 14:19:54" build="180528">
-		<key name=".Vanilla" modified="2020-02-07 13:32:36" build="180528">
+		<key name=".Vanilla" modified="2022-06-24 14:34:34" build="180528">
 			<value name="UseCurrentSizePos" type="hex" data="01"/>
 			<value name="AutoSaveSizePos" type="hex" data="01"/>
 			<value name="Cascaded" type="hex" data="01"/>
 			<value name="IntegralSize" type="hex" data="00"/>
 			<value name="WindowMode" type="dword" data="0000051f"/>
-			<value name="ConWnd X" type="long" data="43"/>
-			<value name="ConWnd Y" type="long" data="187"/>
-			<value name="LastMonitor" type="string" data="0,0,1920,1040"/>
-			<value name="ConWnd Width" type="dword" data="0000004e"/>
-			<value name="ConWnd Height" type="dword" data="0000001d"/>
+			<value name="ConWnd X" type="long" data="203"/>
+			<value name="ConWnd Y" type="long" data="124"/>
+			<value name="LastMonitor" type="string" data="0,0,2048,1152"/>
+			<value name="ConWnd Width" type="dword" data="00000078"/>
+			<value name="ConWnd Height" type="dword" data="00000023"/>
 			<value name="16bit Height" type="ulong" data="0"/>
 			<value name="StartType" type="hex" data="02"/>
 			<value name="CmdLine" type="string" data=""/>

@@ -19,7 +19,7 @@ from lantz.drivers.spectrum import MS2721B
 from lantz.log import log_to_screen, DEBUG
 
 class SpectrumAnalyzer(Spyrelet):
-    
+
     requires = {
         'spa': MS2721B
     }
@@ -87,4 +87,4 @@ class SpectrumAnalyzer(Spyrelet):
         ('file count', {'type': int, 'default': 10}),
         ]
         w = ParamWidget(save_params)
-        return w  
+        return w

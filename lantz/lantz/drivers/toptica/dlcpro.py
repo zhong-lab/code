@@ -8,6 +8,17 @@
     Author: Alexandre Bourassa
     Date: 21/04/2017
 """
+'''
+TIPS: 
+If not sure what input values to give, refer to the output the controller returns.
+To query, use the same command with 'get' and no input.
+To give an input, use 'set'. 
+
+Want more commands than what is listed here? Go to the TOPAS software on the computer,
+click on menu, communication. Then do the thing you want the command for in the software, 
+and look at the command that shows up on the communication box!!! 
+'''
+
 
 import numpy as np
 from lantz import Action, Feat, DictFeat, ureg
@@ -142,6 +153,7 @@ class DLC(MessageBasedDriver):
         def piezo_enabled(self):
             return self.get_param('laser1:dl:pc:enabled')
 
+        # give True or False, or, 1 or 0 for value.
         @piezo_enabled.setter
         def piezo_enabled(self, val):
             return self.set_param('laser1:dl:pc:enabled', val)
@@ -254,6 +266,24 @@ class DLC(MessageBasedDriver):
         def set_output(self, val):
             return self.set_param('laser1:dl:cc:enabled', val)
 
+
+        ##Power Stabilization
+        @Feat(values={True: '#t', False: '#f'})
+        def power_stabilization_enabled(self):
+            return self.get_param('laser1:power-stabilization:enabled')
+
+        # give True or False, or, 1 or 0 for value.
+        @power_stabilization_enabled.setter
+        def power_stabilization_enabled(self, val):
+            return self.set_param('laser1:power-stabilization:enabled', val)
+
+        @Feat()
+        def power_setpoint(self):
+            return self.get_param('laser1:power-stabilization:setpoint')
+        # set power in mW
+        @power_setpoint.setter
+        def power_setpoint(self, val):
+            return self.set_param('laser1:power-stabilization:setpoint', val)
 
 class DLCException(Exception):
     pass

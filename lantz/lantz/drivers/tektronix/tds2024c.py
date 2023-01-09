@@ -174,7 +174,7 @@ class TDS2024C(MessageBasedDriver):
 
     @Action()
     def average(self, number):
-        if number in (4,16,64,128): 
+        if number in (4,16,64,128):
             self.write('ACQ:NUMAV {}'.format(number))
         else:
             print('can only average over 4, 16, 64, or 128 samples!')
@@ -217,20 +217,21 @@ if __name__ == '__main__':
 
     log_to_screen(DEBUG)
     with TDS2024C(args.port) as osc:
-        osc.init()
+        #osc.init()
         # print(osc.idn)
-        osc.set_time(0)
+        #osc.set_time(0)
         # print(osc.trigger)
         # osc.average(16)
-        osc.position(1,1)
-        osc.scale(1,0.05)
-        osc.mode = 'sample'
-        x,y = osc.curv()
-        x = np.array(x)
-        x = x-x.min()
-        y = np.array(y)
-        plt.plot(x,y)
-        plt.show()
+        #osc.position(1,1)
+        #osc.scale(1,0.05)
+        #osc.datasource=
+        #osc.mode = 'sample'
+        #x,y = osc.curv()
+        #x = np.array(x)
+        #x = x-x.min()
+        #y = np.array(y)
+        #plt.plot(x,y)
+        #plt.show()
         # osc.forcetrigger()
         # osc.triggerlevel()
         # osc.trigger = "AUTO"
@@ -241,23 +242,31 @@ if __name__ == '__main__':
         # if args.view:
         #     import matplotlib.pyplot as plt
         #     import numpy as np
+         """
+         the following prints the channels to a CSV file and also plots the
+         oscilloscope screen.
+         """
+         filename="max_coupling"
+         plotlist=[]
+         colors=plt.rcParams["axes.prop_cycle"].by_key()["color"]
+         with open(filename+".csv", "w", newline='') as myfile:
+             wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
+             #wr.writerow(['Channel', 'Freq', 'Max', 'Min', 'Mean'])
+             alllists=[]
+             for channel in args.Channels:
+                 osc.datasource(channel)
+                 x,y = osc.curv()
+                 xlist=list(x)
+                 ylist=list(y)
+                 if len(plotlist)==0:
+                     fig,ax=plt.subplots()
+                 else:
+                     ax=ax.twinx()
+                 p=ax.plot(xlist,ylist,color=colors[channel])
+                 plotlist.append(p)
+                 alllists.append(xlist)
+                 alllists.append(ylist)
+             for i in range(len(x)):
+                 wr.writerow(([l[i] for l in alllists]))
 
-        # with args.output as fp:
-        #     writer = csv.writer(fp, dialect='excel')
-        #     writer.writerow(['Channel', 'Freq', 'Max', 'Min', 'Mean'])
-        #     for channel in args.Channels:
-        #         osc.datasource(channel)
-        #         writer.writerow(([channel, osc.measure_frequency(channel),
-        #                             osc.measure_max(channel),
-        #                             osc.measure_min(channel),
-        #                             osc.measure_mean(channel)]))
-
-        #         if args.view:
-        #             x, y = osc.curv()
-        #             x = np.array(x)
-        #             x = x - x.min()
-        #             y = np.array(y)
-        #             plt.plot(x, y)
-
-        # if args.view:
-        #     plt.show()
+         plt.show()

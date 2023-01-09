@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <key name="Software" modified="2019-06-26 14:19:54" build="180528">
 	<key name="ConEmu" modified="2019-06-26 14:19:54" build="180528">
-		<key name=".Vanilla" modified="2019-06-26 14:20:09" build="180528">
+		<key name=".Vanilla" modified="2022-06-22 22:10:15" build="180528">
 			<value name="UseCurrentSizePos" type="hex" data="01"/>
 			<value name="AutoSaveSizePos" type="hex" data="01"/>
 			<value name="Cascaded" type="hex" data="01"/>
 			<value name="IntegralSize" type="hex" data="00"/>
 			<value name="WindowMode" type="dword" data="0000051f"/>
-			<value name="ConWnd X" type="long" data="650"/>
-			<value name="ConWnd Y" type="long" data="0"/>
-			<value name="LastMonitor" type="string" data="0,0,1600,1160"/>
-			<value name="ConWnd Width" type="dword" data="00000066"/>
-			<value name="ConWnd Height" type="dword" data="00000035"/>
+			<value name="ConWnd X" type="long" data="534"/>
+			<value name="ConWnd Y" type="long" data="349"/>
+			<value name="LastMonitor" type="string" data="0,0,2048,1152"/>
+			<value name="ConWnd Width" type="dword" data="00000061"/>
+			<value name="ConWnd Height" type="dword" data="00000023"/>
 			<value name="16bit Height" type="ulong" data="0"/>
 			<value name="StartType" type="hex" data="02"/>
 			<value name="CmdLine" type="string" data=""/>
@@ -55,6 +55,9 @@
 			<key name="HotKeys" modified="2019-06-26 14:20:00" build="180528">
 				<value name="MinimizeRestore" type="dword" data="000011c0"/>
 			</key>
+			<value name="CmdLineHistory" type="multi">
+				<line data="{Shells::cmd}"/>
+			</value>
 		</key>
 	</key>
 </key>

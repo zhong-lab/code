@@ -70,16 +70,16 @@ class SRS900(MessageBasedDriver):
     @Action()
     def flushoutput(self):
       self.write('FLOQ')
-      #print('Output Queue Flushed')   
+      #print('Output Queue Flushed')
 
     @Action()
     def wait(self):
       self.write('*WAI')
-      print('Waiting to Continue')	
+      print('Waiting to Continue')
 
     @Action()
     def wait_time(self, value):
-      self.write('WAIT {}'.format(value))		
+      self.write('WAIT {}'.format(value))
 
     @DictFeat(keys=list(range(1,8)))
     def SIMmodule_on(self,key):
@@ -89,7 +89,7 @@ class SRS900(MessageBasedDriver):
     @DictFeat(keys=list(range(1,8)))
     def SIMmodule_off(self,key):
       self.write('SNDT {},"OPOF"'.format(key))
-      print("Output Off") 	  
+      print("Output Off")
 
 
     @DictFeat(values={'OFF': 0, 'ON': 1},keys=list(range(1,8)))
@@ -109,12 +109,12 @@ class SRS900(MessageBasedDriver):
     @DictFeat(keys=list(range(1,8)))
     def module_clear_status(self,key):
       self.write('SNDT {},"*CLS"'.format(key))
-      #print("Status Cleared")   
+      #print("Status Cleared")
 
     @DictFeat(keys=list(range(1,8)))
     def module_identify(self,key):
       self.write('SNDT {},"*IDN?"'.format(key))
-      return self.query('GETN? {},80'.format(key)) 
+      return self.query('GETN? {},80'.format(key))
 
     @DictFeat(units='V',limits=(-20,20,0.001),keys=list(range(1,8)))
     def SIM928_voltage(self,key):
@@ -123,7 +123,7 @@ class SRS900(MessageBasedDriver):
       self.write('SNDT {},"VOLT?"'.format(key))
       self.wait_time(10)
       return self.query('GETN? {},80'.format(key))
-      
+
     @SIM928_voltage.setter
     def SIM928_voltage(self,key,value):
    	  self.write('SNDT {},"VOLT {}"'.format(key, float(round(value,3))))
@@ -150,8 +150,8 @@ class SRS900(MessageBasedDriver):
 
     @DictFeat(units='V',keys=list(range(1,5)))
     def SIM970_voltage(self,key):
-      """ port manually set to 7 (8 will work as well since voltmeter occupies both ports). 
-      Key is the channel of the voltmeter being read. 
+      """ port manually set to 7 (8 will work as well since voltmeter occupies both ports).
+      Key is the channel of the voltmeter being read.
       """
       self.flush()
       self.flushoutput()
@@ -163,7 +163,7 @@ class SRS900(MessageBasedDriver):
 
       num=self.split_msg(msg,key)
       return num
-    
+
     # @DictFeat(units = 'V',keys = list(range(1,4)))
     # def SIM970_voltage(self,key):
     #   self.reset()
@@ -186,25 +186,19 @@ if __name__ == '__main__':
     # this is the GPIB Address:
     with SRS900('GPIB0::2::INSTR') as inst:
       inst.clear_status()
+      print(inst.idn)
       # v2=inst.SIM970_voltage[1]
 
-      inst.clear_status()
-      v2=inst.SIM970_voltage[2]
+      #inst.clear_status()
+      #v2=inst.SIM970_voltage[2]
 
-      
+
       # inst.SIM928_on_off[5]='OFF'
       # inst.SIM928_on_off[5]='ON'
       #inst.SIM928_on_off[6]='OFF'
       #inst.SIM928_on_off[6]='ON'
-      
 
-      inst.SIMmodule_on[6]
-      inst.SIMmodule_off[6]
+
+      #inst.SIMmodule_on[6]
+      #inst.SIMmodule_off[6]
       #inst.SIM970_voltage[5]
-      
-
-
-
-
-
-        

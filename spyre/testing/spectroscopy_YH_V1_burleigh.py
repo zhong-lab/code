@@ -1,0 +1,42 @@
+devices = {
+    'fungen':[
+        'lantz.drivers.keysight.Keysight_33622A.Keysight_33622A',
+        ['TCPIP0::A-33622A-01461.local::inst0::INSTR'], # connecting function generator with ethernet works better for Arb mode
+        {}
+    ],
+  # 'source':[
+  #       'lantz.drivers.agilent.N5181A.N5181A',
+  #       ['GPIB1::19::INSTR'], # connecting function generator with ethernet works better for Arb mode
+  #       {}
+  #   ],
+    'wm': [
+        'lantz.drivers.burleigh.WA7600',
+        ['GPIB1::10::INSTR'],
+        {}
+    ],
+    'SRS':[
+        'lantz.drivers.stanford.srs900.SRS900',
+        ['GPIB0::2::INSTR'],   ##SRS - power suppy for the SNSPD
+        {}
+    ],
+    'windfreak':[
+        'lantz.drivers.windfreak.synthnvpro.SynthNVPro',
+        ['ASRL3::INSTR'], # connecting windfreak, the port number could change time to time
+        {}
+    ],
+}
+
+# Experiment List
+spyrelets = {
+    'spectroscopy_YH_V1_burleigh':[
+        'spyre.spyrelets.spectroscopy_YH_V1_burleigh_spyrelet.PLThinFilm',
+        {
+            'fungen': 'fungen',
+            'wm':'wm',
+            'SRS':'SRS',
+            # 'source':'source'
+            'windfreak':'windfreak',
+        },
+        {}
+    ],
+}

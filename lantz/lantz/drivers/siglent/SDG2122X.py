@@ -31,7 +31,6 @@ class SDG2122X(MessageBasedDriver):
 	def operation_completed(self):
 		return self.query('*OPC?')
 
-
 	@Action()
 	def turnon(self, key):
 		self.write('C{}:OUTP ON'.format(key))

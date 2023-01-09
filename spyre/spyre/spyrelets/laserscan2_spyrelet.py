@@ -34,16 +34,16 @@ class LaserScan(Spyrelet):
         'pmd':PM100D
 
     }
-    conn1 = SerialConnection('1.1.1.2')
+    conn1 = NetworkConnection('1.1.1.2')
 
     dlc = Client(conn1)
-    
+
     #daq = nidaqmx.Task()
     #daq.ai_channels.add_ai_voltage_chan("Dev1/ai3")
-    
+
     @Task()
     def scan(self):
-        param=self.parameters.widget.get()     
+        param=self.parameters.widget.get()
         filename = param['Filename']
         F =open(filename+'.dat','w')
         f=filename+'\'.dat'
@@ -58,14 +58,14 @@ class LaserScan(Spyrelet):
         with Client(self.conn1) as dlc:
             print('here')
             for x in range(n):
-                xx=[]            
+                xx=[]
                 dlc.set("laser1:ctl:wavelength-set",start_wavelength)
                 time.sleep(8)
                 for item in self.wv:
                     dlc.set("laser1:ctl:wavelength-set",item)
                     time.sleep(0.005)
                     #xx.append(self.daq.read())
-                    
+
                     xx.append(self.pmd.power.magnitude*1000000)
                 time.sleep(1)
 

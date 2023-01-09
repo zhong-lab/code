@@ -12,7 +12,7 @@ class Keysight_33622A(MessageBasedDriver):
 	protocol implementation also has a native mechanism to specify the
 	end of the of a message.
 	"""
- 
+
 	DEFAULTS = {'COMMON':{'write_termination': '\n', 'read_termination': '\n'}}
 
 	@Feat()
@@ -131,7 +131,7 @@ class Keysight_33622A(MessageBasedDriver):
 		"""
 		self.write('*WAI')
 
-	@DictFeat(units='V', limits=(10,), keys=(1, 2))
+	@DictFeat(units='V', limits=(-10,10), keys=(1, 2))
 	def voltage(self, key):
 		"""returns current voltage
 		"""
@@ -142,13 +142,13 @@ class Keysight_33622A(MessageBasedDriver):
 		"""Voltage setter
 		"""
 		self.write('SOURCE{}:VOLT {}'.format(key, value))
-	
-	@DictFeat(units='V', limits=(-5, 5, .0001), keys=(1, 2))
+
+	@DictFeat(units='V', limits=(-10, 10, .0001), keys=(1, 2))
 	def offset(self, key):
 		"""returns current voltage offset
 		"""
 		return float(self.query('SOURCE{}:VOLT:OFFS?'.format(key)))
-	
+
 	@offset.setter
 	def offset(self, key, value):
 		"""Voltage offset setter
@@ -196,7 +196,7 @@ class Keysight_33622A(MessageBasedDriver):
 		"""returns current waveform function
 		"""
 		return self.query('SOURCE{}:FUNC?'.format(key))
-	
+
 	@waveform.setter
 	def waveform(self, key, value):
 		"""waveform function setter
@@ -208,13 +208,13 @@ class Keysight_33622A(MessageBasedDriver):
 		"""returns current waveform function
 		"""
 		return self.query('SOURCE{}:APPL?'.format(key))
-	
+
 	@waveform.setter
 	def awave(self, key, value):
 		"""waveform function setter
 		"""
 		self.write('SOURCE{}:APPL {}'.format(key, value))
-				   
+
 	@Action()
 	def abort(self):
 		"""Halts a sequence, list, sweep, or burst, even an infinite burst.
@@ -307,7 +307,7 @@ class Keysight_33622A(MessageBasedDriver):
 		Loads each waveform into internal memory, then stores the total sequence
 		as "seqname.seq" in internal memory
 		"""
-		
+
 		seqstring = '"{}"'.format(seqname)
 
 		for i in range(len(seqlist)):
@@ -397,7 +397,6 @@ if __name__ == '__main__':
 		# inst.frequency[2] = 60 * Hz
 		# inst.voltage[2] = 3.5 * V
 		# inst.offset[2] = 1.75 * V
-		inst.output[2] = 'OFF'
 
 		#print(str(inst.read_standard_event_status_register))
 		#inst.output[1] = 'ON'

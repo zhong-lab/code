@@ -31,7 +31,7 @@ class BulkT1(Spyrelet):
 	}
 
 	def saveData(self, wl, x, y,i):
-		out_name = "D:\\Data\\5.25.2019\\OpticalT1"  
+		out_name = "D:\\Data\\5.25.2019\\OpticalT1"
 		np.savez(os.path.join(out_name,str(i)),wl,x,y)
 
 	@Task()
@@ -91,4 +91,3 @@ class BulkT1(Spyrelet):
 		]
 		w = ParamWidget(params)
 		return w
-

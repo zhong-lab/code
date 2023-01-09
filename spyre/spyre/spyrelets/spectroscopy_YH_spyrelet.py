@@ -2883,5 +2883,4 @@ class PLThinFilm(Spyrelet):
 
 	@qutagInit.finalizer
 	def finalize(self):
->>>>>>> 6aaa88ed54b1098234fc40753aab9fe4af5e562d
 		return

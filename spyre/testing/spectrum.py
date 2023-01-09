@@ -12,7 +12,7 @@ devices = {
 spyrelets = {
     'spectrum':[
         'spyre.spyrelets.spectrumanalyzer.SpectrumAnalyzer',
-        {'spa': 'spa'}, 
+        {'spa': 'spa'},
         {}
     ]
 }

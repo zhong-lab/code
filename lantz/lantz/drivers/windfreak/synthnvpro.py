@@ -6,13 +6,45 @@ from lantz.messagebased import MessageBasedDriver
 from time import sleep
 
 class SynthNVPro(MessageBasedDriver):
+	"""
+	IMPORTANT NOTE:
+	Communication port number could change from time to time or if the device is
+	unplugged and plugged in again. Under incorrect port number will get TMO time
+	out error. To find the port number the computer assigns to it, either run
+	python from terminal,
+
+	import pyvisa
+	rm = pyvisa.ResourceManager()
+	rm.list_resources()
+	# here unplug the device and run the above command again to identify the
+	address of SynthNVP.
+	quit()
+
+	Could also go to device manager and do the plug and unplug to see port number.
+	Then go to NIMax and find the address of with that port number.
+
+    For SynthNVP make sure you can connect via the GUI first, then the COM port
+    number should also show up in the maximized window of the GUI.
+
+	NOTE:
+	If device is connected via software GUI or the pyvisa from python terminal,
+	it is occupied and cannot be accessed via the spyrelet. Quit those processes
+	first.
+
+	-- Shawn
+	"""
+	# Synth NVP doesn't have these write or read terminations for purpose of speed
+	# Details see programming manual from website
+
+	# DEFAULTS = {'COMMON': {'write_termination': '\n',
+	#                         'read_termination': '\n'}}
 
 	@Feat()
 	def output(self):
 		"""returns if output is on or off
 		"""
 		return self.query('E?')
-	
+
 	@output.setter
 	def output(self, value):
 		"""sets output to on: 1, or off: 0

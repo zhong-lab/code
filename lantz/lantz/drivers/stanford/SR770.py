@@ -3,7 +3,7 @@
 
 	Implementation of SRS900 Mainframe
 
-	Author: Hong Qiao
+	Author: Sir Hong Qiao
 	Date: 5/13/2021
 """
 
@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 import time
 
 class SR770(MessageBasedDriver):
-	"""This is the driver for the Stanford Research Systems DG645."""
+	"""This is the driver for the Stanford Research Systems SR770 (low frequency RF spectrum analyzer)."""
 
 	DEFAULTS = {'COMMON': {'write_termination': '\n',
 						   'read_termination': '\r\n'}}
@@ -112,7 +112,7 @@ class SR770(MessageBasedDriver):
 	#     # params = self.acqparams()
 	#     ydata = self.query_ascii('SPEC? 0')
 	#     xdata = self.query_ascii('BVAL? 0')
-	#     #print('data',data)    
+	#     #print('data',data)
 	#     return xdata,ydata
 
 
@@ -175,8 +175,8 @@ if __name__ == '__main__':
 	#       y = np.array(y)
 	#       x_full=np.concatenate([x_full,x])
 	#       y_full=np.concatenate([y_full,y])
-		
-		
+
+
 	#       #plt.plot(x,y)
 	#       x_max=max(x)
 
@@ -189,6 +189,3 @@ if __name__ == '__main__':
 	# plt.plot(x_full,y_full)
 	# plt.show()
 	  # v2=inst.SIM970_voltage[1]
-
-	  
-
